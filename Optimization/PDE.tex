@@ -1,0 +1,3153 @@
+\documentclass[a4paper,11pt,fleqn]{book}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[colorlinks = true, linkcolor = blue]{hyperref}
+
+% algorithm / pseudocode
+\usepackage{algpseudocode}
+
+\usepackage{amsmath,amssymb,amsthm,textcomp}
+\usepackage{multicol}
+\usepackage{tikz}
+\usepackage[normalem]{ulem}
+\usepackage{bbm} % characteristic function
+\usepackage{cancel}
+\usepackage{esint} % integral mean
+
+\usepackage{geometry}
+\geometry{left=10mm,right=10mm,%
+bindingoffset=0mm, top=10mm,bottom=5mm}
+
+\renewcommand{\thechapter}{\Roman{chapter}}
+\renewcommand*\thesection{\arabic{section}}
+
+\newtheorem{theorem}{Theorem}[section]
+\renewcommand{\thetheorem}{\arabic{section}.\arabic{theorem}}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\renewcommand{\thedefinition}{\arabic{section}.\arabic{definition}}
+
+\newtheorem*{example}{Example}
+\newtheorem{assumption}{Assumption}[section]
+\newtheorem{exercise}{Exercise}[chapter]
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem{review}{Review}
+
+\linespread{1.3}
+\newcommand{\linia}{\rule{\linewidth}{0.5pt}}
+
+% custom footers and headers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{}
+\chead{}
+\rhead{}
+\lfoot{}
+\cfoot{}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+
+% symbols
+\AtBeginDocument{
+  \let\ran\relax
+  \DeclareMathOperator{\dom}{dom}
+  \DeclareMathOperator{\ran}{ran}
+}
+\DeclareMathOperator{\var}{Var}
+\AtBeginDocument{
+  \let\div\relax
+  \DeclareMathOperator{\div}{div}
+}
+\DeclareMathOperator*{\esssup}{ess\, sup}
+\DeclareMathOperator*{\spa}{span}
+\DeclareMathOperator*{\dist}{dist}
+\DeclareMathOperator*{\supp}{supp}
+\DeclareMathOperator*{\rank}{rank}
+\DeclareMathOperator*{\interior}{int}
+\DeclareMathOperator*{\epi}{epi}
+\DeclareMathOperator*{\lin}{lin}
+\DeclareMathOperator*{\core}{core}
+\DeclareMathOperator*{\prox}{prox}
+\DeclareMathOperator*{\cl}{cl}
+\DeclareMathOperator*{\conv}{conv}
+
+\begin{document}
+\chapter{Optimization with PDEs}
+\section{Introduction}
+Solution of PDEs is a subject of numerical analysis. There is a growing interest in optimisation with PDEs. Applications in biology, chemistry, physics, medical science, economics. 
+\begin{itemize}
+	\item Diffusion processes(heat)
+	\item market dynamics(hedging)
+	\item population dynamics(crowds)
+	\item wave phenomena
+	\item flow of liquids(gas)
+\end{itemize}
+
+\subsection{Problem formulation}
+We consider here optimisation problems involving some PDEs in abstract form 
+\begin{equation}
+\left\{
+\begin{aligned}
+	&\min_{w \in W} f(w)\\ 
+	&\text{s.t.}\\
+	&E(w) = 0, \\
+	&C(w) \in K
+\end{aligned}
+\right.
+\end{equation}
+where $f: W \rightarrow \mathbb{R}$ is the cost function, $E: W\rightarrow Z$ and $C: W \rightarrow V$ are (non-linear) operators on Banach spaces. $K$ is a convex cone:
+\begin{align*}
+	x, y \in K, \alpha, \beta > 0 \Rightarrow \alpha x + \beta y \in K
+\end{align*}
+In most cases, the equation $E(w) = 0$ represents a PDE, $W, Z$ and $V$ are generalised function spaces and the constraint $C(w) \in K$ is an abstract inequality constraint. \\
+Instead of the latter, we sometimes consider of the form $w \in S$ where $S \subset W$ is a closed and convex set:
+\begin{equation*}
+\left\{
+\begin{aligned}
+	&\min_{w \in W} f(w)\\
+	&\text{s.t.}\\
+	&E(w) = 0\\
+	&w \in S
+\end{aligned}
+\right.
+\end{equation*}
+The setting contains the classical finite dimensional problems: With
+\begin{align*}
+	W = \mathbb{R}^n, Z = \mathbb{R}^p, V = \mathbb{R}^m, K = (-\infty, 0]^m
+\end{align*}
+The problem of (1.1) becomes 
+\begin{align*}
+	&\min_{w \in W} f(w) \\
+	&\textbf{s.t.} \\
+	&E(w) = 0\\
+	&C(w) \le 0
+\end{align*}
+Often we have more structure: The optimisation variable $w$ is composed from a state $y \in Y$ and a control $u \in U$, with $Y$ and $U$ Banach spaces. Then
+\begin{align*}
+	W = Y \times U, w = (y, u)
+\end{align*}
+and (1.1) becomes
+\begin{align*}
+	&\min_{y \in Y, u \in U} f(y, u) \\
+	&E(y, u) = 0\\
+	&C(y, u) \in K
+\end{align*}
+Problems with this structure are called optimal control problems
+
+
+\subsection{Examples of stationary problems}
+\begin{example}
+	Given $\Omega \subset \mathbb{R}^3$ with boundary $\partial \Omega$ represents a body that should be heated. Let $y(x), x \in \Omega$ denotes the temperature of the body at the spatial location $x \in \Omega$ and $y_d: \Omega \rightarrow \mathbb{R}$ a desired temperature distribution. \\
+	\textbf{Boundary control:}
+	If we consider as the control of the boundary temperature:
+	\begin{align*}
+		u: \partial \Omega \rightarrow \mathbb{R}
+	\end{align*}
+	The temperature distribution in the body $y$ in an idealised medium satisfies the equation of Laplace
+	\begin{align}
+		- \Delta y(x) = 0, x \in \Omega
+	\end{align}
+	with the boundary condition of \textbf{Robin-type}
+	\begin{align*}
+		\kappa \frac{\partial y}{\partial \nu} = \beta(x) (u(x) - y(x)), x \in \partial \Omega
+	\end{align*}
+	where $\kappa$ is the heat-coefficient of the material and heat exchange coefficient with the surronding 
+	\begin{align*}
+		\Delta y(x) = \sum_{i = 1}^n \frac{\partial^2 y}{\partial^2 x_i}(x)
+	\end{align*}
+	and $\frac{\partial y}{\partial \nu}$ 
+	is the directional derivative of $y$ in the direction of the outer normal $\nu(x)$ of $\partial \Omega$ in $x$ 
+	\begin{align*}
+		\frac{\partial y(x)}{\partial \nu} = \nabla y(x) \cdot \nu(x), x \in \partial \Omega
+	\end{align*}
+	(1.5) is an elliptic equation of second order. The control typically has to satisfy bounds, e.g.:
+\begin{align*}
+	a(x) \le u(x) \le b(x)
+\end{align*}
+we consider
+\begin{align*}
+	\min f(y, u) &= \frac{1}{2}\int_\Omega (y(x) - y_d(x))^2 dx + \frac{\alpha}{2} \int_{\partial \Omega} u(x)^2 dS(x)\\
+	s.t.\\
+	 - \Delta y &= 0, x \in \Omega\\
+	\frac{\partial y}{\partial \nu} &= \frac{\beta}{\kappa}(u - y), x \in \partial \Omega\\
+	a \le u &\le b, x \in \partial \Omega
+\end{align*}
+Here $\alpha \geq 0$ is a regularization for the control $u$
+This problem fits in (1.1):
+\begin{align*}
+	E(y, u) = 
+	\begin{bmatrix}
+		- \Delta y \\
+		\frac{\partial y}{\partial \nu} - \frac{\beta}{\kappa}(u - y)
+	\end{bmatrix}, 
+	C(y, u) =
+	\begin{bmatrix}
+		a - u\\
+		u - b
+	\end{bmatrix}
+\end{align*}
+let $Y$ and $U$ be the suitable Banach spaces for 
+\begin{align*}
+	y : \Omega \rightarrow \mathbb{R}, u: \partial \Omega \rightarrow \mathbb{R}
+\end{align*}
+$Z = Z_1 \times Z_2$ with the suitable Banach space $Z_1, Z_2$ for 
+\begin{align*}
+	Z_1: \Omega \rightarrow \mathbb{R}, Z_2: \partial \Omega \rightarrow \mathbb{R}
+\end{align*}
+and $V = U \times U$ and $K = \{(v_1, v_2) \in U \times U: v_1(x) \le 0, v_2(x) \le 0, x \in \partial \Omega\}$
+\end{example}
+
+\begin{example}[Distributed control]
+If we consider controlling a distributed heat source(e.g. electromagnetic induction), we obtain the problem:
+\begin{align*}
+	\min f(y, u):= \frac{1}{2} \int_\Omega (y(x) - y_d(x))^2 dx + \frac{\alpha}{2} \int_\Omega u(x)^2 dx\\
+	s.t. \qquad - \Delta y = \gamma u \quad x \in\Omega, y= 0 \quad x \in \partial \Omega \\
+	a \le u \le b \quad x \in \Omega
+\end{align*}
+	Here, $\gamma: \Omega \rightarrow [0, \infty)$ is a weight function for the control $u$ on $\Omega$. The choice $\gamma = \mathbbm{1}_{\Omega_c}$ restricts the action to control subdomain $\Omega_C \subset \Omega$. \\
+	For inhomogeneous boundary temperature $y_a$, the equation of state is 
+	\begin{align*}
+		- \Delta y &= \gamma u, x \in \Omega\\
+		\frac{\partial y}{\partial \nu} &= \frac{\beta}{\kappa}(y_a - y), x \in \partial \Omega
+	\end{align*}
+\end{example}
+
+\begin{example}[state constraints]
+	Both in boundary and distributed control problems constraints of the form:
+	\begin{align*}
+		 l \le y \le r
+	\end{align*}
+	for functions $l, r: \Omega \rightarrow \mathbb{R}$ with $l \le r$ are of interest. These are much more difficult to treat than constraints on $u$. 
+\end{example}
+
+
+\subsection{Instationary problems}
+Often, heating problems are time-dependant i.e. the temperature $y$ depends on space and time $y:\Omega \times [0, T] \rightarrow \mathbb{R}$, we define 
+\begin{align*}
+	Q:= \Omega \times (0, T), \Sigma:= \partial \Omega \times (0, T)
+\end{align*}
+
+\begin{example}[boundary control]
+	Let $y_d$ be the desired temperature at end time $T \geq 0$ and $y_0$ the initial temperature at time $t = 0$. We consider 
+	\begin{align*}
+		&\min f(y, u) := \frac{1}{2} \int_\Omega (y(T, x) - y_d(T, x))^2 dx + \frac{\alpha}{2} \int_0^T \int_{\partial \Omega} u(x, t)^2 dS(x)dt\\
+		&\text{s.t.}\\
+		&y_t - \Delta y = 0, \quad (x, t) \in   Q\\
+		&\frac{\partial y}{\partial \nu} = \frac{\beta}{\kappa}(u - y), \quad  (x, t) \in \Sigma \\
+		&y(0, x) = y_0(x), \quad (x, t)\in  \Omega
+	\end{align*}
+	where
+	\begin{align*}
+		y_t = \frac{\partial y}{\partial t} y(t, x), \Delta y = \Sigma_{i = 1}^n \frac{\partial^2 y}{\partial x_i^2}(t, x)
+	\end{align*}
+	with
+	\begin{align*}
+		E(y, u)= 
+		\begin{bmatrix}
+			y_t - \Delta y\\
+			\frac{\partial y}{\partial \nu} - \frac{\beta}{\kappa} (u - y)
+		\end{bmatrix}, C(y, a) = 
+		\begin{bmatrix}
+			a - u\\
+			u - b
+		\end{bmatrix}
+	\end{align*}
+	suitable Banach space $Y$ and $U$ for 
+	\begin{align*}
+		y: Q \rightarrow \mathbb{R}, u: \Sigma \rightarrow \mathbb{R}
+	\end{align*}
+	$Z:= Z_1 \times Z_2 \times Z_2$ with suitable $Z_i$ for 
+	\begin{align*}
+		Z_1: Q \rightarrow \mathbb{R}, Z_2: \Sigma \rightarrow \mathbb{R}, Z_3: \Omega \rightarrow \mathbb{R}
+	\end{align*}
+	and 
+	\begin{align*}
+		V &= U \times U\\
+		\kappa &= \{(v_1, v_2) \in U \times U: v_1(t, x)\le 0, v_2(t, x) \le 0, (t, x) \in \Sigma \}
+	\end{align*}
+	the problem is again of the form (1.1). 
+\end{example}
+
+
+\subsection{Finite-dimensional case}
+Consider (1.3)
+\begin{align*}
+	& \min_{w \in W} f(w)\\
+	& s.t.\\
+	& E(w) = 0, C(w) \le 0
+\end{align*}
+with 
+\begin{align}
+	f: W \rightarrow \mathbb{R}, E: W \rightarrow Z, C: W \rightarrow V
+\end{align}
+for $W = \mathbb{R}^n, Z = \mathbb{R}^p, V = \mathbb{R}^m$\\
+\textbf{Existence of solutions:}
+Let $W_{ad}$ denote the set of feasable points 
+\begin{align*}
+	W_{ad}:= \{ w \in W: E(w) = 0, C(w) \le 0\}
+\end{align*}
+and $f^*$ be the optimal value of (1.6). $(\inf)$. \\
+Suppose that $f$ is bounded below on $W_{ad}$. And $W_{ad}$ is not empty then
+\begin{align*}
+	- \infty < f^* = \inf_{w \in W_{ad}} f(w)
+\end{align*}
+Let $(w^k) \subset W_{ad}$ be a minimizing sequence, i.e. $E(w^k) = 0, C(w^k) \le 0, f(w^l) \rightarrow f^*$. \\
+Suppose $(w^k)$ is bounded (to show). Then there exists a convergent subsequence $(w^k)_K$ with $(w^k)_K \rightarrow w^*$. \\
+The function $f, E, C$ shall be continuous(to show), then 
+\begin{align*}
+	f(w^*) = \lim_{k \in K \rightarrow \infty} f(w_k), 
+	E(w^*) = \lim E(w^k) = 0, 
+	C(w^*) = \lim C(w^k) \le 0
+\end{align*}
+i.e. $w^*$ is a solution. \\
+Typically in the infinite dimensional case we do not have the compactness w.r.t. the norm-topology. We will consider therefore the weak convergence and continuity and compactness w.r.t the weak topology. \\
+\textbf{Uniqueness:} The uniqueness of the solution holds for strictly convex problems, i.e. $f$ is strictly convex, $E$ is linear and $C_i$ are convex, this carries over to the infinite dimensional case. \\
+\textbf{Optimality conditions: }
+Suppose the functions $f, C, E$ are continuously differentiable. And the constraints satisfies an appropriate regularity condition(CQ). Then there exists (Lagrange) multipliers $\lambda^*\in \mathbb{R}^m$ and $\mu^* \in \mathbb{R}^p$ such that $(w^*, \lambda^*, \mu^*)$ satisfies the KKT system. 
+\begin{equation}
+\begin{aligned}
+	\nabla f(w^*) + C'(w^*)^T \lambda^* + E'(w^*)^T \mu^* &= 0, \\
+	E(w^*) &= 0, \\
+	C(w^*) \le 0, \lambda^* \geq 0, C(w^*)^T \lambda ^* &= 0
+\end{aligned}
+\end{equation}
+Here the vector $\nabla f(w) = f'(w)^T \in \mathbb{R}^n$ is the gradient of $f$ and $C'(w) \in \mathbb{R}^{m \times n}, E'(w) \in \mathbb{R}^{p \times n}$ are gradients of $C$ and $E$. \\
+Our interest is similar for the infinite dimensional case are similar. Here to carefully select $W, Z, V$ to ensure 
+\begin{itemize}
+	\item well-posedness of the state equation
+	\item differentiability of $f, E, C$ 
+	\item Constraints qualifications. 
+\end{itemize}
+\textbf{Nummerical methods}: without inequality constraints (1.7) reduces to 
+\begin{align}
+	G(w, \mu) = 
+	\begin{bmatrix}
+		\nabla f(w) + E'(w)^T\mu\\
+		E(w)
+	\end{bmatrix}
+	= 0
+\end{align}
+An application of Newton's method yields the lagrange-Newton method. So we will need the second derivative of $f$ and $E$. 
+
+
+\subsection{Outlook}
+we will follow the program in (1.3) for the semilinear elliptic and parabolic PDEs. \\
+Literature:
+\begin{itemize}
+  \item Froeltzsch: optimal control of PDEs
+  \item Leugering: optimal control of PDEs in restrictable domains
+  \item Hinze: Optimizable with PDE constraints
+  \item Lious: Optimal control of systems generated by PDEs
+\end{itemize}
+
+
+
+
+
+\section{Operator and Sobolev theory}
+For a multiindex $\alpha \in \mathbb{N}_0^n$, $k \in \mathbb{N}_0$ the space
+\begin{align*}
+	C^k(\bar{\Omega}) := \{ u \in C(\bar{\Omega}): D^\alpha u \in C(\bar{\Omega}), |\alpha| \le k\}
+\end{align*}
+are Banach spaces with 
+\begin{align*}
+	\|u\|_{c^k(\Omega)}:= \sum_{|\alpha| \le k} \|d^\alpha|u\|_{c(\bar{\Omega})}
+\end{align*}
+Dropping eh completeness and taking instead scalar product $(., .)$, then $X$ becomes a pre-Hilbert space, where the CS-inequality holds. 
+\begin{align*}
+	|(u, v)| \le \|u\| \|v\| \quad \forall u, v \in X
+\end{align*}
+
+A pre-Hilbert space that is complete w.r.t. the induced norm
+\begin{align*}
+	\|u\|:= \sqrt{(u, v)}
+\end{align*}
+is called a Hilbert space
+
+\begin{example}\quad\\
+	1. $\mathbb{R}^n$ with $(u, v)_{\mathbb{R}^n}:= u^T v$ is a Hilbert space\\
+	2. For $\Omega \subset \mathbb{R}^n$ open and bounded, the space $L^2(\Omega)$ is a pre-Hilbert space. 
+\end{example}
+
+\subsubsection*{separable Banach spaces}
+A Banach space is separable if it contains a countable dense set. 
+
+\example
+For $\Omega \subset \mathbb{R}^n$ bounded, $C(\bar{\Omega})$ is separable by Stone-Weierstrass. 
+
+\subsubsection*{Bounded linear operator}
+Let $X, Y$ be bounded NLS. A mapping 
+\begin{align*}
+	A: X \rightarrow Y
+\end{align*}
+is called a linear operator if 
+\begin{align*}
+	A(\lambda u + \mu v) = \lambda A(u) + \mu A(v), \qquad \forall u, v \in X, \lambda, \mu \in \mathbb{R}
+\end{align*}
+we denote:
+\begin{align*}
+	L(X,Y) 
+\end{align*}
+the space of all bounded linear operators. i.e.
+\begin{align*}
+	\|A\|_{X, Y}:= \sup_{\|x\| = 1} \|Au\|_Y < \infty
+\end{align*}
+
+\begin{theorem}
+	If $(Y, \|.\|_Y)$ is a Banach space, then $L(X, Y)$ is a Banach space. 
+\end{theorem}
+
+\begin{theorem}
+	If $Y$ is a Banach space and $U\subset X$ a dense subset, then for any $A \in L(U, Y)$, there is an unique extension $\tilde{A} \in L(X, Y)$, such that
+	\begin{align*}
+		\tilde{A}|_U = A, \|\tilde{A}\|_{X,Y} = \|A\|_{U. Y}
+	\end{align*}
+\end{theorem}
+
+\subsubsection*{Dual space}
+
+\begin{definition}[Dual Space]
+	Given a TVS $X$ on $\mathbb{K}$, the \textbf{dual space} of $X$ is defined as
+	\begin{equation*}
+		X' := L(X, \mathbb{K}) := \{ A: X \rightarrow \mathbb{K} \quad \text{continuous linear operator}\}
+	\end{equation*}
+	with the operator norm:
+	\begin{align*}
+	\|\Lambda\|:= \sup_{\nu \in H \backslash 0} \frac{|\Lambda (\nu)|}{\|\nu\|}, \quad \|\Lambda\|:= \sup_{\|v\| = 1} \|\Lambda(v)\|
+\end{align*}
+\end{definition}
+
+we denote 
+\begin{align*}
+	\langle u^*, u\rangle_{X^*, X\rangle}
+\end{align*}
+the \textbf{dual pairing} of $X^*$ and $X$. \\
+\quad\\
+theory 2.8
+\begin{example}
+	For $n \le 3$, we have
+	\begin{align*}
+		H^1(\Omega) \hookrightarrow L^6(\Omega)
+	\end{align*}
+	with $m = 2, l = 0, p = 2, q = 6$. And
+	\begin{align*}
+		H^2(\Omega) \hookrightarrow^C C(\Omega)
+	\end{align*}
+	with $\beta = k = 0, p = 2 = m$. \\
+	For us, $H^1_0(\Omega)$ will be important. For $\Omega \subset \mathbb{R}^n$ open we define
+	\begin{align*}
+		H^{-1}(\Omega):= (H_0^1(\Omega))^*
+	\end{align*}
+\end{example}
+
+\begin{theorem}
+	For $\Omega \subset \mathbb{R}^n$ open. 
+	\begin{align*}
+		H^{-1}(\Omega) = \bigg\{ v \in H^1_0(\Omega) \mapsto \langle f^0, v) + \sum_{i = 1}^n \langle f^j, v_{x_j} \rangle, f^j \in L^2(\Omega) \bigg\}
+	\end{align*}
+	and 
+	\begin{align*}
+		\|f\|_{H^{-1}(\Omega)} = \min (\sum_{j = 0}^n \|f^j\|^2_2 )^{\frac{1}{2}}(???)
+	\end{align*}
+	with
+	\begin{align*}
+		\langle f, v \rangle_{H^1, H^1_0} = \langle f^0, v\rangle_2 +  \sum_{j = 1}^n \langle f^j, v_{x_j} \rangle_2
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	\quad\\
+	"$\subset$": $f \in H^{-1}(\Omega)$, by Riesz there exists $u \in H^1_0(\Omega)$(?) such that
+	\begin{align*}
+		\langle u, v \rangle_{H^1} = \langle f, v \rangle_{H^{-1}, H^1_0}
+	\end{align*}
+	Given $f \in H^{-1}$, for all $v \in H^1_0(\Omega)$. Let $f:= u, f^j:= u_{x_j}, j \geq 1$. We get the canonical Riesz map:
+	\begin{align*}
+		f(v) &= 
+		\langle f^0, v \rangle_2 + \sum_{j = 1}^n \langle f^j, v_{x_j} \rangle_2 \\ 
+		& =\langle u, v \rangle_2 + \sum_{j = 1}^n \langle u_{x_j}, v_{x_j} \rangle_2 
+	\end{align*}
+	"$\supset$": For $g^0, \dots, g^n \in L^2(\Omega)$, consider 
+	\begin{align*}
+		g: v \in H^1_0(\Omega) \mapsto \langle g^0, v \rangle_2 + \sum_{j = 1}^n \langle g_1, v_{x_i}\rangle
+	\end{align*}
+	this function is linear and for $v \in H^1_0(\Omega)$:
+	\begin{align*}
+		|\langle g_0, v \rangle_2 + \sum_{j = 1}^n \langle g^j, v_{x_j} \rangle_2 | &\le \|g_0\|_2\|v\|_2 + \sum_{j = 1}^n \|g^j\|_2\|v_{x_j}\|_2\\
+		&\le (\sum_{j = 0}^n \|g^j\|^2_2)^{\frac{1}{2}} (\|v\|_2^2 + \sum_{j = 1}^n \|v_{x_j}\|_2^2)^\frac{1}{2}\\
+		&= |\sum_{j = 0}^n \|g_j\|_2^2| \|v\|_{H^1}
+	\end{align*}
+	hence for $g \in H^{-1}(\Omega)$ we have 
+	\begin{align*}
+		\|g\|_{H^{-1}} \le \sum_{j = 0}^n (\| g^n\|_2^2)^{\frac{1}{2}}
+	\end{align*}
+	The norm inequality is estabilished. 
+\end{proof}
+
+\section{Weak solutions of elliptic PDE}
+\subsection{The Equation of Poisson}
+Consider\textbf{(3.1)}
+\begin{align*}
+	-\Delta y &= f \qquad \text{on } \Omega\\
+	y &= 0 \qquad \text{on } \partial \Omega
+\end{align*}
+with $\Omega \subset \mathbb{R}^n$ open bounded and $f \in L^1(\Omega)$. We want to have as less regularity as possible for the righthand side by the control. The classical solution of the equation in $C^2 \cap C^1$ only exists for $f \in C$. So we need a generalised solution concept. \quad
+For this, we assume $y \in C^2 \cap C^1(\bar{\Omega})$ is a classical solution of (3.1). Then $y \in H^1_0(\Omega)$. We get 
+\begin{align*}
+	-\int_{\Omega} \Delta v dx = \int_\Omega fv dx\quad \forall v \in C_c^\infty(\Omega)
+\end{align*}
+integrating by parts we have
+\begin{align*}
+	-\int_{\Omega} y_{x_ix_i} v dx = \int_\Omega y_{x_i} v_{x_i} dx - \int_{\partial \Omega} (y_{x_i} v)\cdot \nu_i dS(x) 
+\end{align*}
+the second term vanishes and we have:
+\begin{align*}
+	\int_{\Omega} \nabla y \nabla v dx = \int_\Omega fv dx \quad \forall v \in C_c^\infty(\Omega)
+\end{align*}
+this variantional equation holds in larger spaces: this map
+\begin{align*}
+	(y, v) \in H^1_0(\Omega)^2 \mapsto a(y, v) := \int_{\Omega} \nabla y \nabla v dx \in \mathbb{R}
+\end{align*}
+is bilinear and 
+\begin{align*}
+	|a(y, v)| &\le \int_\Omega |\Delta y(x)^T \Delta v(x)|dx \\
+	&\le \int_\Omega \|\nabla y\|_2 \|\nabla v\|_2 dx \\
+	&\le \| \|\nabla y\|_2 \|_2 \| \|\nabla v\|_2 \|_2\\
+	&= |y|_{H^1} |v|_{H^1}\\
+	&\le \|y\|_{H^1} \|v\|_{H^1}
+\end{align*}
+For $f \in L^2(\Omega)$, we have
+\begin{align*}
+	v \in H_0^1(\Omega) \rightarrowtail \int_\Omega fv dx \in \mathbb{R}
+\end{align*}
+is linear and 
+\begin{align*}
+	|\int_\Omega fv dx | \le \|f\|_2 \|v\|_2 \le \|f\|_2 \|v\|_{H^1_0}
+\end{align*}
+with this, we can define for all $y \in H^1_0(\Omega)$ and $v \in H^1_0(\Omega)$ :
+\begin{align*}
+	\int_\Omega \nabla y \cdot \nabla v = \int_\Omega fv dx \qquad \forall v \in H_0^1(\Omega)
+\end{align*}
+we say that $y \in H^1_0(\Omega)$ is a weak solution if $y$ satisfies the variational(weak) form. \par
+we set $V = H^1_0(\Omega)$ then we have \textbf{(3.5)}
+\begin{align*}
+	a(y, v) = \int_\Omega \nabla y \cdot \nabla v dx , \quad y, v \in V
+\end{align*}
+and\textbf{ (3.6)}.
+\begin{align*}
+	F(v) = \langle f, v \rangle_2, v \in V
+\end{align*}
+Then $a: V \times V: \rightarrow \mathbb{R}$ is a bilinear form and $F \in V^*$ and (3.4) reads: 
+\begin{align*}
+	\text{Find } y \in V: a(y, v) = F(v) \text{ for all } v \in V
+	\quad \textbf{(3.7)}
+\end{align*}
+From $a(y, \cdot) \in V^*$ for all $y \in V$ and  $V \ni y \mapsto a(y, \cdot) \in V^*$ being continuous and linear, there exists a linear operator:
+\begin{align*}
+	A: V \rightarrow V^*
+\end{align*}
+with\textbf{(3.8)}
+\begin{align*}
+	a(y, v) = \langle Ay, v \rangle \quad \forall y, v \in V
+\end{align*}
+with this, (3.7) becomes 
+\begin{align*}
+	\text{Find } y \in V: Ay = F
+\end{align*}
+
+\begin{theorem}[Lax-Milgram]
+	Let V be a Hilbert space with $\langle, \rangle_V$ and a bilinear form $a: V \times V \rightarrow \mathbb{R}$ a bilinear form such that it's bounded:
+	\begin{align*}
+		\forall \alpha_0, \beta_0> 0: |a(y, v)| \le \alpha_0 \|y\|_v \|v\|_v
+	\end{align*}
+	and coercive:
+	\begin{align*}
+		a(y, y) \geq \beta_0\|y\|_v^2
+	\end{align*}
+	then $\forall F \in V^*$, \textbf{(3.7)  }has an unique solution $y \in V$, such that $\|y\|_v \le \frac{1}{\beta_0}\|F\|_{v^*}$. We have
+	\begin{align*}
+		A \in L(V, V^*), A^{-1} \in L(V^*, V)
+	\end{align*}
+	and 
+	\begin{align*}
+		\|A^{-1}\|_{V^*, V} \le \frac{1}{\beta_0}
+	\end{align*}
+\end{theorem}
+
+\begin{theorem}[existence and uniqueness of solution of Poisson problem in $H^1_0(\Omega)$. ]
+	Let $\Omega \subset \mathbb{R}^n$ open and bounded with a Lipschitz-boundary $\partial \Omega$. Then the bilinear form defined in \textbf{(3.5)} is bounded and $V$-coercive for $V = H_0^1(\Omega)$ and the linear operator $A \in L(V, V^*)$ defined in \textbf{(3.8)} has a bounded inverse. In particular, (3.1) has an unique weak solution $y \in H_0^1(\Omega)$ given by (3.4) for all $f \in L^2(\Omega)$. The solution satisfies
+	\begin{align*}
+		\|y\|_{H^1} \le c_d \|f\|_2
+	\end{align*}
+	with a constant $c_d$ that depends on $\Omega$, but not on $f$
+\end{theorem}
+\begin{proof}
+	boundedness of $a(,)$ is shown. We have
+	\begin{align*}
+		a(y, y) = \int_\Omega \nabla y \cdot \nabla y dx = |y|^2_{H^1} 
+		\geq \frac{1}{c^2} \|y\|_{H_0^1}^2 = \frac{1}{c^2}\|y\|^2_V
+	\end{align*}
+	By the Poincare inequality. \\
+	Moreover, 
+	\begin{align*}
+		\|F\|_{V^*} &= \sup_{\|v\|_V = 1} F(v) \\
+		&= \sup_v \langle f, v \rangle \\
+		&\le \sup_v \|f\|_2 \|v\|_2 \\
+		&\le \|f\|_2
+	\end{align*}
+	so the conclusion follows from theorem 3.1 for $c_d = c^2$. 
+\end{proof}
+\quad\\
+\quad\\
+Consider the Robin boundary condition problem \textbf{(3.10)}
+\begin{align*}
+	-\Delta y + c_0 y &= f \quad \text{on } \Omega \\
+	y_\nu + \alpha y &= g \quad \text{on } \partial \Omega
+\end{align*}
+For a classical solution of 3.10 and $v \in C^1(\bar{\Omega})$ 
+\begin{align*}
+	\int_\Omega (-\Delta y + c_0 y )v dx = \int_\Omega \nabla y \nabla v + 
+	\langle c_0 y , v \rangle_2 - \int_{\partial \Omega} \partial_\nu y \cdot  v  dS = \int_\Omega fv dx \qquad \forall v \in C^1(\Omega)
+\end{align*}
+with $\partial_\nu y = - \alpha y + g$ and density $C^1(\bar{\Omega})$ in $H^1(\Omega)$  \textbf{(3.11)}
+\begin{align*}
+	\int_\Omega \nabla y \nabla v dx + (c_0 y, v )_{L^2(\Omega)} + (\partial y, v )_{L^2(\partial \Omega)} = (f, v)_2 + (g, v)_2 \qquad \forall v \in H^1(\Omega)
+\end{align*}
+we say that $y \in H^1(\Omega)$ is a weak solution of \textbf{(3.10)} if is satisfies \textbf{(3.11)} with 
+\begin{align*}
+	V &= H^1(\Omega)\\
+	a(y, v) &= \int_\Omega \nabla y \nabla v dx +  (c_0 y, v)_{L^2(\Omega)} + (\alpha y, v)_{L^2( \partial \Omega)}\qquad \forall v , y \in V\\
+	F(v) &= (f, v)_2 + (g, v)_2\quad \forall v \in V \quad \textbf{(3.12)}
+\end{align*}
+
+\begin{theorem}
+	Let $\Omega \subset \mathbb{R}^n$ be open, bounded, with Lipschitz boundary $\partial \Omega$, $c_0 \in L^\infty(\Omega), \alpha \in L^\infty(\partial \Omega)$ with $c_0 \geq 0$, a.e. on $\Omega$ and $\alpha \geq 0$ a.e. on $\partial \Omega$ and 
+	\begin{align*}
+		\|c_0\|_2 + \|\alpha\|_2 > 0
+	\end{align*}
+	then $a(, )$ in (3.12) is a bounded and $V$-coercive for $V = H^1(\Omega)$ and the associated operator $A \in L(V, V^*)$ in 3.8 is boundedly invertible. In particular, for all $f \in L^2(\Omega)$ and $g \in L^2(\partial \Omega)$, has an unique weak solution $y \in H^1(\Omega)$ given by (3.11) satisfying
+		\begin{align*}
+			\|y\|_{H^1} \le C_R (\|f\|_2 + \|g\|_2)
+		\end{align*}
+		with $C_R$ depends on $\alpha, c_0$ but not on $f$, $g$. 
+\end{theorem}
+\begin{proof}
+	the boundedness of $a(, )$ and $F$ follows from 2.7 on the trace of $y \in H^1(\Omega)$. The $V$-$coercivity$ follows from the Poincare-inequality. The conclusion follows from the theorem 3.1.
+\end{proof}
+
+\begin{theorem}
+	Under the assumption of the last theorem and $r > \frac{n}{2}$, $s > n -1$ and $n \geq 2$. Then, for all $f \in L^r(\Omega), g \in L^s(\partial \Omega)$, then there exists an uniquely defined weak solution $y \in H^(\Omega) \cap C(\bar{\Omega})$ of $3.10$ satisfying 
+	\begin{align*}
+		\|y\|_{H^1} + \|y\|_{C} \le C_\infty(\|f\|_{L^r} + \|g\|_{L^s(\partial \Omega)}
+	\end{align*}
+	where $C_\infty$ depends on $\Omega, \alpha, c_0$ but not on  $f, g$. 
+\end{theorem}
+
+\subsection{Elliptic problems}
+More generally we consider 2nd order elliptic problem\textbf{(3.14)}
+\begin{align*}
+	Ly = g \quad \text{on } \Omega
+\end{align*}
+with \textbf{(3.15)}
+\begin{align*}
+	Ly := - \sum_{i, j= 1}^n (a_{ij} y_{x_i})_{x_j} + c_o y 
+\end{align*}
+with $a_{ij}, c_0 \in L^\infty(\Omega), c_0 \ge 0, a.e., a_{ij} = a_{ji}$
+and uniform ellipticity: $\exists \theta > 0$:
+\begin{align*}
+	\sum_{i, j = 1}^n a_{ij} (x) \xi_i \xi_j \ge \theta \|\xi\|^2 \quad \forall \xi \in \mathbb{R}^n, x \in \Omega \qquad a.e.
+\end{align*}
+
+For $f \in L^2(\Omega)$ and Dirichlet boundary condition $y|_{\partial \Omega} = 0$. The weak solution of (3.14) is $y \in V = H^1_0(\Omega)$ with 
+\begin{align*}
+	a(y, v) = (f, v)_2 \quad \forall v \in V
+\end{align*}
+with 
+\begin{align*}
+	a(y, v) = \int_\Omega \sum_{i, j =1}^n (a_{ij}y_{x_i} v_{x_j} + c_0 yv)dx
+\end{align*}
+
+An existence result such as theorem 3.2 follows from the theorem 3.1(Lax-Milgram). \par 
+For Robin boundary condition
+\begin{align*}
+	y_{\nu_A} + \alpha y = g \quad \text{on } \partial \Omega
+\end{align*}
+with the co-normal
+\begin{align*}
+	y_{\nu_A} := \nabla y(x) \cdot A(x) \nu(x), \quad A(x) := (a_{ij}(x))
+\end{align*}
+a well poseness result similar to theorem 3.3. follows. 
+
+
+\subsection{Semilinear elliptic Problems}
+Even more generally, we can consider \textbf{(3.18)}
+\begin{align*}
+	Ly + d(x, y) &= f \quad \text{on }\Omega\\
+	y_{\nu_A} + \alpha y + b(x, y) &= g \quad \text{on } \partial \Omega
+\end{align*}
+
+with $Ly$ given by 3.15 satisfying\textbf{ (3.16)}, $\alpha \in L^\infty(\partial \Omega)$, $\alpha \geq 0$ a.e. on $\partial \Omega)$ and $d: \Omega \times R \rightarrow R$, $b: \partial \Omega \times \mathbb{R} \rightarrow \mathbb{R}$ such that \textbf{(3.19)}
+\begin{itemize}
+	\item $d(x, ), b(x, )$ continuous and monotone increasing for $x \in \Omega$ a.e. or $x \in \partial \Omega$ a.e. 
+	\item $d(, y), b(,y )$ Lebesgue measurable for $y \in \mathbb{R}$. 
+\end{itemize}
+weak solutions are $y \in H^1(\Omega)$ such that
+\begin{align*}
+	a(y, v) + \int_\Omega d(x, y) v dx + \int_{\partial \Omega} b(x, y) v dS 
+	= \int_\Omega fv dx + \int_{\partial \Omega} gv dS \qquad \forall v \in H^1(\Omega)
+\end{align*}
+with (3.21)
+\begin{align*}
+	a(y, v) = \int_{\Omega} \sum_{i, j = 1}^n a_{ij} y_{x_i} v_{x_j} + c_0yv)dx + \int_{\partial \Omega} \alpha y v dS
+\end{align*}
+\qquad\\
+\textbf{1.} For a separable Hilbert space $V$, we call a non-linear operator
+\begin{align*}
+	A: V \rightarrow V^*
+\end{align*}
+\textbf{monotone} if 
+\begin{align*}
+	\langle Ay_1 - Ay_2, y_1 - y_2 \rangle_{V^*, V} \ge 0 \quad \forall y_1, y_2 \in V
+\end{align*}
+\textbf{2.} and \textbf{strictly monotone} if equality only holds fo r $y_1 = y_2$. \\
+\textbf{3. }Moreover, $A$ is coercive if 
+\begin{align*}
+	\frac{\langle Ay, y \rangle_{V^*, V}}{\|y\|_V} \rightarrow \infty \quad \|y\| \rightarrow \infty
+\end{align*}
+\textbf{4.} and \textbf{hemi contiuous} if the function
+\begin{align*}
+	\varphi:[0, 1] \rightarrow \mathbb{R}, t \mapsto \langle A(y + tv), w \rangle_{V^*, V}
+\end{align*}
+is continuous on $[0, 1]$ for all fixed $y, w, v \in V$. \\
+\textbf{5.} If for some $\beta_0$, 
+\begin{align*}
+	\langle Ay_1 - Ay_2, y_1 - y_2 \rangle_{V^*, V} \geq \beta_0\|y_1 - y_2\|_V^2 \quad \forall y_1, y_2 \in V
+\end{align*}
+then $A$ is called \textbf{strongly monotone}. 
+
+\begin{theorem}[Browder, Minty]
+	Let $V$ be a separable Hilbert space and $A: V \rightarrow V^*$ a \textbf{non-linear} operator which is monotone, coercive and hemi continuous. Then the equation $Ay = f$ has a solution $y$ for all $f \in V^*$. The solution set is bounded, convex and closed. And the solution is unique if $A$ is strictly monotone. If $A$ is a strongly monotone, then 
+	\begin{align*}
+		A^{-1}: V^* \rightarrow V
+	\end{align*}
+	is Lipschitz continuous.
+\end{theorem}
+
+\begin{theorem}
+	let $\Omega \subset \mathbb{R}^n$ be open, bounded and $\partial \Omega$ Lipschitz, $c_0 \in L^\infty(\Omega)$, $\alpha \in L^\infty(\Omega)$ such that $c_0 \ge 0$ a.e on $\Omega$ and
+	\begin{align*}
+		\|c_0\|_{L^2(\Omega)}+ \|\alpha\|_{L^2(\partial \Omega)} > 0
+	\end{align*}
+	Further, suppose \textbf{(3.19)} hold and $b(x, 0) = d(x, 0) = 0$ , then \textbf{(3.18)} has an unique weak solution $y \in H^1(\Omega)$ for all $f \in L^2(\Omega), g \in L^2(\partial\Omega)$. And 
+	\begin{align*}
+		\|y\|_{H^1(\Omega)} \le C_M (\|f\|_{L^2(\Omega)} + \|g\|_{L^2(\partial\Omega)})
+	\end{align*}
+	with $C_M$ depends on $\Omega, \alpha, c_0$, but not on $f, g, d, b$. 
+\end{theorem}
+\begin{proof}
+	let
+	\begin{align*}
+		A = A_1 + A_2 + A_3: V \rightarrow V^*
+	\end{align*}
+	with 
+	\begin{align*}
+		\langle A_1 y, v\rangle = a(y, v) \quad \forall y, v \in V
+	\end{align*}
+	and $A_2, A_2: V \rightarrow V^*$ with 
+	\begin{align*}
+		A_2 y = F_d,\quad A_3 y = F_b
+	\end{align*}
+	with 
+	\begin{align*}
+		F_d(v) &= \int_\Omega d(x, y(x)) v(x) dx\\
+		F_b(v) &= \int_\Omega b(x, y(x) v(x) dx
+	\end{align*}
+	as element of $V^*$, $A$ is monotone. Monotonicity of $A_1$ follows from $a(y, y) \ge 0$, for $A_2$
+	\begin{align*}
+		(d(x, y_1) - d(x, y_2))(y_1 - y_2) \ge 0 \quad \forall y_1, y_2, x\in \Omega
+	\end{align*}
+	thus
+	\begin{align*}
+		\langle A_2(y_1) - A_2(y_2), y_1 - y_2 \rangle_{V^*, V} = 
+		\int_\Omega (d(x, y_1(x)) - d(x, y_2(x))(y_1(x) - y_2(x)) dx \geq 0 \quad y_2, y_1 \in H^1(\Omega)
+	\end{align*}
+	and similar for $A_3$. \\
+	\textbf{$A$ coercive:} $A_1$ is coercive, 
+	\begin{align*}
+		\langle A_1 v, v \rangle = a(v, v) \ge \alpha \|v\|_V^2
+	\end{align*}
+	by assumption. \\
+	$A_2$ is bounded from below, 
+	\begin{align*}
+		\langle A_2 v, v\rangle &= \int_\Omega d(x, v(x)) v(x) dx \\
+		&= \int_\Omega (d(x, v(x)) - d(x, 0))(v(x) - 0)dx \\
+		&\ge 0 \text{ ($d$ monotone)}
+	\end{align*}
+	\textbf{$A$ hemi-continuous:}\\
+	$A_1$ is hemi-continuous since it's linear. and 
+	\begin{align*}
+		\varphi(t)&:= \langle A_2(y + tv), w \rangle \\
+		&= \int_\Omega d(x, y(x) + tv(x))w(x) dx \\
+	\end{align*}
+	For $\tau \in \mathbb{R}$ and $t_n \subset \mathbb{R}$ such that $t_n \rightarrow\tau$ as $n \rightarrow \infty$, we have to show that 
+	\begin{align*}
+		\varphi(t_n) \rightarrow \varphi(\tau)
+	\end{align*}
+	it holds
+	\begin{align*}
+		d(x, y(x) + t_n v(x)) w(x) \rightarrow d(x, y(x)+ \tau v(x))w(x) \quad x \in \Omega a.e.
+	\end{align*}
+	due to $d$ is continuous in the 2.nd argument. And there exists a constant $M$ such that
+	\begin{align*}
+		|d(x, y(x) + t_n v(x))w(x) | \le M |w(x)|
+	\end{align*}
+	hence by DCT
+	\begin{align*}
+		\varphi(t_n) = \int_\Omega d(x, y(x)) + t_n v(x)) w(x) dx \rightarrow 
+		\int_\Omega d(x, y(x) + \tau v(x) )w(x) dx = \varphi(\tau)
+	\end{align*}
+	The result follows form Browder and Minty where $C_M$ does not depend on $b$ and $d$ because of $b, d \geq 0$. 
+\end{proof}
+
+One can even show 
+\begin{theorem}
+	Let $\Omega \subset \mathbb{R}^n$ open bounded domain with Lipschitz boundary. $ c_0 \in L^\infty(\Omega), \alpha \in L^\infty(\partial \Omega), c_0 \geq 0$ on $\Omega$ a.e., $\alpha \geq 0$ on $\partial \Omega$ a.e.and 
+	\begin{align*}
+		\|c_0\|_2 + \|\alpha \|_{L^2(\partial \Omega)} > 0
+	\end{align*}
+	and let (3.19) holds. Moreover, let $r > \frac{n}{2}, s > n - 1, 2 \le n \le 3$ and $d(\cdot, 0) \in L^r(\Omega)$ and $b(, 0) \in L(^s(\partial \Omega)$, then \textbf{3.18} has an unique weak solution $y \in H^1(\Omega) \cap C(\bar{\Omega})$ for all $f \in L^r(\Omega)$ and $g \in L^s(\partial \Omega)$ with
+	\begin{align*}
+		\|y\|_{H^1} + \|y\|_{C} \le C_\infty (\|f - d(, 0)\|_{L^r} + \|g - b(, 0)\|_{L^s}
+	\end{align*}
+	for $C_\infty$ depending on $\Omega, \alpha, c_0$, but not on $f, g, b, d$. 
+\end{theorem}
+
+
+\newpage
+\section{Existence of optimal control}
+\subsection{weak convergence}
+Let $X$ be a normed space. We say that a sequence $x_k$ converges weakly to some element $x \in X$ and write $x_k \rightharpoonup x$, if
+\begin{align*}
+	\langle x^*, x_k \rangle_{X^*, X} \rightarrow \langle x^*, x\rangle_{X^*, X} \quad \forall x^* \in X^*
+\end{align*}
+By continuity of $x^* \in X^*$, strong convergence implies weak convergence. 
+
+\begin{lemma}\quad
+	\begin{enumerate}
+		\item let $X$ be a normed space and $x_k \subset X$ with $x_k \rightharpoonup x \in X$, then $x_k$ is bounded
+		\item Let $C \subset X$ is closed and convex. Then $C$ is weakly sequentially closed. i.e.
+		\begin{align*}
+			C\ni x_k \rightharpoonup x \Rightarrow x \in C
+		\end{align*}
+	\end{enumerate}
+\end{lemma}
+\begin{proof}
+the second statement can be proved by Mazur lemma. 
+\end{proof}
+
+we say a Banach space $X$ is reflexive if 
+\begin{align*}
+	X \ni x \mapsto \langle \cdot , x\rangle_{X^*, X} \in (x^*)^x
+\end{align*}
+is surjective, i.e. for all $x^{**} \in X^{**} \exists x \in E:$
+\begin{align*}
+	\langle x^{**}, x^*\rangle = \langle x^*, x\rangle  \quad \forall x^* \in X^*
+\end{align*}
+
+\begin{example}
+ For $1 < p < \infty$ and $\Omega \subset \mathbb{R}^n$ open, $L^p(\Omega)$ is reflexiv. 
+\end{example}
+
+\begin{theorem}
+	let $X$ be a reflexive Banach space then we have
+	\begin{enumerate}
+		\item Every bounded sequence $(x_k) \subset X$ admits a weakly convergent subsequence. \text{(Banach Alaoglu)}
+		\item Every bounded, closed, and convex set is \textbf{weakly sequential compact.} i.e. $(x_k) \subset C$ contains a subsequence $(x_{k_i}) \subset (x_k)$ with
+		\begin{align*}
+			x_{k_i} \rightharpoonup x, \quad x \in C
+		\end{align*} 
+	\end{enumerate}
+\end{theorem}
+
+A function $F: X \rightarrow \mathbb{R}$ on a Banach space $X$ is called weakly (sequentially) lower semi-continuous if 
+\begin{align*}
+	x_k \rightharpoonup x \Rightarrow F(x) \le \liminf_{k \rightarrow} F(x_k)
+\end{align*}
+
+\begin{theorem}
+	Let $X$ be a Banach space and suppose $F: X \rightarrow \mathbb{R}$ be convex and continuous. Then the function $F$ is w.l.s.c
+\end{theorem}
+\begin{proof}
+	For $c \in \mathbb{R}$. Let $A_c:= \{x \in X: F(x) \le c\}$, then $A_c:= F^{-1}((-\infty, c])$. As a preimage of a closed set we see that $A_c$ is closed. Moreover $A_c$ is convex since $\forall x, y \in A_c, \alpha \in [0, 1]:$
+	\begin{align*}
+		F(\alpha x, (1 - \alpha)y ) &\le \alpha F(x) + (1 - \alpha)F(y)\\
+		&\le c
+	\end{align*}
+	Suppose that there exists $(x_k) \subset X$, $x_n \rightharpoonup x$ with 
+	\begin{align*}
+		\liminf_{n \rightarrow \infty} F(x_k) &< F(x)
+	\end{align*}
+	then there exists $c \in \mathbb{R}:$
+	\begin{align*}
+		c < F(x)
+	\end{align*}
+	and a subsequence $x_{n_k} \subset x_n$ such that
+	$F(x_{n_k}) \le c$ for all $l$, i.2. $(x_{n_k}) \subset A_c$
+\end{proof}
+\begin{remark}
+The assertion of 4.2 remains ture if continuity is replaced by l.s.c. 	
+\end{remark}
+
+
+\subsubsection*{weak convergence \& strong convergence}
+Mappings that maps weakly convergent sequences to strongly convergent ones will be important. A linear operator $A: X \rightarrow Y$ between normed space is called \textbf{compact}, if $A$ maps bounded subsets onto relatively compact subsets, i.e.
+\begin{align*}
+	M \subset X \text{ bounded } \Rightarrow \bar{AM} \subset Y \text{ is compact}
+\end{align*}
+since compact sets are bounded, compact operators are bounded and therefore continuous. 
+
+
+\begin{lemma}
+	Let $A: X \rightarrow Y$ be a compact operator between normed spaces $X$ and $Y$. Then for all $X \supset x_k \rightharpoonup x \in X$. We have:
+	\begin{align*}
+		Ax_k \rightarrow Ax
+	\end{align*}
+\end{lemma}
+\begin{proof}
+	by $x_k \rightharpoonup x$ we know $x_k$ is bounded. Since $A$ maps bounded sequence to a sequence with convergent subsequence
+	\begin{align*}
+		Ax_{k_l} \rightarrow Ax
+	\end{align*} 
+	Argue by contradiction , then 
+	\begin{align*}
+		\exists \epsilon > 0 \exists (Ax_k)_n \subset Y \forall n : \|Ax_{k_n} - Ax \| \ge \epsilon
+	\end{align*}
+	From the compactness of $A$ and that $(x_{k_n})$ is bounded( it's weakly convergent) we know there exists
+	\begin{align*}
+		Ax_{k_{n_p}} \overset{p \rightarrow \infty}{\rightarrow} Ax
+	\end{align*}
+	contradiction. 
+\end{proof}
+
+\subsection{Linear-quadratic problems}
+Consider \textbf{(4.1)}
+\begin{align*}
+	\min f(y, u) &:= \frac{1}{2}\|Q_y - q_d \|_H^2 + \frac{\alpha}{2}\|u\|_U^2\\
+	s.t. \quad Ay + Bu &= g\\
+	u \in U_{ad}, y &\in Y_{ad}
+\end{align*}
+with $H, U$ Hilbert space and $Y, Z$ Banach space. $Y$ reflexive, $q_d \in H$, $g \in Z$, $A \in L(Y, Z), B \in L(U, Z), Q \in L(Y, H)$. and the following assumptions:
+
+\subsubsection*{Assumption 4.1}
+\begin{enumerate}
+	\item $\alpha \geq 0$, $U_{ad} \subset U$ is a closed and convex and if $\alpha = 0$, bounded
+	\item $Y_{ad} \subset Y$ closed and convex, so that \textbf{(4.1)} has at least 1 feasible solution. 
+	\item $A \in L(Y, Z)$ has a bounded inverse. 
+\end{enumerate} 
+
+\quad\\
+A point $(\bar{y}, \bar{u}) \in Y_{ad} \times U_{ad}$ is \textbf{optimal} if 
+\begin{align*}
+	A\bar{y} + B \bar{u} &= g\\
+	f(\bar{y}, \bar{u}) &\le f(y, u) \quad \forall (y, u) \in Y_{ad} \times U_{ad}
+\end{align*}
+
+\begin{theorem}
+	Under the assumption \textbf{4.1}.  The problem \textbf{(4.1)} admits an optimal point $(\bar{y}, \bar{u}) \in Y_{ad} \times U_{ad}$. Moreover, if $\alpha \neq 0$, the optimal point is unique. 
+\end{theorem}
+\begin{proof}
+	let $W_{ad} := \{(y, u) \in Y \times U: y \in Y_{ad}, u \in U_{ad}, Ay + Bu = g\}$. \\
+	From $f \ge 0$ and $W_{ad} \neq \emptyset$, there exists:
+	\begin{align*}
+		f^*:= \inf_{(y, u) \in W_{ad}} f(y, u)
+	\end{align*}
+	and there exists a infimizing sequence:
+	\begin{align*}
+		\lim_{ k\rightarrow \infty} f(y_k, u_k) = f^*
+	\end{align*}
+	This is a bounded sequence since for $\alpha = 0$, $U_{ad}$ is bounded by assumption \textbf{1)}. If $\alpha$ is positive, we have 
+	\begin{align*}
+		f(y_k, u_k) \geq \frac{\alpha}{2}\|u_k\|_U^2\quad (????)
+	\end{align*}
+	and w.o.l.g. $f(y_k, u_k) \le f(y_1, u_1)$. From $A \in L(Y, Z), B \in L(U, Z)$ and $A^{-1} \in L(Z, Y)$ we have that the sequence $y_k$ is bounded:
+	\begin{align*}
+		y_k:= A^{-1}(g - Bu_k)
+	\end{align*}
+	hence for some sufficiently large $r > 0$, we have
+	\begin{align*}
+		(y_k, u_k) \subset W_{ad} \cap (\bar{B_Y(r)} \times \bar{B_U(r)}):= M
+	\end{align*}
+	By assumption the admissible set is closed and convex, hence $W_{ad}$ is closed and convex, so is $M$. Therefore $M$ is weakly sequentially compact, i.e. for a subsequence
+	\begin{align*}
+		(y_{k_i}, u_{k_i}) \rightharpoonup (\bar{y}, \bar{u}) \in W_{ad}
+	\end{align*}
+	The mapping $(y, u) \in W_{ad} \rightarrow f(y, u)$ is w.l.s.c.(cf. Exercise). Hence
+	\begin{align*}
+		f^* = \lim_{i \rightarrow \infty} f(y_{k_i}, u_{k_i}) \geq f(\bar{y}, \bar{u}) \geq f^*
+	\end{align*}
+	we have an optimal point $(\bar{y}, \bar{u})$. \\
+	For $\alpha > 0$, the mapping $u \mapsto f(A^{-1}(g - Bu), u)$ is \textbf{strictly convex,} which rules out the existence of more than 1 minimum. 
+\end{proof}
+
+\begin{example}[Distributed control of the elliptic problems]
+	Consider 
+	\begin{align*}
+		\textbf{(4.2)}\quad
+		\min_{y, u} f(y, u) &= \frac{1}{2}\|y - y_d\|^2_{L^2(\Omega)} + \frac{\alpha}{2} \|u\|^2_2\\
+		s.t. -\Delta y &= \gamma u \quad \Omega\\
+			y &= 0 \quad \partial \Omega\\
+			a \le u &\le b \quad \Omega
+	\end{align*}
+	with $\gamma \in L^\infty(\Omega) \slash \{0\}, \gamma \geq 0, a , b \in L^2(\Omega), a \le b$. \par 
+	We choose $U = L^2(\Omega)$, $U_{ad}:= \{ u \in U, a \le u \le b , a.e. \}$. Then $U_{ad}$ is closed bounded and convex. (cf Exercise). The weak formulation of the PDE in \textbf{4.2} is 
+	\begin{align*}
+		\text{Find } y \in Y&:= H_0^1(\Omega):\\
+		a(y, v) &= \langle \gamma u, v \rangle_{L^2} \quad \forall v \in Y
+	\end{align*}
+	with $a(y, v) = \int_\Omega \nabla y \cdot \nabla v dx$ or short
+	\begin{align*}
+		Ay + Bu = 0
+	\end{align*}
+	with $A \in L(Y, Y^*)$ the operator representation of $a(, )$(cf, 3.8) and $B \in L(U, Y^*)$ given by 
+	\begin{align*}
+		Bu = - \langle \gamma u, \cdot \rangle_{L^2(\Omega)}
+	\end{align*}
+	by Lax-Milgram we have $A \in L(Y, Y^*)$ is bounded invertable. with 
+	\begin{align*}
+		Y_{ad} = Y = H_0^1(\Omega), Z = Y^*
+	\end{align*}
+	Assumption \textbf{4.1} holds with $H= L^2(\Omega)$ and $Q = I_{Y, H}: y \in Y \mapsto y \in H$. The example satisfies all the assumptions. 
+\end{example}
+
+
+\subsection{Nonlinear problems}
+Consider 
+\begin{align*}
+	\min_{y, u} &f(y, u)\\
+	s.t.\\
+	 E(y, u) &= 0\\
+	 u \in U_{ad},& y \in Y_{ad}
+\end{align*}
+with $f: Y \times U \rightarrow \mathbb{R}$ and $\mathbb{E}: Y \times U \rightarrow Z$ continuous for Banach spaces $Y, U, Z$ with $Y, U$ reflexive and 
+\subsubsection*{Assumption 4.2}
+\begin{enumerate}
+	\item $U_{ad}$ is closed, bounded, convex. \text{ (control space)}
+	\item $Y_{ad}$ is closed and convex, such that there exists a feasible point. \text{(solution space)}
+	\item The equation $E(y, u)$ has a bounded solution operator 
+		\begin{align*}
+			U_{ad} \ni u \mapsto y(u) \in Y
+		\end{align*}
+	\item The mapping $(y, u) \in Y \times U \mapsto E(y, u) \in Z$ is continuous w.r.t. the weak topology, i.e.
+		\begin{align*}
+			(y_k, u_k) \rightharpoonup (y,u) \Rightarrow E(y_k, u_k) \rightharpoonup E(y, u) 
+		\end{align*}
+	\item The function $f$ is w.l.s.c.
+\end{enumerate}
+
+\begin{theorem}
+	Under the assumption \textbf{4.2} the problem $(4. 3)$ has an optimal point $(\bar{a}, \bar{y}) \in U_{ad} \times Y_{ad}$ 
+\end{theorem}
+\begin{proof}
+	As before\\
+	1) + 3) $\Rightarrow$ existence of minimizing sequence\\
+	$Y, U$ reflexive yield a weakly convergent subsequence 
+	\begin{align*}
+		(y_{k_i}, u_{k_i}) \rightharpoonup (\bar{y}, \bar{u})
+	\end{align*}\\
+	1) + 2) + 4) $\Rightarrow$ $W_{ad}$ is weakly sequential closed. i.e.
+	\begin{align*}
+		(\bar{y}, \bar{u}) \in W_{ad}
+	\end{align*}
+	5) $\Rightarrow$ optimality
+\end{proof}
+
+\begin{example}[Boundary control of semilinear elliptic problem]
+		Consider 
+		\begin{align*}
+			\min f(y, u) =& \frac{1}{2} \|y - y_d\|^2_2 + \frac{\alpha}{2}\|u\|^2_{L^2(\partial \Omega)}\\
+			s.t. -\Delta y + y^3 &= 0 \quad \Omega\\
+			y_\nu + y &= u \quad \partial \Omega\\
+			0 \le u &\le b \quad \partial \Omega
+		\end{align*}
+		with $\Omega = \subset \mathbb{R}^n$, $n = 2$ or $n = 3$, open, bounded, and $\partial\Omega$ is Lipschitz, $a, b \in L^n(\partial\Omega)$, $a \le b$. \\
+		We take $U = L^n(\partial \Omega)$, $Y = H^1(\Omega)$ and 
+	\begin{align*}
+		U_{ad} &:= \{u \in U: a \le u \le b \}\\
+		Y_{ad} &:= Y
+	\end{align*}
+		we verify \textbf{4.2}\\
+		1. $U_{ad}$ is bounded, convex, and closed. (EX)\\
+		2. The weak solution of the PDE is given by the operator:
+		\begin{align*}
+			E:(y, u) \mapsto E(y, u):= a(y, \cdot) + (y^3, \cdot)_{L^2(\Omega)} + \langle y - u, \cdot \rangle _{L^2(\partial\Omega)} \in Y^* = Z
+		\end{align*}
+		with $a(y, v) = \int_\Omega \nabla y \cdot \nabla v dx$. Note $y^3 \in L^2(\Omega)$ because we have $n \le 3, H^1 \overset{cts}{\hookrightarrow}  L^6(\Omega)$(2.8).
+		Moreover, $y \mapsto y^3$ is monotone, satisfies(3.19). And $0^3 = 0$. From theorem of additional regularity(3.6, Brauder-Minty) there exists a bounded solution operator 
+		\begin{align*}
+			U_{ad} \ni u \mapsto y(u) \in Y
+		\end{align*} 
+		4. Let $Y \supset y_k \rightharpoonup y \in Y$, we have:
+		\begin{align*}
+			Y = H^1 \nearrow^{cp} L^5(\Omega)
+		\end{align*}
+		for $n = 2, n = 3$. Lemma 4.2 yields (with $A = Id: H^1(\Omega) \rightarrow L^5(\Omega))$ yields
+		\begin{align*}
+			y_k \rightarrow y \quad \text{in } L^5(\Omega)
+		\end{align*}
+		From $y_k, y \in Y \in H^1(\Omega) \nearrow^{cp} L^5(\Omega)$. we have: $y_k^3, y^3 \in L^{\frac{5}{3}} (\Omega)$ with
+		\begin{align*}
+			|b^3 - a^3| \le 3(|a|^2 + |b|^2)|b - a|
+		\end{align*}
+		we get 
+		\begin{align*}
+			\|y_k^3 - y^3\|_{L^{\frac{5}{3}}(\Omega)} &\le 3 \|(y_k^2 + y^2)|y_k - y|\|_{L^{\frac{5}{3}}}(\Omega)\\
+			&\le 3\|y_k^2|y_k - y|\|_{5\slash3} + 3 \|y^2 |y_k - y|\|_{5 \slash 3}
+		\end{align*}
+		Apply Holder-inequality with $p = \frac{3}{2}$ and $q = 3$ we have
+		\begin{align*}
+			\|v^2 w \|_{5 \slash 3} &= \| |v|^{10\slash 3} |w|^{5 \slash 3} \|_1 \\
+			&\le \||v|^{10 \slash 3}\|^{3 \slash 5}_{3 \slash 2} \||w|^{\frac{3}{5}}\|_3^{3 \slash 5} \\
+			&=  \|v\|^2_5 \|w\|_5
+		\end{align*}
+		and with that
+		\begin{align*}
+			\|y_k^3 - y^3\| &\le 3 (\|y_k\|^2_5 + \|y\|_5^2)\|y_k - y\|_5\\
+			&\rightarrow 0
+		\end{align*}
+		Altogether we get:
+		\begin{align*}
+			y_k^3 \rightarrow y^3 \qquad \text{in } L^{5 \slash 3} = L^{5 \slash 2}(\Omega)^* \nearrow Y^*
+		\end{align*}
+		hence finally. $y_k \rightarrow y$ in $Y^*$. With the weak convergence for the linear part of $E$ we obtain that for $u_k \rightharpoonup u$:
+		\begin{align*}
+			E(y_k, u_k) \rightharpoonup E(y, u) \quad \text{ in } Y^*
+		\end{align*}
+		5. The function $f$ is weakly l.s.c. by theorem 4.2.
+\end{example}
+
+
+\newpage
+\section{Differentiation of the reduced problem}
+\subsection{Differentiation in Banach spaces}
+Let $F: X \supset U \rightarrow Y$ be a nonlinear operator between 2 Banach spaces $X, Y$ and $U \neq \emptyset$ open. We say that $F$ is \textbf{directional differentiable} in $x \in U$ if 
+\begin{align*}
+	dF(x, h) = \lim_{t \rightarrow 0^+} \frac{F(x + th) - F(x)}{t} \in Y
+\end{align*}
+for all $h \in X$. In this case, $dF(x, h)$ is the \textbf{directional derivative} of $F$ in $x$ in direction $h$. $F$ is called \textbf{Gateaux differentiable} in $x \in U$ if $F$ is directional differentiable in $x \in U$ and the directional derivative 
+\begin{align*}
+	F'(x): X \ni x \mapsto dF(x,h) \in Y
+\end{align*}
+is bounded and linear, i.e. $F'(x) \in L(X, Y)$. \\
+$F$ is called \textbf{Frechet differentiable} in $x \in U$ if it's Gateaux differentiable and 
+\begin{align*}
+	\|F(x + h) - F(x) - F'(x) h\|_Y = o(\|h\|_X)
+\end{align*}
+We say $F$ is directional, Gateaux or Frechet differentiable short $d- \slash G- \slash - F$ on $V \subset U$ if the respective differentiability holds. If $G$-differentiable in a neighborhood $V$ of $x$ and $F': V \rightarrow L(X, Y)$ is also G-differentiable, then $F$ is called \textbf{twice} G-differentiable. And we write 
+\begin{align*}
+	F''(x) \in L(X, L(X, Y))
+\end{align*}
+for the second Gateaux-derivative of $F$ in $x$. Iteratively, we define in this way the k-th Gateaux derivative and analogous Frechet derictive. We say $F$ is k-times continuously F-differentiable, if $F$ is k-times $F$-differentiable and $F^(k)$ is continuous. For F-differentiable we have the \textbf{chain rule:}
+\begin{enumerate}
+	\item $H(x) = G(F(x))$, $F, G$ are F-differentiable in $x$ or $F(x)$. Then H is F-differentiable in $x$ with
+		\begin{align*}
+			H'(x) = G'(F(x))F'(x)
+		\end{align*}
+	\item $H(x) := G(F(x))$, $F$ is F-differentiable in $x$ and $G$ is G-differentiable in $F(x)$, then $H$ is G-differentiable in $x$ and 
+		\begin{align*}
+			H'(x) = G'(F(x)) F'(x)
+		\end{align*}
+	\item If $F$ is G-differentiable on a neighborhoods of $x$ and $F'$ is continuous in $x$, then $F$ is Frechet differentiable in $x$. 
+	\item If $F:X \times Y \rightarrow Z$ is F-differentiable in $(x, y)$, then $F( \cdot, y )$ and $F(x, \cdot)$ are F-differentiable in $x$ and $y$ respectively. These directional derivatives are called partial derivatives that we denote by
+		\begin{align*}
+			F_x'(x, y) \quad \& \quad F_y'(x, y)
+		\end{align*}
+		it holds 
+		\begin{align*}
+			F'(x, y)(h_x, g_y) = F_x'(x, y)h_x + F_y(x, y)h_y
+		\end{align*}
+	\item If $F$ is Gateaux differentiable, then in a neighborhood $V \ni x$, $\forall h \in X$ with $\{x + th: 0 \le t \le 1\} \subset V$
+		\begin{align*}
+			\|F(x + h) - F(x)\|_Y \le \sup_{0 < t < 1} \|F'(x + th) h\|_Y
+		\end{align*}
+		If, in addition, the mapping $t \in [0, 1] \mapsto F'(x + th) h \in Y$ is continuous, then 
+		\begin{align*}
+			F(x + h) - F(x) = \int_0^1 F'(x + th)\cdot h dt
+		\end{align*}
+	\item For $Y = \mathbb{R}$ and $F: X \supset U \rightarrow Y$ G-diffble in $x \in U$, then $F'(x) \in L(X, \mathbb{R}):= X^*$ is by definition an element of the dual. 
+\end{enumerate}
+
+
+\subsection{Differentiation of the reduced problem}
+Consider \textbf{(5.1)}
+\begin{equation}
+\left\{	
+\begin{aligned}
+	&\min_{(y, u) \in W_{ad}} f(y, u) \quad\\
+	&\text{s.t.}\\
+	&E(y, u) = 0,\\
+	&W_{ad} \subset W:= Y \times U \text{ closed non-empty on the Banach space } U, X, Y, Z, 
+\end{aligned}
+\right.
+\end{equation}
+with $f:Y \times U \rightarrow \mathbb{R}$, $E: Y \times U \rightarrow Z$ are continuously F-differentiable and there exists a well-posed solution operator
+\begin{align*}\textbf{(5.2) }
+	U \ni u \mapsto y(u)\in Y \text{ (the control state operator)}
+\end{align*}
+Moreover, we assume that $E_y(y(u), u) \in L(Y, Z)$ is continuously invertible. Thus the implicit function theorem yields that $u \mapsto y(u)$ is continuously F-differentiable. \par 
+Differentiating $E(y(u), u) = 0$ w.r.t. $u$ yields
+\begin{align*}
+	(*) \qquad
+	E_y(y(u), u) y'(u)+ E_u(y(u), u) = 0
+\end{align*}
+with \textbf{(5.2)} we can eliminate the equality constraint in \textbf{(5.1)} and obtain the reduced problem:
+\begin{equation}
+\left\{
+\begin{aligned}
+	&\min_{u \in U} \hat{f}(u):= f(y(u), u)\\
+	&\text{s.t.}\\
+	& u \in \hat{U}_{ad}:= \{u \in U:(y(u), u) \in W_{ad} \}
+\end{aligned}
+\right.
+\end{equation}
+
+We are now interested now in derivative of $\hat{f}': U \rightarrow \mathbb{R}$. There are 2 approaches:
+\subsubsection{sensitivities approach:} For $u \in U$ and a direction $s \in U$ we have the directional derivative 
+	\begin{align*}
+		d\hat{f}(u, s) &= \langle \hat{f}'(u), s \rangle_{U^*, U} \\
+		&= \langle f_y(y(u), u), y'(u)s \rangle_{Y^*, Y} 
+		+ \langle f_u(y(u), u), s \rangle_{U^*,U}
+	\end{align*}
+	differentiating $E(y(u), u) = 0$ in the direction $s$ gives. 
+	\begin{align*}
+		E_y(y(u), u) y'(u)s + E_u(y(u), u)s = 0.
+	\end{align*}
+	The sensitivity (\textbf{or the first variation}) $\delta_s y = dy(u, s)$ is not explicit given, but can be calculated by the linearization
+	\begin{equation}
+	\tag{$*$}
+		E_y(y(u), u)\delta_s y = -E_u(y(u), u) \cdot  s 
+	\end{equation}
+	in order to compute the directional derivative 
+	\begin{align*}
+		d\hat{f}(u, s) = \langle \hat{f}'(u), s \rangle_{U^*, U}
+	\end{align*}
+	we first compute $\delta_s y$ by \textbf{($*$)} and $d\hat{f}(u, s)$ then by 
+	\begin{align*}
+		d\hat{f}(u, s) &= \langle \hat{f}'(u), s \rangle_{U^*, U} \\
+		&= \langle f_y(y(u), u), y'(u)s \rangle_{Y^*, Y} 
+		+ \langle f_u(y(u)), u), s \rangle_{U^*,U},
+	\end{align*}
+	this approach is however quite expensive if we need the total derivative because we then have to compute the directional derivatives in the direction of all basis functions $b \in B$ of $U$ we have to solve a linear system \textbf{($*$)} with $s = b$. The effort grows linearly with $\dim(U)$. 
+	
+	
+\subsubsection{Adjoint method:} 
+The sensitivity is not feasible if $U$ is some infinite dimensional functional space. We need different toolbox. 
+	Observe the total derivative of $\hat{f}$ w.r.t. $u$, 
+	\begin{align*}
+		 \quad \frac{d}{du} \hat{f}(u) &= y_u^* f_y(y(u), u) + f_u(y(u), u)
+	\end{align*}
+	so that instead of $y_u(u) \in L(U, Y)$ we  need $y_u(u)^* f_y(y(u), u) \in U^*$. \\
+	From $(*)$ the constraints equality we know
+	\begin{align*}
+		y_u(u) = -(E_y)^{-1} E_u
+	\end{align*}
+	and hence
+	\begin{align*}
+		&(y_u)^* = -E_u(y(u), u)^* \bigg(E_y^{-1}\bigg)^*\\
+		&y_u^* f_y = E_u^* \underbrace{ -\bigg(E_y^{-1}\bigg)^*f_y }_{:= p(u) \in Z^*}
+	\end{align*}
+	Define $p: U \rightarrow  Z^*$ by
+	\begin{equation}
+		p(u): = -(E_y)^{-*} \cdot f_y
+	\end{equation}
+	Plug it back into the derivative to get the derivative of the reduced cost:
+	\begin{equation}
+	\begin{aligned}
+		&\hat{f}_u = E_u^* \cdot  p(u) + f_u \\
+		& \text{with}\\
+		& p \text{ as above}
+	\end{aligned}
+	\end{equation}
+	to compute $\hat{f}(u)$ with this approach we need to solve \textbf{(adjoint equation)} w.r.t the unknown $p$. The effort is independent of $\dim(U)$.
+
+\subsubsection*{The Lagrange argument}
+	This approach can also be derived form the \textbf{principle of Lagrange }by using $p \in Z^*$ as Lagrange multiplier:  
+	\begin{align*}
+		L(y, u, p)= f(y, u) + \langle p, E(y, u) \rangle_{Z^*. Z}
+	\end{align*} 
+	with $y = y(u)$ we have for all $ p \in Z^*$:
+	\begin{align*}
+		L(y(u), u, p) = f(y(u), u) + \langle p, E(y(u), u) \rangle_{Z^*, Z} := \hat{f}(u)
+	\end{align*}
+	Since $\langle p, E \rangle = 0$.  From this we get 
+	\begin{align*}\textbf{(5.7)}\quad 
+		\langle \hat{f}', s \rangle_{U^*, U} = \langle L_y, y'(u)s\rangle_{Y^*, Y} + \langle L_u, s \rangle_{U^*, U}
+	\end{align*}
+	we can choose $p= p(u) \in Z^*$ such that the first optimality condition holds:  
+	\begin{align*} \quad
+		L_y = 0
+	\end{align*}
+	this is the adjoint equation, because for all $d \in Y$ we have:
+	\begin{align*}
+		\langle L_y, d \rangle_{Y^*, Y} &= \langle f_y, d \rangle_{Y^*, Y} + \langle p, E_y d \rangle_{Z^*, Z }\\
+		&= \langle f_y + E_y^* p , d \rangle_{Y^*, Y}
+	\end{align*}
+	with the adjoint operation $E_y^* p$ takes the value $p \in Z^*$ and projects to $Y^*$. Therefore we get the expression of $L_y$:
+	\begin{align*}
+		& L_y(y(u), u, p) = f_y + (E_y)^* p \\
+		& \text{with} \\
+		&  \langle E_y^* \cdot p, d \rangle_{Y^*, Y}  := \langle p, E_y d  \rangle_{Z^*, Z} \quad \text{for all } d \in Y,
+	\end{align*}
+	hence  is equivalent to 
+	\begin{align*}
+		E_y^* \cdot  p = - f_y
+	\end{align*}
+	which is the adjoint equation.\par 
+	Analog we now take the first optimality condition w.r.t. $u$, then we have 
+	\begin{align*}
+		L_u &= f_u + E_u^* \cdot  p 
+	\end{align*}
+	with $p$ from  we know the derivative of the reduced problem: 
+	\begin{align*}
+		\hat{f}' = E_u^* \cdot  p + f_u,
+	\end{align*}
+	i.e., \textbf{(5.5)}
+
+
+\begin{example}
+Consider 
+\begin{align*}
+	&\min_{y, u \in Y \times U} f(y, u) = \frac{1}{2} \|Qy - q_d\|_H^2  + \frac{\alpha}{2}\|u\|_U^2\\
+	&\text{s.t.}\\
+	& Ay + Bu = g,\\
+	&u \in U_{ad}, y \in Y_{ad}
+\end{align*}	
+with $H,U$ Hilbert space, $Y, Z$ Banach space, $q_d \in H, g \in Z, A \in L(Y, Z), B \in L(U, Z), Q \in L(Y, H)$. Suppose the assumption \textbf{4.1} holds.\\
+we set 
+\begin{align*}
+	E(y, u) = Ay + Bu - g, \quad W_{ad} = Y_{ad} \times U_{ad}
+\end{align*}
+By assumption the solution exists 
+\begin{align*}
+	U \ni u \mapsto y(u):= A^{-1}(g - Bu) \in Y
+\end{align*}
+For the derivatives we get
+\begin{align*}
+	\langle f_y(y, u), s_y\rangle &= (Qy - q_d, Q s_y)_H\\
+	&= \langle Q^* (Qy - q_d), s_y \rangle \\
+	\langle f_u(y, u), s_u \rangle &= \alpha (u, s_u)_U\\
+	\langle E_y(y, u), s_y \rangle &= As_y \\
+	\langle E_u(y, u), s_u \rangle &= B s_u
+\end{align*}
+Hence
+\begin{align*}
+	f_y(y, u) &= (Qy - q_d, Q \cdot)_H, \\
+	f_u(y, u) &= \alpha (u, \cdot)_U\\
+	E_y'(y, u) &= A\\
+	E_u'(y, u) &= B 
+\end{align*}
+with the identification $U^* = U, H = H^*$ we get:
+\begin{align*}
+	f_y(y, u) &= (Qy - q_d, Q \cdot)_H = \langle Qy - q_d, Q \cdot \rangle_{H^*, H}\\
+	&= \langle Q^*(Qy- q_d), \cdot \rangle_{Y^*, Y} \\
+	&= Q^*(Q_y - q_d)\\
+	f_u(y, u) &= \alpha u(u, \cdot)_U = \alpha u
+\end{align*}
+The reduced costs are :
+\begin{align*}
+	\hat{f}(u) &= f(y(u), u) \\
+	&= \frac{1}{2} \|Q(A^{-1}(g - Bu)) - q_d\|_H^2 + \frac{\alpha}{2}\|u\|_U^2
+\end{align*}
+To evaluate $\hat{f}$ we first solve $Ay + Bu = g$ (PDE) for $y = y(u)$ to evaluate $f(y, u)$. To obtain $\hat{f}'$ we have 2 possibilities:\\
+\textbf{1): sensitivity approach: } for $s \in U$ we obtain $d \hat{f}(u, s) = \langle \hat{f}'(u), s \rangle_{U^*, U}$ by solving \textbf{($*$).}
+\begin{align*}
+	E_y ((y(u), u) \delta_s y &= - E_u'((y(u), u) s \\
+	A\delta_{s}y &= - B s
+\end{align*}
+w.r.t. $\delta_{s}y$ and 
+\begin{align*}
+	d\hat{f}(u, s) &= \langle \langle Qy(u) - y_d, Q \delta_s y   \rangle + \alpha \langle u, s\rangle 
+\end{align*}
+\textbf{2): adjoint approach:}  we compute $\hat{f}'(u)$ by solving the \textbf{adjoint equation.}
+\begin{align*}
+	E_y(y(u), u)^* p  &= f_y(y(u), u) \\
+	\Rightarrow 
+	A^* p &= - \langle Qy - q_d, \quad Q \cdot\rangle_H \quad( - Q^*(Qy - q_d) \quad \text{for} \quad H = H^*)
+\end{align*}
+w.r.t. $p = p(u) \in Z^*$ and computation of 
+\begin{align*}
+	\hat{f}(u) = B^* p(u) + \alpha (u,  \cdot )_U  \in U^*
+\end{align*}
+\end{example}
+
+\begin{example}[stationary heatting]
+	Consider \textbf{(5.10)}
+	\begin{align*}
+		\min f(y, u) = \frac{1}{2}\int_\Omega (y(x) - y_d(x))^2 dx 
+		&+ \frac{\alpha}{2} \int_\Omega u(x)^2 dx \\
+		s.t.\qquad - \Delta y = \gamma u \quad &\text{on } \Omega \\
+		y_\nu = \frac{\beta}{\kappa}(y_a - y) \quad &\text{on } \partial \Omega\\
+		a \le u \le b \quad &\text{on }  \Omega
+	\end{align*}
+	First, we bring this into the form of the last example. We let $U = L^2(\Omega), Y = H^1(\Omega)$ and assume that $\Omega$ is bounded and $\partial \Omega$ Lipschitz. $a, b \in U$, $y_d \in L^2(\Omega)$, $\alpha > 0, y_a \in L^2(\Omega), \gamma \in L^\infty(\Omega) \slash \{0\}, \gamma > 0, \beta > 0, \kappa > 0$. \\
+	The \textbf{weak form of the constraint} is 
+	\begin{align*}
+		\text{Find } y \in Y: a(y, v) &= (\gamma u,  v)_{L^2(\Omega)} 
+		+ (\frac{\beta}{\kappa} y_a, v)_{L^2(\partial \Omega)} \quad \forall v \in Y \\
+		\text{with } 
+		a(y, v) &= \int_\Omega \nabla y \cdot \nabla v dx + (\frac{\beta}{\kappa}y, v)_{L^2(\partial\Omega)}
+	\end{align*}
+	By Lax-Milgram we know $a( , )$ induces an operator $A \in L(Y, Y^*)$ with a bounded inverse. We choose $Z = Y^*, H = L^2(\Omega), U_{ad} = \{u \in U: a \le u \le b \text{ on } \Omega\}, Y_{ad} = Y$ and
+	\begin{align*}
+		B \in L(U, Y^*) &\text{ by } Bu = -(\gamma u, \cdot)_{L^2(\Omega)} \\
+		g \in Y^* &\text{ by } g = (\frac{\beta}{\kappa} y_a, \cdot)_{L^2(\Omega)}\\
+		Q\in L(Y, H) &\text{ by } Qy = y
+	\end{align*}
+	\textbf{(5.10)} $\Leftrightarrow$ \textbf{(5.9)} and assumption 4.1 holds. We now determine the adjoint equation and the gradient of the reduced cost. The spaces $U, H, Y, Z$ are Hilbert spaces therefore reflexive. In particular we can identify $U$ with $U^*$: $\langle , \rangle_{U^*, U} = (, )_{L^2(\Omega)}$. With that 
+	\begin{align*}
+		&A^* \in L(Z^*, Y^*) = L(Y, Y^*)\\
+		&B^* \in L(Y^{**}, U^*) = L(Y, U^*)\\
+		&Q^* \in L(H^*, Y^*) = L(H, Y)
+	\end{align*}
+	For $A^*$ we get
+	\begin{align*}
+		\langle A^* v, w \rangle_{Y^*, Y} &= \langle v, Aw\rangle _{Z^*, Z} = \langle Aw , v\rangle_{Y^*, Y} = a(w, v) = a(v, w) = \langle Av, w\rangle_{Y^*, Y} \quad \forall v, w \in Y
+	\end{align*}
+	i.e. $A^* = A$. For $B^*$ we get 
+	\begin{align*}
+		(B^*v, w)_U = \langle B^* v , w \rangle_{U^*, U} = \langle v, Bw \rangle_{Z^*, Z} 
+		= \langle v, Bw \rangle_{Y. Y^*} = \langle v, Bw \rangle_{Y, Y^*} = (v, - \gamma w )_{L^2(\Omega)} = - (\gamma v, w)_U \quad \forall v \in Y, w \in U
+	\end{align*}
+	i.e. $B^* v = - \gamma v$ From $Qy = y$ we get
+	\begin{align*}
+		&f_y(y, u) = (Q_y - y_d, Q \cdot)_{L^2(\Omega)} = (y - y_d, \cdot )_2 \\
+		&f_u(y, u) = \alpha(u, \cdot)_2 = \alpha u
+	\end{align*}
+	hence the adjoint equation is 
+	\begin{align*}
+		Ap = - (y - y_d, \cdot)_2
+	\end{align*}
+	as a weak form of 
+	\begin{align*}
+		- \Delta p = - (y - y_d) &\text{ on } \Omega\\
+		p_\nu + \frac{\beta}{\kappa} p = 0 &\text{ on } \partial\Omega
+	\end{align*}
+	we finally get 
+	\begin{align*}
+		\hat{f}'(u) = B^*p(u) + f_u'(y(u), u) = - \gamma p + \alpha u
+	\end{align*}
+\end{example}
+
+
+\begin{remark}
+For state equation in weak form, we can also argue with the Lagrange function	.\\
+For $E : Y \times Y \rightarrow Z = Y^*$, the weak form in example 5.3 is 
+\begin{align*}
+	\langle p, E(y, u) \rangle_{Z^*, Z} = a (y, p) - (\gamma u , p)_2 - (\frac{\beta}{\kappa}y_a, p)_{2 \partial}
+\end{align*}
+with $p \in Z^* = Y$, the Lagrange function:
+\begin{align*}
+	L(y, u, p) = \frac{1}{2}\|y - y_d\|^2_2 + \frac{\alpha}{2} \|u\|^2_2 + a(y, p) - (\gamma u, p)_2 - (\frac{\beta}{\kappa}y_a, p)_{2 \partial}
+\end{align*}
+the adjoint equation is 
+\begin{align*}
+	L_y(y(u), u, p) &= 0 \Leftrightarrow \langle L_y(y(u), u, p), v \rangle = 0 \quad \forall v \in Y
+\end{align*}
+we get
+\begin{align*}
+	(y - y_d, v)_2 + a(v, p) = 0 \quad \forall v \in Y
+\end{align*}
+as before (using $a(v, p) = a(p, v)$) we get
+\begin{align*}
+	\hat{f}'(u) = L_u'(y(u), u, p) = \alpha(u, \cdot)_2 - (\gamma p, \cdot)_2 = (\alpha u - \gamma p, \cdot)_2 = \alpha u - \gamma p
+\end{align*}
+This works well when you have the weak form of PDE. 
+\end{remark}
+\quad\\
+\quad\\
+
+we now consider the 2nd derivatives of $\hat{f}$. For this, let $f$ and $E$ twice continuous F-differentiable. We know 
+\begin{align*}
+	\hat{f}(u) = f(y(u), u) = L(y(u), u, p) \forall p \in Z^*
+\end{align*}
+with 
+\begin{align*}
+	L(y, u, p) = f(y, u) + \langle p, E(y, u) \rangle_{Z^*, Z}
+\end{align*}
+Differentiate in direction $s_n \in U$ yields as before 
+\begin{align*}
+	\langle \hat{f}(u), s_1\rangle_{U^*, U} = \langle L_y, y'(u) s_1 \rangle + \langle L_u, s_1 \rangle_{U^*, U}
+\end{align*}
+and again in the direction of $s_2 \in U$ yield:
+\begin{align*}
+	\langle \hat{f}''s_2, s_1 \rangle = \langle L_y', y''(u)(s_1, s_2) \rangle
+	+ \langle L'_{yy} y'(u) s_2, y'(u)s_1 \rangle 
+	+ \langle L'_{yu} s_2, y'(u)s_1 \rangle 
+	+ \langle L'_{uy} y'(u)s_2, s_1\rangle 
+	+ \langle L'_{uu} s_2, s_2 \rangle 
+\end{align*}
+choose $p= p(u)$ such that
+\begin{align*}
+	L_y(u) = 0\\
+	\Rightarrow
+	\langle L_y', y''(u)(s_1, s_2) \rangle = 0
+\end{align*}
+we get 
+\begin{align*}
+	\hat{f}''(u) &= y'^* L'_{yy} y' + y'^* L_{yu}'' + L'_{uy} y' + L'_{uu}\\
+	&= T(u)^* L_{ww}''(y(u), u,p(u)) T(u)
+\end{align*}
+with
+\begin{align*}
+	T(u) &= (y'(u), I_u) \in L(U, Y \times U)\\
+	L_{ww}'' &= 
+	\begin{bmatrix}
+		L'_{yy} & L'_{yu}\\
+		L'_{uy} & L'_{uu}
+	\end{bmatrix}
+\end{align*}
+Usually we don't need the total derivative $\hat{f}''(u)$ according to \textbf{(5.11)}, but only need evaluations of the form 
+\begin{align*}
+	\hat{f}(u) s
+\end{align*}
+For this we compute the sensitivity:
+\begin{align*}
+	\delta_s y = y'(u) s = - E'^{-1}_y E_u' s
+\end{align*}
+this requests one solve a linearized state equation. Then we compute
+\begin{align*}
+	\begin{bmatrix}
+		h_1 \\
+		h_2
+	\end{bmatrix}
+	&= 
+	\begin{bmatrix}
+		L'_{yy} \delta_{s}y + L'_{yu} s \\
+		L'_{uy} \delta_{s}y + L'_{uu} s 
+	\end{bmatrix}\\ 
+\end{align*}
+and 
+\begin{align*}
+		h_3 &= y'^* h_1 = -E_u^* (E_y)^{-*} h_1
+\end{align*}
+the computation of $h_3$ can again be realised by the adjoint method. Finally
+\begin{align*}
+	\hat{f}''(u)s = h_2 + h_3
+\end{align*}
+This approach can for example be used directly for Newton-problems:
+\begin{align*}
+	\hat{f}''(u^k) s^k = - \hat{f}'(u^k)
+\end{align*}
+for the unconstrained optimality condition of $\hat{f}$. 
+
+\begin{example}
+	we have $U = U^*, H = H^*$ and 
+	\begin{align*}
+		L(y, u, p) = f(y, u) + \langle p, Ay + Bu - g \rangle
+	\end{align*}
+	and 
+	\begin{align*}
+		L_y(y, u, p) &= Q^*(Qy - q_d) + A^* p\\
+		L_u(y, u, p) &= \alpha u + B^* p\\
+		L'_{yy}(y, u, p) &= Q^* Q \\
+		L'_{uu} &= \alpha I_U\\
+				L_{yu}'' ,\quad L'_{uy} &\equiv 0
+	\end{align*}
+\end{example}
+
+
+
+\section{Optimality conditions}
+\subsection{Simple constraints}
+Consider 
+\begin{align*}\textbf{(6.1)}\quad
+	\min_{w \in W} f(w) \\
+	w \in S
+\end{align*}
+with $W$ a Banach space, $f: W \rightarrow \mathbb{R}$ G-differentiable and $S \subset W$ nonempty, closed and convex.
+
+\begin{theorem}
+	let $W$ be a Banach space and $S \subset W$ nonempty and convex. Moreover $f: V \rightarrow \mathbb{R}$ be defined on an open neighborhood of $ V \supset S$ and $\hat{w} \in W$ a local optimal point of \textbf{(6.1}) in which $f$ is G-differentiable, then
+	\begin{align*}
+	\textbf{(6.2) \quad}
+		\hat{w} \in S, \langle f'(\hat{w}), w - \hat{w} \rangle \geq 0 \quad \forall w \in S
+	\end{align*}
+	Moreover:\\
+	\textbf{1. }if $f$ is convex on $S$, then \textbf{(6.2)} is necessary and sufficient for global minimality.\\
+	\textbf{2. }If $f$ is strictly convex on $S$, then there is at most one solution of \textbf{(6.1)}. \\
+	\textbf{3. }If $W$ is reflexive, $S$ is closed and convex and $f$ is continuous and convex with 
+	\begin{align*}
+		\lim_{w \in S, \|w\|_W \rightarrow \infty } f(w) = \infty
+		\text{ (ensure infimum attained at bounded sequence) }
+	\end{align*}
+	then \textbf{(6.1)} has a global solution. 
+\end{theorem}
+\begin{proof}
+	let $w \in S$. From convexity of $S$ and local optimality of $\hat{w}$  we have
+	\begin{align*}
+		f(\hat{w} + t(w - \hat{w})) - f(\hat{w}) \geq 0 \quad \forall t \in [0, 1]
+	\end{align*}
+	hence 
+	\begin{align*}
+		\langle f'(\hat{w}), w - \hat{w} \rangle = \lim_{t \rightarrow 0^+}
+		\frac{f(\hat{w} + t(w - \hat{w})) - f(\hat{w}) }{t} \geq0
+	\end{align*}
+	If $f$ is convex, then
+	\begin{align*}
+		f(\hat{w} + t(w - \hat{w})) &\le (1 - t) f(\hat{w}) + t f(w)\\
+		\Rightarrow
+		f(w) - f(\hat{w}) &= \frac{(1 - t) f(\hat{w}) + tf(w) - f(\hat{w}) }{t}\\
+		&\ge \frac{f(\hat{w} + t(w - \hat{w})) - f(\hat{w}) }{t}\\
+		&\overset{t \rightarrow 0^+}{\rightarrow} \langle f'(\hat{w}), w - \hat{w} \rangle \\
+		&\ge 0
+	\end{align*}
+	with \textbf{6.2} it yields $\hat{w}$ is optimal. \\
+	If $f$ is strictly convex and $\hat{w}_1, \hat{w}_2$ global optimal point then $\frac{ \hat{w}_1 + \hat{w}_2}{2}$ is a better solution except when $\hat{w}_1 = \hat{w_2}$. \\
+	Under the assumption of the last statement, let $w_k$ being a minimizing sequence then $w_k$ is bounded(by the coercivity condition) and has a weakly convergent subsequence $(w_k)_l \rightharpoonup \hat{w}$. From $S$ is closed and convex it's weakly closed. Since the energy is continuous and convex we know $f$ is w.l.s.c. and we get a minimizer. 
+\end{proof}
+
+\begin{lemma}
+	Let $S \subset W$ be non-empty, closed and convex with $W$ a Hilbert space and 
+	\begin{align*}
+		&P: W \rightarrow S \text{ (the projection onto $S$) }\\
+		&p(w) \in S, \|P(w) - w \|_W = \min_{v \in S} \|v - w\|_W \quad \forall w \in W
+	\end{align*}
+	and it holds:
+	\begin{enumerate}
+		\item $P$ is a well-posed function.
+		\item For all $w, z \in W:$
+			\begin{align*}
+				z = P(w) \Leftrightarrow z \in S, \langle w - z, v - z \rangle \le 0 \quad \forall v \in S
+			\end{align*}
+		\item $P$ is non-expensive, i.e.
+			\begin{align*}
+				\|P(v) - P(w)\|_w \le \|v - w\|_w \quad \forall v, w \in W
+			\end{align*}
+		\item $P$ is monotone, i.e.
+			\begin{align*}
+				\langle P(v) - P(w), v - w \rangle \ge 0 , \forall v, w \in W
+			\end{align*}
+		\item $\forall w \in S, d \in W$:
+			\begin{align*}
+				\phi(t) = \frac{1}{t}\|P(w + td) - w\|_W, t > 0
+			\end{align*}
+			is non-increasing. 
+	\end{enumerate}
+\end{lemma}
+\begin{proof}
+	\qquad\\
+	\textbf{1).} observe the function $w \mapsto \|w\|_w$ is strictly convex: $\forall w_1, w_2, w_1 \neq w_2, \forall t \in (0, 1):$
+	\begin{align*}
+		p(t):= \|w_1 + t(w_2 - w_1)\|_w^2 = \|w_1\|_w^2 + t^2\|w_2 - w_1\|^2_w+ 2t\langle w_1, w_2 - w_1\rangle
+	\end{align*}
+	hence
+	\begin{align*}
+		p(t) < (1 - t) p(0) +  t p(1) = (1 - t) \|w_1\|^2 + t \|w_2\|^2
+	\end{align*}
+	with that, for all $w \in W$, then function
+	\begin{align*}
+		f(v) = \frac{1}{2}\|v - w\|_w^2
+	\end{align*}
+	is also strictly convex. Moreover, $f(v) \rightarrow \infty$ for $\|v\|_W \rightarrow \infty$. By the last theorem $\min_{v \in S} f(v)$ admits an unique solution in $\bar{v} \in S$. $P$ is well defined. \\
+	\textbf{2).} the function $f$ in the last part is $F$-diffbar with
+	\begin{align*}
+		f'(v)(s) = \langle v - w, s \rangle \forall s \in W
+	\end{align*}
+	by the last theorem and $\bar{v} = P(w)$ is a minimizer we have $z = P(w)$ iff
+	\begin{align*}
+		\forall v \in S:
+		\langle f'(z), v - z \rangle = \langle z - w, v - z \rangle \geq 0
+	\end{align*}
+	\textbf{3)}. For all $w, v \in W$ we get from \textbf{2).}
+	\begin{align*}
+		\langle v - P(v), P(w) - P(v) \rangle \le 0\\
+		\langle w - P(w), P(v) - P(w) \rangle \le 0
+	\end{align*}
+	therefore
+	\begin{align*}
+		2 \langle w - v + P(v) - P(w), P(v) - P(w) \rangle
+		= 2 \langle w - v, P(v) - P(w) \rangle + 2\|P(v) - P(w)\|^2  \le 0
+	\end{align*}
+	hence 
+	\begin{align*}
+		\|P(v) - P(w) \|_w^2 \le \langle v - w, P(v) - P(w) \rangle
+		\le \|v - w\| \|P(v) - P(w)\|
+	\end{align*}
+	\textbf{4)} trivial.\\
+	\textbf{5)} let $ t > s > 0$, $w , d \in W$, if 
+	\begin{align*}
+		\|P(w + td) - w\| \le \|P(w + sd) - w\|
+	\end{align*}
+	then
+	\begin{align*}
+		\phi(s) \geq \phi(t)
+	\end{align*}
+	Now let
+		\begin{align*}
+		\|P(w + td) - w\| > \|P(w + sd) - w\|
+	\end{align*}
+	for all $u, w \in W$ we have
+	\begin{align*}
+		\|v\| \langle u, v - u\rangle - \|u\| \langle v, u - v \rangle
+		&= \|v\|\|u\|^2 - \|v\| \langle u, v\rangle - \|u\| \langle v, u\rangle + \|u\| \|v\|\\
+		&\geq \|v\| \|u\|^2 - \|v\| \|u\| \|v\| - \|u\|\|v\|\|u\| + \|u\|\|v\|\\
+		&= 0
+	\end{align*}
+	for $u:= P(w + td) - w$, $v := P(w + sd) - w$ and $w_\tau := w + \tau d$, we have by \textbf{2)}
+	\begin{align*}
+		\langle u, u - v\rangle - \langle td, P(w_t) - P(w_s)\rangle
+		&= \langle P(w_t) - w - td, P(w_t) - P(w_s) \rangle\\
+		&= \langle P(w_t) - w_t, P(w_t) - P(w_s) \\
+		&\le 0
+	\end{align*}
+	analog
+	\begin{align*}
+		\langle v, u - v \rangle - (sd, P(w_t) - P(w_s) \rangle
+		&= \langle P(w_s) - w_s, P(w_t) - P(w_s) \rangle \\
+		&\ge 0
+	\end{align*}
+	hence
+	\begin{align*}
+		0 \le \|v\|\langle u , u - v \rangle - \|u\| \langle v, u - v \rangle\\
+		&\le \|v\| \langle td, P(w_t) - P(w_s) - \|u\|\langle sd, P(w_t) - P(w_s) \rangle \\
+		&= ( t \|v\| - s \|u )\langle d, P(w_t) - P(w_s) \rangle \\
+	\end{align*}
+	since by \textbf{4)}
+	\begin{align*}
+		\langle d, P(w_t) - P(w_s) \rangle = \frac{1}{t - s} \langle w_t - w_s, P(w_t) - P(w_s) \rangle > 0
+	\end{align*}
+	we have
+	\begin{align*}
+		0 \le t\|v\| - s \|u\| = ts (\phi(s) - \phi(t))
+	\end{align*}
+\end{proof}
+
+\begin{lemma}
+	let $W$ be a Hilbert space, $S \subset W$ non-empty closed and convex and $P$ the projection onto $S$, then $\forall y \in W, \gamma > 0$: we have for $w \in S:$
+	\begin{align*}
+		\langle y, v - w \rangle \geq 0 \quad \forall v \in S
+		\Leftrightarrow w - P(w - \gamma y) = 0
+	\end{align*}
+\end{lemma}
+\begin{proof}\quad\\
+	"$\Rightarrow$": with $w_\gamma = w - \gamma y$ we have
+	\begin{align*}
+		\langle w_\gamma - w, v - w \rangle 
+		= -\gamma \langle y, v - w \rangle 
+		\le 0 \quad \forall v \in S
+	\end{align*}
+	with the \textbf{lemma 2}:  $w = P(w_\gamma)$, $ w - P(w - \gamma y) = 0$\\
+	"$\Leftarrow$" we have $P(w_\gamma) = w$ with lemma we have
+	\begin{align*}
+		\langle y, v - w\rangle = \frac{1}{-\gamma}\langle w_\gamma - w, v - w \rangle \geq 0 \quad \forall v \in S
+	\end{align*}
+\end{proof}
+
+\begin{corollary}
+	Let $W$ be a Hilbert space, $S \subset W$ closed convex and non-empty. if $f$ is defined on an open neighborhood of $S$ and $\bar{w}$ the local optimal solution of the problem \textbf{(6.1)}, and $f$ is G-diffbar in $\bar{w}$, then
+	\begin{align*}
+		\bar{w} = P(\bar{w} - \gamma \nabla f(\bar{w})) \quad \forall \gamma > 0
+	\end{align*}
+	where $\nabla f(w) \in W$ is the Riesz map of $f'(w) \in W^*$. 
+\end{corollary}
+
+
+\subsection{Control constraints}
+Consider \textbf{(6.3)}
+\begin{align*}
+	& \min f(y, u) \\
+	& \text{s.t.}\\
+	&  E(y, u) = 0, \quad u \in U_{ad}
+\end{align*}
+
+\subsubsection*{Assumption (6.1)}
+\begin{enumerate}
+	\item $U_{ad}$ non-empty and convex
+	\item $f: Y \times U \rightarrow \mathbb{R}$ and $E: Y \times U \rightarrow Z$ are continuously F-diffbar and $U, Y, Z$ are Banach space. 
+	\item For all $u \in U$ in a nbhd $V \subset U$ of $U_{ad}$. $E(y, u) = 0$ admits an unique solution $y =y(u) \in Y$
+	\item $E_y \in L(Y, Z)$ has a bounded inverse for all $u \in U_{ad}$. 
+\end{enumerate}
+
+Under assumption we can again consider the reduced problem \textbf{(6.4)}
+\begin{align*}
+	&\min_{u \in U} \hat{f} \\
+	&s.t. \\
+	&u \in U_{ad}\\
+\end{align*}
+where $\hat{f}(u) = f(y(u), u) \quad V \ni u \mapsto y(u) \in Y$ is the solution operator of $E(y, u) = 0$. Then 6.1 yields:
+
+\begin{theorem}
+	If \textbf{Assumption (6.1)} holds. If $\bar{u}$ is a local optimal solution of \textbf{(6.4)}, then $\bar{u} \in U_{ad}$ and 
+	\begin{align*}
+		\langle \hat{f}'(\bar{u}), u - \bar{u} \rangle \geq 0 \quad 
+		\forall u \in U_{ad}
+	\end{align*}
+\end{theorem}
+
+\begin{lemma}[optimal control on 2-sided box constraints]
+	Set the control space $U = L^2(\Omega)$.$a, b \in L^2(\Omega)$, $U_{ad} = \{u \in L^2(\Omega): a \le u \le b\}$.  For $\hat{f}' \in L^2(\Omega)^*$ we rewrite it by $\nabla \hat{f} \in L^2(\Omega)$. Then the followings are equivalent:
+	\begin{enumerate}
+		\item $\forall u \in U_{ad}:$
+		\begin{align*}
+			\langle \nabla \hat{f}(\bar{u}), u - \bar{u} \rangle \geq 0
+		\end{align*}
+		\item $\nabla \hat{f}(\bar{u})$ satisfies:
+		\begin{align*}
+			\nabla \hat{f}(\bar{u}) (x) 
+			& = 0  \text{ on } \{a(x) \le \bar{u}(x) \le b(x)\}\\
+			&\ge 0 \text{ on } \{a(x) = \bar{u}(x) \le b(x) \}\\
+			&\le 0 \text{ on } \{a(x) \le \bar{u}(x) = b(x) \}
+		\end{align*}
+		\item There exists $\bar{z}_a,\bar{z}_b \in U^* = L^2(\Omega)$ such that 
+		\begin{align*}
+			\nabla \hat{f}(\bar{u}) + \bar{z}_b - \bar{z}_a = 0\\
+			\bar{u} \ge a, \bar{z}_a \ge 0, \bar{z}_a (\bar{u} - a) = 0\\
+			\bar{u} \le b, \bar{z}_b \ge 0, \bar{z}_b (b - \bar{u}) =0
+		\end{align*}
+		\item For $\gamma > 0$:
+		\begin{align*}
+			\bar{u} &= P_{U_{ad}} (\bar{u} - \gamma \nabla \hat{f}(\bar{u}))\\
+			\text{where: } P_{U_{ad}}(u) &:= \min\bigg( \max(a, u), b\bigg)
+		\end{align*}
+	\end{enumerate}
+\end{lemma}
+\begin{proof}
+\quad\\
+\textbf{2) $\Rightarrow$ 1):} trivial\\
+\textbf{1) $\Rightarrow$ 2):} Argue by contradiction. \textbf{2)} holds iff
+\begin{equation*}
+\nabla f(x)\left\{
+\begin{aligned}
+	\ge 0 \text{ a.e. on  } I_a := \{a(x) \le \bar{u}(x) \lneqq b(x)\}\\
+	\le 0 \text{ a.e. on  } I_b := \{a(x) \lneqq \bar{u}(x) \le b(x) \}
+\end{aligned}
+\right.	
+\end{equation*}
+assuming there exists $M \subset I_a$ such that 
+\begin{align*}
+	\nabla \hat{f}(\bar{u})|_M <  0
+\end{align*}
+choose 
+\begin{align*}
+	u = \bar{u} + \mathbbm{1}_{M}(b - \bar{u})
+\end{align*}
+then we have:
+\begin{align*}
+	\langle \nabla \hat{f}(\bar{u}), u - \bar{u} \rangle 
+	&= \int_M \nabla \hat{f} (\bar{u})(b - \bar{u}) dx < 0
+\end{align*}
+contradiction. \\
+\textbf{2)$\Rightarrow$ 3):} Define:
+\begin{align*}
+	&\bar{z}_a:= \max\{\nabla f(\bar{u}), 0 \}\quad \text{ (0-floor)} \\
+	&\bar{z}_b:= \max\{-\nabla f(\bar{u}), 0\}\quad \text{(reflected 0-cell) }
+\end{align*}
+and get the result. 
+\end{proof}
+
+\quad\\
+\quad\\
+\subsubsection*{Apply to the Lagrangian}
+We will now consider the adjoint-based representation: 
+\begin{align*}
+\textbf{(6.6)} \quad
+	\hat{f}'(u) = (E_U')^* p + f_U
+\end{align*}
+where $p$ is solved by the \textbf{adjoint equation:} 
+\begin{align*}
+\textbf{(6.7)}
+\qquad
+	(E_Y')^* p = -f_Y'
+\end{align*}
+and using the Lagrange method:
+\begin{align*}
+	L(u, y, p) = f(y, u) + \langle p, E(y(u), u) \rangle_{Z^*, Z}
+\end{align*}
+
+\begin{corollary}
+	Let $(\bar{y}, \bar{u})$ be an optimal solution under the assumption \textbf{(6.1).} Then there exists an adjoint state (or Lagrange Multiplier) satisfies:
+	\begin{align*}
+	\textbf{ (6.8) }	&E(\bar{y}, \bar{u}) = 0 \\
+	\textbf{ (6.9) }	&(E_Y)^* \bar{p}(\bar{y}, \bar{u}) = -f_Y(\bar{y}, \bar{u})\\
+	\textbf{(6.10) }	&\bar{u} \in U_{ad}, \forall u \in U_{ad}: 
+		\langle L_U'(\bar{y}, \bar{u}, \bar{p})   , u - \bar{u} \rangle_{U^*, U} \ge 0
+	\end{align*}
+	or equivalently:
+	\begin{align*}
+		\textbf{(6.11) }
+		&L_P'(\bar{y}, \bar{u}, \bar{p}) = 0\\
+		\textbf{(6.12) }
+		&L_Y'(\bar{y}, \bar{u}, \bar{p}) = 0\\
+		\textbf{(6.13) }
+		&\bar{u} \in U_{ad}, \forall u \in U_{ad}: 
+		\langle L_U'(\bar{y}, \bar{u}, \bar{p})   , u - \bar{u} \rangle_{U^*, U} \ge 0
+	\end{align*}
+\end{corollary}
+\begin{proof}
+	trivial
+\end{proof}
+\begin{remark}
+\textbf{(6.8)-(6.10)} holds iff:
+\begin{align*}
+	\textbf{(6.14) }&
+	\langle E(\bar{y}, \bar{u}) \rangle_{Z^*, Z} = 0 \quad \forall p \in Z^*\\
+	\textbf{(6.15) }&
+	\langle L_y'(\bar{y}, \bar{u}, \bar{p}), v \rangle_{Y^*, Y} = 0 \quad \forall v \in Y\\
+	\textbf{(6.16) }&
+	\langle L_u'(\bar{y}, \bar{u}, \bar{p}), u - \bar{u} \rangle_{U^*, U} \ge 0 \quad \forall u \in U_{ad}
+\end{align*}	
+\end{remark}
+
+\begin{example}[simple quadratic probolem]
+Consider 
+\begin{align*}
+	\textbf{(6.17)}\quad
+	&\min_{y,u} \frac{1}{2}\|Qy - y_d\|_H^2 + \frac{\alpha}{2}\|u\|_U^2\\
+	&s.t.\\
+	&Ay + Bu = g \\
+	&u \in U_{ad}
+\end{align*}	
+Derive the optimality condition
+\begin{proof}
+we have
+\begin{align*}
+	E(y, u) &= Ay + Bu - g\\
+	E_y' &= A\\
+	E_u' &= B\\
+	f_y' &= Q
+\end{align*}
+verify the assumptions:
+\begin{enumerate}
+	\item $U_{ad}$ non-empty, convex. \text{(for optimality inequality)}
+	\item $f, E$ \textbf{continuously} $F$-differentiable. \text{}
+	\item $E$ is solvable and satisfies the realisability with $u$. 
+	\item $E_y'$ bounded invertible since $A$ bounded invertible. 
+\end{enumerate}
+The necessary optimality condition \textbf{(6.8)-(6.10)} are
+\begin{align*}
+	&E(\bar{y}, \bar{u}) = 0\\
+	&A^* \bar{p} = Q^*(Qy - y_d)\\
+	&\langle \alpha \bar{u} + B^* \bar{p} , u - \bar{u} \rangle \ge 0 \quad \forall u \in U_{ad}
+\end{align*}
+Derive the optimality condition.
+\end{proof}
+\end{example}
+
+\begin{example}[wave; two-sided box]
+Consider 
+\begin{align*}
+	\textbf{(6.18)} \quad 
+	&\min_{(y, u) \in Y \times U} \|Qy - y_d\|_{L^2(\Omega)} + \frac{\alpha}{2}\|u\|_{L^2(\Omega)}\\
+	&s.t.\\
+	&- \Delta y = \gamma u \text{ on } \Omega \\
+	&y = 0 \text{ on } \partial \Omega\\
+	&a \le u \le b \text{ on } \Omega
+\end{align*}
+	
+\end{example}
+
+
+
+
+\begin{lemma}
+	Let $\Omega \subset \mathbb{R}^n$ by $\mu$-measurable
+\end{lemma}
+
+\begin{theorem}[optimality of the two-sided box control]
+	Let $(\bar{y}, \bar{u})$ be an optimal solution of \textbf{(6.18)}, then there exists $\bar{p} \in H_0^1(\Omega), \bar{z_a}, \bar{z_b} \in L^2(\Omega)$ such that:
+	\begin{align*}
+		&-\Delta \bar{y} = \gamma \bar{u},\qquad \qquad \bar{y}|_{\partial\Omega}= 0\\
+		&-\Delta \bar{p} = -(\bar{y} - y_d), \quad \bar{p}|_{\partial\Omega} = 0\\
+		&\bar{u} \ge a,\quad  \bar{z}_a \ge 0,\quad \bar{z}_a(\bar{u} - a) = 0\\
+		&\bar{u} \le b, \quad \bar{z}_b \ge 0, \quad \bar{z}_b(b - \bar{u}) = 0
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	
+\end{proof}
+
+\begin{lemma}
+	Let $\Omega \subset \mathbb{R}^n$ be $\mu$-measurable, then for all $p_i, p \in [1, \infty]$ with 
+	\begin{align*}
+		\frac{1}{p_1} + \dots \frac{1}{p_k} = \frac{1}{p}
+	\end{align*}
+	and $\forall u_i \in L^{p_i}(\Omega)$, it holds that 
+	\begin{align*}
+		u_1 u_2 \dots u_k \in L^p(\Omega)
+	\end{align*}
+	and 
+	\begin{align*}
+		\|u_1 \dots u_k \|_{L^p(\Omega)} \le \|u_1\|_{L^{p_1}(\Omega)}\dots\|u_k\|_{L^{p_k}(\Omega)}
+	\end{align*}
+\end{lemma}
+\begin{proof}
+	Induction
+\end{proof}
+
+\begin{example}[semilinear elliptic; two-sided box]
+Consider:
+\begin{align*}
+\textbf{(6.19)} \quad
+	\min f(y, u) &:= \frac{1}{2}\|y - y_d\|_{L^2(\Omega)}^2 + \frac{\alpha}{2}\|u\|_{L^2(\Omega)}^2\\
+	s.t.\\
+	-\Delta y + y^3 &= \gamma u \text{ on } \Omega\\
+	y &= 0 \text{ on } \partial \Omega\\
+	a \le &u \le b \text{ on } \Omega
+\end{align*}	
+\end{example}
+
+\begin{theorem}
+	
+\end{theorem}
+
+
+\subsection{General constraints}
+Consider  \textbf{(6.20)}
+\begin{align*}
+	&\min_{w \in W} f(w) \\
+	s.t.\quad &G(w) \in \mathcal{K}, w \in \mathcal{C} 
+\end{align*}
+with $f:W \rightarrow \mathbb{R}$, $G: W \rightarrow V$ continuously F-differentiable on Banach space $W, V$. $\mathcal{C} \subset W$ non-empty, closed, convex set. $\mathcal{K} \subset V$ closed convex cone. ($\forall \alpha, \beta > 0, x, y \in \mathcal{K}, \alpha x + \beta y \in \mathcal{K})$. \\
+We set
+\begin{align*}
+	W_{ad}:= \{ w \in W: G(w) \in \mathcal{K}, w \in \mathcal{C}\}
+\end{align*}
+\begin{remark}
+this setting covers equality constraints e.g. $E(w) = 0, C(w) \in \mathcal{K}_c$ can be written as 
+\begin{align*}
+	G(w) = 
+	\begin{bmatrix}
+		E(w)\\
+		C(w)
+	\end{bmatrix}
+	\in  \{0\} \times \mathcal{K}_c:= \mathcal{K}
+\end{align*}	
+\end{remark}
+\quad\\
+For $W_{ad} \subset W$ non-empty, we write the \textbf{tangential cone} \textbf{(6.21)} of $W_{ad}$ in $w \in W_{ad}$.
+\begin{align*}
+	T(W_{ad}, w) = \{ s \in W: \exists \eta_k > 0, w_k \in W_{ad}: \lim_k w_k = w, \lim_k \eta_k(w_k - w) = s \}
+\end{align*}
+\begin{align*}
+	\textbf{(picture)}
+\end{align*}
+
+The first theorem shows that constrained in the admissible set $W_{ad}$, the first optimality condition holds for directions in the tangent cone.  
+\begin{theorem}
+	let $f: W \rightarrow \mathbb{R}$ be continuously F-diffbar and $\bar{w}$ a local optimal solution of \textbf{(6.20)}. Then we have $\bar{w} \in W_{ad}$ 
+	\begin{align*}
+		\langle f'(\bar{w}), s \rangle \ge 0 \quad \forall s \in T(W_{ad}, \bar{w})
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	$\bar{w} \in W_{ad}$ holds trivially. Let $s \in T(W_{ad}, \bar{w})$, then by definition there exists $(w_k) \subset W_{ad}, \eta_k > 0$:
+	\begin{align*}
+		w_k \rightarrow \bar{w},\qquad \eta_k(w_k - \bar{w}) \rightarrow s
+	\end{align*}
+	hence
+	\begin{align*}
+		0 \le \eta_k (f(w_k) - f(\bar{w}))
+		= \langle f'(\bar{w}), \eta_k(w_k - \bar{w}) \rangle+ \eta_k o(\|w_k - \bar{w}\|_W)
+		\rightarrow \langle f'(\bar{w}), s \rangle 
+	\end{align*}
+\end{proof}
+
+
+Observe the case of our \textbf{general constraints}. we get the linearisation cone. 
+\begin{align*}
+	L(W_{ad}, \mathcal{K}, \mathcal{C}, \bar{w}) = \{\eta d: \eta > 0, d \in W, G(\bar{w}) + G'(\bar{w}) d \in \mathcal{K} ,  \bar{w} + d \in \mathcal{C}\}
+\end{align*}
+We say, $\bar{w}$ satisfies the \textbf{constraint qualification(CQ)} if 
+\begin{align*}
+\textbf{(6.22) }\quad
+	L(W_{ad}, \mathcal{K}, \mathcal{C}, \bar{w}) \subset T(W_{ad}, \bar{w})
+\end{align*} 
+(the opposite direction always holds). :
+\begin{theorem}
+	Let $f : W \rightarrow \mathbb{R}, G: W \rightarrow V$ be continuously F-diffbar with Banach spaces $W, V$. Let $\mathcal{C} \subset W$ be non-empty closed and convex, $\mathcal{K} \subset V$ convex cone and $\bar{w}$ a local optimal point of \textbf{(6.20) } for which \textbf{(6.22)} holds, then
+	\begin{align*}
+		\bar{w} \in W_{ad}, \quad  \langle f'(\bar{w}), s \rangle \geq 0 \quad \forall s \in L(W_{ad}, G, K, C, \bar{w})
+	\end{align*}
+\end{theorem}
+\begin{remark}
+For affine linear $G$, \textbf{(6.22)} holds
+\begin{proof}(of the remark) 
+	let $s \in L(W_{ad}, G, \mathcal{K}, \mathcal{C}, \bar{w})$ with $s = \eta d$, $y \geq 0$ and $d \in W$. By the definition of linearisation cone: 
+	\begin{align*}
+		G(\bar{w} + d) = G(\bar{w}) + G'(\bar{w})d \in \mathcal{K} , 
+		\quad \bar{w} + d \in \mathcal{C}
+	\end{align*}
+	From $G(\bar{w}) \in \mathcal{K}, \bar{w} \in \mathcal{C}$ and the convexity of $\mathcal{K}, \mathcal{C}$ we have (by convexity, the line between $G(\bar{w})$ and $G(\bar{w} + d)$ lies in $\mathcal{K}$.):
+	\begin{align*}
+		w_k:= \bar{w} + \frac{1}{k} d \in W_{ad}
+	\end{align*}
+	The choice $\eta_k = k \eta $ yields $s \in T(W_{ad}, \bar{w})$. 
+\end{proof}	
+\end{remark}
+
+\quad\\
+\quad\par
+More generally, \textbf{(6.22)} holds under the constraint qualification of Robinson \textbf{(Robinson-CQ)}. 
+\begin{align*}
+\textbf{(6.24)}\quad
+	0 \in \interior \bigg(G(\bar{w}) + G'(\bar{w})(\mathcal{C} - \bar{w}) - \mathcal{K}\bigg)
+\end{align*}
+
+\begin{theorem}
+	the condition \textbf{(6.24)} implies \textbf{(6.22)}.
+\end{theorem}
+\begin{proof}
+	\text{cf. Robinson}
+\end{proof}
+\quad\\
+in the convex case: $\forall w_1, w_2 \in W$:
+\begin{align*}
+	G((1 - t)w_1 + tw_2) - (1 - t) G(w_1) - tG(w_2) \in \mathcal{K}, \qquad \forall t \in [0, 1]
+\end{align*}
+then the \textbf{(6.24)} holds under the constraint-qualification of Slater \textbf{(Slater-CQ)}: 
+\begin{align*}
+\textbf{(6.25) }\quad
+	\exists \tilde{w} \in W: G(\tilde{w}) \in int(\mathcal{K}), \tilde{w} \in \mathcal{C}
+\end{align*}
+
+\begin{theorem}
+	$\mathcal{C}, \mathcal{K}$ conditioned as before, if $G:W \rightarrow V $ is convex, then the \textbf{Slater-CQ} implies the \textbf{Robinson-CQ}.
+\end{theorem}
+\begin{proof}
+Claim:
+\begin{align*}
+	0 \in int\{ G(\bar{w}) + G'(\bar{w}) (\mathcal{C} - \bar{w}) - \mathcal{K}\}
+\end{align*}
+	with \textbf{(6.25)} we know for $\epsilon > 0$ sufficiently small:
+	\begin{align*}
+	    \textbf{(*)} \quad
+		G(\tilde{w}) + B_v(\epsilon) \subset \mathcal{K}
+	\end{align*}
+	we show that \textbf{(6.24)} holds for $\bar{w} \in W$ with $G(\bar{w}) \in \mathcal{K}$. Let $w(t) = \bar{w} + t(\tilde{w} - \bar{w}), t \in [0, 1]$. With convexity of $G$ we have $\forall t \in [0, 1]:$
+	\begin{align*}
+		\underbrace{\frac{1}{t}(G(w(t)) - (1 - t)G(\bar{w}) - tG(\tilde{w}))}_{\in \frac{1}{t} \mathcal{K} \in \mathcal{K}}
+		&= \frac{G(w(t)) - G(\bar{w})}{t} + G(\bar{w}) - G(\tilde{w})
+	\end{align*}
+	since $\mathcal{K}$ is closed, for $t \downarrow 0$, 
+	\begin{align*}
+		G'(\bar{w}) (\tilde{w} - \bar{w}) + G(\bar{w}) - G(\tilde{w}) \in \mathcal{K}
+	\end{align*}
+	i.e. there exists $d \in \mathcal{K}$ with 
+	\begin{align*}
+		G(\bar{w}) + G'(\bar{w})(\tilde{w} - \bar{w}) - \mathcal{K}
+		&= G(\tilde{w}) + d - \mathcal{K} \\
+		&= G(\tilde{w}) - \underbrace{ (\mathcal{K} - d) }_{\supset \mathcal{K}}
+	\end{align*}
+	where the closeness under addition of the convex cone follows from:
+	\begin{align*}
+		d + w = 2 (\frac{d + w}{2}) \in \mathcal{K} \quad \forall d, w \in \mathcal{K} \Rightarrow d + \mathcal{K} \subset \mathcal{K}
+	\end{align*}
+	therefore with \textbf{(*)}
+	\begin{align*}
+		G(\bar{w}) + G'(\bar{w}) (\mathcal{C} - \bar{w}) - \mathcal{K} 
+		&\supset G(\bar{w}) + G'(\bar{w})(\tilde{w} - \bar{w}) - \mathcal{K}\\
+		&\supset G(\tilde{w}) - \mathcal{K}\\
+		&\supset B_v(\epsilon)
+	\end{align*}
+\end{proof}
+
+\begin{theorem}[J.Zowe, Kovcyusz: 1970]
+	Let $f: W \rightarrow \mathbb{R}, G: W \rightarrow V$ be continuously $F$-differentiable. $W, V$ Banach space. Let $\mathcal{C} \subset W$ non-empty closed and convex, $\mathcal{K} \subset V$ is closed and convex cone and $\bar{w}$ a local solution of \textbf{(6.20)} for which the \textbf{(6.24)} holds. Then there exists a multiplier $\bar{q} \in V^*$ with 
+	\begin{align*}
+		\textbf{(6.26) } &G(\bar{w}) \in \mathcal{K}\\
+		\textbf{(6.27) } &\bar{q} \in \mathcal{K}^0:= \{q \in V^*: \langle q, v \rangle \le 0 \quad \forall v \in \mathcal{K} \}\\
+		\textbf{(6.28) } &\langle \bar{q}, G(\bar{w}) \rangle = 0\\
+		\textbf{(6.29) } &\bar{w} \in \mathcal{C}, \langle f'(\bar{w}) + [G'(\bar{w})]^* \bar{q}, w - \bar{w} \rangle_{w^*, w} \geq 0 \quad \forall w \in \mathcal{C}
+	\end{align*}
+	with the Lagrange function
+	\begin{align*}
+		L(w, q):= f(w) + \langle q, G(w) \rangle_{V^*, V}
+	\end{align*}
+	we can write \textbf{(6.29)} as 
+	\begin{align*}
+		\textbf{(6.30) }
+		\bar{w} \in \mathcal{C}, \langle L_w(\bar{w}, \bar{q}), w - \bar{w} \rangle \ge 0\qquad \forall w \in \mathcal{C}
+	\end{align*}
+\end{theorem}
+
+Similar results are possible for $\mathcal{K}$ being closed and convex \textbf{set}. Then \textbf{(6.26)}, \textbf{(6.27)} has a more complicated structure. \text{(cf. Bonnans, A.Shapies: 1999)}
+
+
+\subsection{State constraints}
+Consider \textbf{(6.31)}
+\begin{align*}
+	&\min f(y, u) \\
+	&s.t.\\
+	&E(y, u) = 0,\\
+	&C(y) \in \mathcal{K}_c,\\
+	&u \in U_{ad}
+\end{align*}
+with
+\begin{align*}
+	&E: Y \times U \rightarrow Z,\quad C:Y \rightarrow R \quad \text{continuous F-differentiable}\\
+	&Y, U, Z, R \quad \text{Banach space}, \mathcal{K}_C \text{ closed and convex cone}, U_{ad} \subset U \text{ closed and convex set}
+\end{align*}
+with 
+\begin{align*}
+	&G:  W := Y \times U \rightarrow  Z \times R := V,
+	(y, u) \mapsto (E(y, u), C(y))\\
+	&\mathcal{K} = \{0\} \times \mathcal{K}_c,\\
+	&\mathcal{C} = Y \times U_{ad}
+\end{align*}
+then \textbf{(6.31)} is of the form of \textbf{(6.20).} Then Robinson-CQ \textbf{(6.24)} in $\bar{w} = (\bar{y}, \bar{u}) \in W_{ad}$ is 
+\begin{align*}
+	0 \in int\bigg( 
+	\begin{bmatrix}
+		0\\
+		C(\bar{y})
+	\end{bmatrix}
+	+ 
+	\begin{bmatrix}
+		E_y (\bar{w}) & E_y(\bar{w})\\
+		C'(\bar{y}) & 0
+	\end{bmatrix}
+	\begin{bmatrix}
+		y\\
+		U_{ad} - \bar{u}
+	\end{bmatrix}
+	 - 
+	 \begin{bmatrix}
+	 	0\\
+	 	\mathcal{K}_c
+	 \end{bmatrix} \bigg)
+\end{align*}
+consider \textbf{(6.26)} to \textbf{(6.29)} the multiplier $q$ is 
+\begin{align*}
+	q = (p, \lambda) \in V^* = Z^* \times R^*
+\end{align*}
+and the Lagrange function is 
+\begin{align*}
+	\mathcal{L}(y, u, p, \lambda) &= f(y, u) + \langle p, E(y, u) \rangle_{z^*, z} + \langle \lambda, C(y) \rangle_{R^*, R}\\
+	&= L(y, u, p) + \langle \lambda, C(y) \rangle_{R^*, R}
+\end{align*}
+From $\mathcal{K} = \{0\} \times \mathcal{K}_c$ we get $\mathcal{K}^0 = Z^* \times \mathcal{K}_c^0$ and \textbf{(6.26-9)} becomes
+\begin{align*}
+	&\textbf{(6.33) }E(\bar{y}, \bar{u}) = 0, C(\bar{y}) \in \mathcal{K}_c\\
+	&\textbf{(6.34) }\bar{\lambda} \in \mathcal{K}_c^0, \langle \bar{\lambda}, C(\bar{y}) \rangle_{R^*, R} = 0 \quad \textbf{(KKT conditon)} \\
+	&\textbf{(6.35) }\langle L_y(\bar{y}, \bar{u}, \bar{p}) + C'(\bar{y})^* \bar{\lambda}, y - \bar{y} \rangle \geq 0, \forall y \in Y\\
+	&\textbf{(6.36) }\bar{u} \in U_{ad}, \langle L_u(\bar{y}, \bar{u}, \bar{p}), u - \bar{u} \rangle \geq 0 \quad \forall u \in U_{ad}
+\end{align*}
+\begin{remark}
+\textbf{(6.35)} implies that 
+\begin{align*}
+	L_y(\bar{y}, \bar{u}, \bar{p}) + C'(\bar{y})^* \bar{\lambda} = 0
+\end{align*}	
+without the state constraint, this yields the same condition as in  \textbf{corollary 6.2}
+\end{remark}
+
+\begin{lemma}[A sufficient condition of Robinson CQ]
+	Let $\bar{w} = (\bar{y}, \bar{u}) \in W_{ad}$, if $E_y(\bar{w}) \in L(Y, Z)$ is \underline{\textbf{surjective}} and if there exists a $\tilde{u} \in U_{ad}$ and $\tilde{y} \in Y$ with
+	\begin{align*}
+		E_y(\bar{y})(\tilde{y} - \bar{y}) + E_u(\tilde{u} - \bar{u}) = 0\\
+		C(\bar{y}) + C'(\bar{y})(\tilde{y} - \bar{y}) \in int(\mathcal{K}_c)
+	\end{align*}
+	then the \textbf{Robinson-CQ(6.24)} holds.
+\end{lemma}
+\begin{proof}
+	 let $\tilde{v}:= C(\bar{y}) + C'(\bar{y})(\tilde{y} - \bar{y})$, then there exists $\epsilon > 0$ with $\tilde{v} + B_R(2 \epsilon) \subset \mathcal{K}_c$ for $B_R(\epsilon)$ open ball by the continuity of $C$. Moreover, there exists a $\delta > 0$ such that
+	 \begin{align*}
+	 	C'(\bar{y}) B_Y(\delta) \subset B_R(\epsilon)
+	 \end{align*}
+	 From $\tilde{u} \in U_{ad}$ and $(\tilde{y} - \bar{y}) + B_y(\delta) \subset Y - \bar{y}$ we have
+	 \begin{align*}
+	 	&\begin{bmatrix}
+	 		0\\
+	 		C(\bar{y})
+	 	\end{bmatrix}
+	 	+ 
+	 	\begin{bmatrix}
+	 		E_y(\bar{w}) & E_u(\bar{w})\\
+	 		C'(\bar{y}) & 0
+	 	\end{bmatrix}
+	 	\begin{bmatrix}
+	 		Y - \bar{y} \\
+	 		U_{ad} - \bar{u} 
+	 	\end{bmatrix}
+	 	-
+	 	\begin{bmatrix}
+	 		0\\
+	 		\mathcal{K}_c
+	 	\end{bmatrix}\\
+	 	\supset &
+	 	\begin{bmatrix}
+	 		0\\
+	 		C(\bar{y})
+	 	\end{bmatrix}
+	 	+ 
+	 	\begin{bmatrix}
+	 		E_y(\bar{w}) & E_u(\bar{w})\\
+	 		C'(\bar{y}) & 0
+	 	\end{bmatrix}
+	 	\begin{bmatrix}
+	 		\tilde{y} - \bar{y} + B_y(\delta)\\
+	 		\tilde{u} - \bar{u}
+	 	\end{bmatrix}
+	 	- 
+	 	\begin{bmatrix}
+	 		0\\
+	 		\tilde{v} + B_R(2 \epsilon)
+	 	\end{bmatrix}\\
+	 	=& 
+	 	\begin{bmatrix}
+	 		\cancel{E_y(\bar{w})(\tilde{y} - \bar{y}) + E_u'(\bar{w})( \tilde{u} - \bar{u})} + E_y(\bar{w}) B_y(\delta)\\
+	 		\cancel{C(\bar{y}) + C'(\bar{y})(\tilde{y} - \bar{y}) }+ C'(\bar{y})B_y(\delta) 
+	 	\end{bmatrix}
+	 	-
+	 	\begin{bmatrix}
+	 		0\\
+	 		\cancel{\bar{v}} + B_R(2\epsilon) 
+	 	\end{bmatrix}
+	 	\\
+	 	\supset&
+	 	\begin{bmatrix}
+	 		E_y(\bar{w}) B_y(\delta)\\
+	 		B_R(\epsilon)
+	 	\end{bmatrix}
+	 \end{align*}
+	 the open mapping theorem we have $E_y(\bar{w}) B_Y(\delta)$ open in $Z$ and contains $0$, hence, $0$ is in the interior 
+	 \begin{align*}
+\begin{bmatrix}
+	 		0\\
+	 		C(\bar{y})
+	 	\end{bmatrix}
+	 	+ 
+	 	\begin{bmatrix}
+	 		E_y(\bar{w}) & E_u(\bar{w})\\
+	 		C'(\bar{y}) & 0
+	 	\end{bmatrix}
+	 	\begin{bmatrix}
+	 		Y - \bar{y}\\
+	 		U_{ad} - \bar{u}
+	 	\end{bmatrix}
+	 	-
+	 	\begin{bmatrix}
+	 		0\\
+	 		\mathcal{K}_c
+	 	\end{bmatrix}
+	 	= G(\bar{w}) + G'(\bar{w})(\mathcal{C} - \bar{w}) - \mathcal{K}
+	 \end{align*}
+	 as a subset of $V = Z \times R$. 
+\end{proof}
+
+\begin{example}
+Consider \textbf{(6.37)}
+\begin{align*}
+	&\min f(y, u) =  - \frac{1}{2} \|y - y_d\|_{L^2(\Omega)}^2 + \frac{\alpha}{2}\|u\|^2_{L^2(\Omega)}\\
+	&\text{s.t.} \\
+	& -\Delta y + y = \gamma u \text{ on } \Omega\\
+	& \frac{\partial y}{\partial \nu} = 0 \text{ on } \partial \Omega\\
+	& y \ge 0 \text{ on } \Omega 
+\end{align*}	
+For $\Omega \subset \mathbb{R}^n$ bounded and Lipschitz boundary, $2 \le u \le 3$, $\gamma \in L^\infty(\Omega)\slash \{0\}$, $\gamma \geq 0$ and $\alpha \geq 0$. By 3.4 the unique solution $y \in H^1(\Omega) \cap C(\bar{\Omega})$ of the PDE exists. Rewrite:
+\begin{align*}
+	&\min f(y, u) \\
+	&Ay + Bu = 0\\
+	 &y \ge 0
+\end{align*}
+with $Bu = -\gamma u, a(y, u) = \int_\Omega \nabla y \cdot \nabla u dx + (y, u)_2$. 
+For spaces $Y \subset H^1(\Omega), Z \subset H^1(\Omega)^*$ and $R \supset Y$ we set
+\begin{align*}
+	E: Y \times Y \ni (y, u) &\mapsto Ay + Bu \in Z\\
+	C(y) &= y\\
+	\mathcal{K}_C &= \{v \in R: v \geq 0\}\\
+	U_{ad} &= U
+\end{align*}
+we set a problem of the form \textbf{(6.31)}. However, for the choice $R \supset Y = H^1(\Omega)$ and $Z = Y^*$ the cone $\mathcal{K}_C$ \textbf{has no interior point}. We have to choose a different space.
+
+
+Now we choose $R = C(\bar{\Omega})$ then $R \supset Y$ and $\mathcal{K}_C \supset R$ has an interior point. So 
+\begin{align*}
+	U &= L^2(\Omega)\\
+	Y &= \{y \in H^1 \cap C(\bar{\Omega}): Ay \in L^2(\Omega) \}\\
+	Z &= L^2(\Omega)\\
+	R &= C(\bar{\Omega}) 
+\end{align*}
+Assuming there exists $\tilde{y} \in Y, \tilde{y} > 0$ and $\tilde{u}$ with 
+\begin{align*}
+	A(\tilde{y} - \bar{y}) + B(\tilde{u} - \bar{u}) = 0
+\end{align*}
+For example, $\gamma \equiv 1$, we can choose $\tilde{y} = \bar{y} + 1, \tilde{u} = \bar{u} + 1$. By the lemma 6.15, the \textbf{Robinson-CQ} holds. With
+\begin{align*}
+	L(y, u, p) = \frac{1}{2}\| y - y_d\|^2_{L^2(\Omega)} + \frac{\alpha}{2}\|u\|_{L^2(\Omega)} + (p, Ay + Bu)_{L^2(\Omega)}
+\end{align*}
+we get from \textbf{(6.33)-(6.36)} for an optimal solution $(\bar{y}, \bar{u})$ the necessary condtition 
+\begin{align*}
+	&A \bar{y} + B\bar{u} = 0, \bar{y} \geq 0\\
+	&\bar{\lambda} \in \mathcal{K}_C^0, \\
+	&\langle \bar{\lambda}, \bar{y}\rangle_{C(\bar{\Omega})^*,C(\bar{\Omega})} = 0 \\
+	&(y - y_d, c)_{L^2(\Omega)} + (\bar{p}, Av )_{L^2(\Omega)} + \langle \bar{\lambda}, v \rangle_{C(\Omega)^*, C(\bar{\Omega})} = 0 \quad \forall v \in Y\\
+	&(\alpha \bar{u} - \gamma \bar{p}, u - \bar{u} \rangle_{L^2(\Omega)} \geq  0 \quad \forall u \in U
+\end{align*}
+one can show that the set $\mathcal{K}_C^0 \subset C(\bar{\Omega})^*$ can be identified with the set of nonpositive regular Borel measures, i.e. 
+\begin{align*}
+	\lambda \in \mathcal{K}^0_C \Leftrightarrow \langle \lambda , v \rangle_{C(\bar{\Omega})^*, C(\bar{\Omega})} = 
+	- \int_\Omega v(x) d \mu_\Omega(x) - \int_{\partial \Omega} v(x) d\mu_{\partial \Omega}(x)
+\end{align*}
+with the non-negative measure $\mu_\Omega, \mu_{\partial\Omega}$. \\
+Hence, the optimal condition is a weak form of
+\begin{align*}
+	&-\Delta \bar{y} + \bar{y} = \gamma \bar{u} \text{ on } \Omega\\
+	&y_\nu = 0 \text{ on } \partial \Omega\\
+	&\bar{y} \ge 0, \bar{u}_\Omega, \bar{u}_{\partial\Omega} \text{ non-negative Borel measures}
+\end{align*}
+is
+\begin{align*}
+	&\int_\Omega \bar{y}(x) d\mu_{\Omega}(x) + \int_{\partial\Omega} \bar{y}(x) d\mu_{\partial\Omega}(x) = 0 \\
+	&-\Delta \bar{p} + \bar{p} = -(\bar{y} - y_d) + \bar{\mu}_\Omega \text{ on } \Omega \\
+	&p_v = 0 \text{ on } \partial \Omega\\
+	&\alpha \bar{u} + \gamma \bar{p} = 0 
+\end{align*}
+\end{example}
+
+
+\section{instationary problems}
+\subsection{weak solutions of parabolic equations}
+Let $\Omega \subset \mathbb{R}^n$ be open and bounded and 
+\begin{align*}
+	\Omega_T := (0, T) \times \Omega \qquad \text{for some } T > 0
+\end{align*}
+consider \textbf{(7.1)}
+\begin{equation*}
+\left\{
+\begin{aligned}
+	y_t + Ly = f &\text{ on } \Omega_T\\
+	y= 0 &\text{ on } [0, T] \times \partial\Omega\\
+	y(0, \cdot) = y_0 &\text{ on } \Omega
+\end{aligned}
+\right.
+\end{equation*}
+with $f : \Omega_T \rightarrow \mathbb{R}, y_0: \Omega \rightarrow \mathbb{R}$ given \textbf{(7.2)}
+\begin{align*}
+	&y :\bar{\Omega}_T \rightarrow \mathbb{R} \text{ (the unknown) }\\
+	&L_Y = -\sum_{i, j = 1}^n (a_{ij}(t, x)y_{x_i})_{x_j} + 
+	\sum_{i = 1}^n b_i(t, x) y_{x_i} + c_0(t, x) y
+\end{align*}
+we say that $\frac{\partial}{\partial t} + L_Y$ is uniformly parabolic if:
+\begin{align*}
+	\sum_{i,j = 1}^n a_{ij}(t, x) \xi_i \xi_j \geq \theta \|\xi\|^2
+	\text{ for } (t, x) \in \Omega_T \text{ a.e. and } \xi \in \mathbb{R}^n \text{ with } \theta > 0 
+\end{align*}
+Now we generalise the Sobelev space to Bochnar space. Let $X$ be a separable Banach space and consider abstract functions:
+\begin{align*}
+	[0, T] \ni t  \mapsto y(y) \in X
+\end{align*}
+
+\begin{definition}[weakly measurable a. strongly measurable]
+	Given 
+	\begin{align*}
+		f: (a, b) \rightarrow H
+	\end{align*}
+	$-\infty \le a \le b \le \infty$ and $H$ a separable Hilbert space. We say $f$ is weakly measurable if 
+	\begin{align*}
+		\forall \alpha \in \mathbb{R}: \{t \in \mathbb{R}: \langle f(t), x \rangle \le \alpha \}  \text{ is measurable}
+	\end{align*}
+	and $f$ is strong measurable if 
+	\begin{align*}
+		\text{$f$ is the pointwise limit of simple functions } a.e \text{ in } [0, T].
+	\end{align*}
+\end{definition}
+
+\begin{theorem}
+	A strongly measurable function is Bochner integrable iff $t \mapsto \|f\|_X$ is Lebesgue-integrable. Then:
+	\begin{align*}
+		\| \int_0^T f(t) dt \|_X \le \int_0^T \|f(t)\|_X dt
+	\end{align*}
+	and $\forall u^* \in X^*$ the map
+	\begin{align*}
+		t \mapsto \langle u^*, f(t) \rangle_{X^*, X} 
+	\end{align*}
+	is Bochner-integrable with 
+	\begin{align*}
+		\langle u^*, \int_0^1 f(t)dt \rangle_{X^*, X}
+	\end{align*}
+\end{theorem}
+
+\quad\\
+For $1 \le p < \infty$ let
+\begin{align*}
+	L^p(0, T, X) = \bigg\{ y: [0, T] \rightarrow X \text{ strongly measurable}: \|y\|_{L^p(0, T: X)}:= (\int_0^T\|y(t)\|_X^p dt)^{1 \slash p} < \infty \bigg\}
+\end{align*}
+moreover
+\begin{align*}
+	L^\infty(0, T, X) = \bigg\{ y: [0, T] \rightarrow X \text{ strongly measurable}: \|y\|_{L^\infty(0, T: X)}:= esssup_{t \in [0, T]} \|y(t)\|_X < \infty \bigg\}
+\end{align*}
+the space $C^k([0, T], X)$ $k \in \mathbb{N}_0$ denotes the space of all $k$-times F-differentiable function on $[0, T]$ for $y \in L^1(0, T, X)$ the \textbf{weak (time) derivative} $y_t$ of $y$ is give by $v \in L^1(0, T, X)$ satisfying
+\begin{align*}
+	\int_0^T \varphi(t)'y(t) dt = -\int_0^T \varphi(t) v(t) dt
+	\quad \forall \varphi \in C_C^\infty((0, T))
+\end{align*}
+
+\begin{lemma}
+	For $y \in L^p(0, T, X)$, $1 \le p < \infty$, there exists a sequence of simple functions $s_k$ with $s_k \rightarrow y$ a.e. and 
+	\begin{align*}
+		s_k \overset{L^p}{\rightarrow} y
+	\end{align*}
+	Moreover, functions of the form:
+	\begin{align*}
+		\sum_{i = 1}^m \varphi_i(t)y_i, \quad \varphi_i \in C_C^\infty((0, T)), y_i \in X
+	\end{align*}
+	are dense in $L^p(0, T, X)$. In particular, $C_C^\infty([0, T], X)$ and $C^k([0, T], X)$ are dense in $L^p(0, T, X)$, $k \in \mathbb{N}_0$. 
+\end{lemma}
+\quad\\
+\quad\\
+\subsubsection{The Gelfand triple}
+We now consider the following setup: Let $H, V$ separable Hilbert spaces with dense embedding $V \hookrightarrow H$. We identify $H$ with its dual $H^*$. then
+\begin{align*}
+	V \hookrightarrow H = H^* \hookrightarrow V^*
+\end{align*}
+$(V, H, V^*)$ is a Gelfand triple. The embedding $H \hookrightarrow V^*$ is given by $H \ni y \mapsto (y, \cdot)_H \in H^* \subset V^*$. We think of $V^*$ as extending the inner product of $H$. If $u \in V$ and $f \in H$, then $f \in H^*$ and $f$ acts on $u$ as 
+\begin{align*}
+	\langle f, u \rangle_{V^*, V} = \langle f, u \rangle_H \qquad(*)
+\end{align*}
+For $f \in V^* \slash H$, then $(*)$ is still valid (density of $H$ in $V^*$).
+\begin{align*}
+	W(0, T: H, V) = \{ y \in L^2(0, T; V): y_t \in L^2(0, T, V^*)\}
+\end{align*}
+$y$ is defined in $L^2$ since we have $y \in L^2(0, T; V^*)$ and also $y \in L^1(0, T, V)$ so it makes sense to work with $y_t \in L^1(0, T, V^*)$ and impose $y_t \in L^2(0, T, V^*)$. 
+
+\begin{theorem}
+	the $(V, H, V^*)$ be a Gelfand triple, then $W(0, T; H, V)$ is a Hilbert space and 
+	\begin{align*}
+		W(0, T; H, V) \hookrightarrow C([0, T]; H)
+	\end{align*}
+	Moreover, for all $y, v \in W(0, T; H, V)$ it holds
+	\begin{align*}
+		(y(t), v(t))_H - (y(s), v(s))_H 
+		= \int_s^t \langle y_t(\tau), v(\tau) \rangle_{V^*, V} + \langle v_t(\tau), y(\tau)\rangle_{V^*, V} d\tau
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	\text{cf.Evans}
+\end{proof}
+
+Consider now \textbf{(7.1)} and assume that $a_{ij}, b_i, c_0 \in L^\infty(\Omega_T), f \in L^2(0, T; H^{-1}(\Omega)), y_0 \in L^2(\Omega)$ with $H^{-1}(\Omega) = H^1_0(\Omega)^*$. we set 
+\begin{align*}
+	H:= L^2(\Omega), V := H_0^1(\Omega)
+\end{align*}
+and have the Gelfand triple $(V, H, V^*)$ because
+\begin{align*}
+	H_0^1 \hookrightarrow L^2(\Omega) \hookrightarrow H^{-1}(\Omega)
+\end{align*}
+For a weak formulation of \textbf{(7.1)} let 
+\begin{align*}
+	y \in W(0, T; L^2(\Omega), H^1_0(\Omega)) = W(0, T; H, V)
+\end{align*}
+for $t \in [0, T] a.e.$, we have:
+\begin{align*}
+	a_{ij}(t, \cdot), b_i(t, \cdot), c_0(t, \cdot)\in L^\infty(\Omega), f(t, \cdot) \in H^{-1}(\Omega)
+\end{align*}
+According to \textbf{(7.1)} it holds
+\begin{align*}
+	L(t)y(t) = f(t) - y_t(t) \in H^{-1} , \quad y(t) |_{\partial \Omega} = 0
+\end{align*}
+The elliptic theory motivates to require for $t \in [0, T]$ $a.e.$ \textbf{(7.4)}
+\begin{align*}
+	a(y(t), v ;t) = \langle f(t), v \rangle_{H^{-1}(\Omega), H^1_0(\Omega)} - \langle y_t(t), v\rangle_{H^{-1}(\Omega), H_0^1(\Omega)}
+\end{align*}
+for all $v \in H^1_0(\Omega)$ with
+\begin{align*}
+	a(y, v;t) := \int_\Omega \bigg(\sum_{i, j = 1}^n a_{ij}(t) y_{x_i}v_{x_j} + \sum_{i = 1}^n b_i(t) y_{x_i} v + c_0(t) y v \bigg) dx  \qquad y, v \in H^1_0(\Omega)
+\end{align*}
+we say $y \in W(0,T; L^2(\Omega), H_0^1(\Omega))$ is a \textbf{weak solution} of \textbf{(7.1)} if  \textbf{(optimal control setting)}
+\begin{align*}\textbf{(7.5)}\quad
+	\langle y_t(t), v \rangle_{H^{-1}(\Omega), H^1_0(\Omega)} + a(y(t), v ; t) = 
+	\langle f(t), v \rangle_{H^{-1}(\Omega), H^1_0(\Omega)} \qquad \forall v \in H^1_0(\Omega), t \in [0, T]\quad a.e.
+\end{align*}
+and the initial condition $y(0) = y_0$ holds. \par 
+An alternative definition is: A function $y \in W(0, T; L^2(\Omega)), H^1_0(\Omega))$ is a \textbf{weak solution} of \textbf{(7.1)} if  (usual way)
+\begin{align*} \textbf{(7.6)}\quad
+	\int_0^T \langle y_t(t) , v \rangle_{H^{-1}(\Omega), H_0^1(\Omega)} dt + \int_0^T a(y(t), v(t), t) dt 
+	= \int_0^T \langle f(t), v(t) \rangle_{H^{-1}(\Omega), H_0^1(\Omega)} dt \quad \forall v \in L^2(0, T,  H_0^1(\Omega))
+\end{align*}
+
+\begin{theorem}
+	The definitions \textbf{(7.5)} and \textbf{(7.6)} are equivalent. 
+\end{theorem}
+\begin{proof}\quad\\
+"$\Rightarrow$": \quad\\
+	let $y \in W(0, T; H, V)$ be a weak solution given by \textbf{(7.5)}, then  $\forall v \in L^2(0, T, \Omega), t \in [0, T]$:
+	\begin{align*}
+		\langle y_t(t), v(t) \rangle_{V^*, V} + a(y(t), v(t); t) =\langle f(v), v(t) \rangle_{V^*, V}
+	\end{align*} 
+	both sides are in $L^1(0, T)$ ($y \in W(0, T;H, V)$, $f \in L^2(0, T, V^*)$). For simple functions $v(t) = \sum_{i = 1}^m \mathbbm{1}_{E_i}(t) v_i, v^i \in V$ it hold:
+	\begin{align*}
+		\langle y_t(t), v(t) \rangle_{V^*, V} + a(y(t), v(t); t) - \langle f(t), v(t) \rangle_{V^*, V} &= 
+		\sum_{i = 1}^m \mathbbm{1}_{E_i}(t) (\langle y_t(t), v_i \rangle_{V^*, V} + a(y(t)), v; t) - \langle f(t), v \rangle_{V^*, V}\\
+		 &= 0
+	\end{align*}
+	for $t \in (0, T)$ a.e. and for arbitrary $v \in L^2(0, T; V)$ the assumption follows from considering a sequence of simple functions $v_k(t) \rightarrow v(t)$. By integrating over $t$. \textbf{(7. 6)} follows. \\
+	"$\Leftarrow$": trivial
+\end{proof}
+
+More generally, we can consider abstract parabolic problems: 
+\begin{align*}\textbf{(7.7)} \quad
+	&\text{Find: } y \in (0, T; H, V)\\
+	&\text{with: } y(0) = y_0: \\
+	&\langle y_t(t), v \rangle_{V^*,  V} + a(y(t), v; t) = \langle f(t), v \rangle_{V^*, V} \quad \forall v \in V, t \in [0, T] \quad a.e.
+\end{align*}
+\quad\\
+\textbf{Assumption 7.1}
+\begin{itemize}
+	\item $V \hookrightarrow H \hookrightarrow V^*$ is a Gelfand triple with separable Hilbert space $H, V$. 
+	\item $a(\cdot, \cdot, t): V \times V \rightarrow \mathbb{R}$ is a bilinear form for a.e. $t \in (0, T)$, so that for $\alpha, \beta > 0, \gamma \geq 0$ :
+	\begin{align*}
+		|a(v, w;t)| \le \alpha \|v\|_V \|w\|_V \quad \forall v, w \in V, t \in (0, T) \qquad a.e.\\
+		a(v, v;t) + \gamma \|v\|_H^2 \geq \beta \|v\|_V^2 \qquad \forall v \in V, t \in (0, T) \qquad a.e.
+	\end{align*}
+	\item $y_0 \in H, f \in L^2(0, T, V^*)$
+\end{itemize}
+
+Under assumption \textbf{(7.1)} $t \mapsto a(y(t), v(t); t)$ is in $L^1(0, T)$. As before, \textbf{(7.7)} implies 
+\begin{align*} \textbf{(7.8)} \quad
+	\langle y_t(t), v(t) \rangle_{V^*, V} + a(y(t), v(t); t) 
+	= \langle f(t), v(t) \rangle_{V^*, V} \quad v \in L^2(0, T; V), t \in (0, T), a.e.
+\end{align*} 
+and \textbf{(7.7)} is equivalent to 
+\begin{align*}\textbf{(7.9)}\quad
+	&\text{Find:} y \in W(0, T; H, V):\\
+	&\forall v \in L^2(0, T, V), y(0) = y_0:\\
+	&\int_0^T \langle y_t(t), v(t) \rangle_{V^*, V} dt + \int_0^T a(y(t), v(t); t) dt = \int_0^T \langle f(t), v(t)_{V^*, V} dt
+\end{align*}
+
+\begin{theorem}
+	under assumption \textbf{(7.1)} the abstract parabolic problem \textbf{(7.7)} or \textbf{(7.9)} has at most one solution $y \in W(0, T; H, V)$ and for this it holds \textbf{(7.10)}
+	\begin{align*}
+		\|y(t)\|_H^2 + \|y\|_{L^2(0, T; V)}^2 + \|y_t\|^2_{L^2(0, T;V^*)} \le 
+		C (\|y_0\|_H^2 + \|f\|_{L^2(0, T; V^*)}) \qquad \forall t \in (0, T]
+	\end{align*}
+	where $C > 0$ depends on $\beta, \gamma $ from assumption \textbf{(7.1)}, not on $y_0, f$. 
+\end{theorem}
+\begin{proof}
+	Use $v = y$ in \textbf{(7.8)}, theorem \textbf{7.2} and the lemma of Gronwall. 
+\end{proof}
+
+For the existence of weak solution we consider the Galerkin approximations. $V$ separable, there exists a countable basis $\{v_k, k \in \mathbb{N}\}$ so that $span\{v_k, k \in \mathbb{N}\}$ is dense in $V$. Let $V_k:=span\{v_1, \dots, v_k\}$, the $V_k$ are Hilbert spaces and $\cup_{k \in \mathbb{N}} V_k$ is dense in $V$. From $V$ dense in $H$, we get 
+\begin{align*}
+	y_{0, k} = \sum_{i = 1}^k \alpha_{ik} v_i \in V_k \text{ with }
+	y_{0, k} \rightarrow y_0 \text{ in } H
+\end{align*}
+consider 
+\begin{align*}
+	y_k(t):= \sum_{i = 1}^k \varphi_{ik}(t)v_i, \varphi_{ik} \in H^1(0, T)
+\end{align*}
+with \textbf{(7.11)}
+\begin{align*}
+	\langle (y_k)_t(t), v \rangle_{V^*, V} + a (y_k(t), v;t) = \langle f(t), v \rangle_{V^*, V} \quad
+	\forall v \in V_k, t \in (0, T), y_k(0) = y_{0, k}
+\end{align*}
+the $y_k \in W(0, T; H, V)$ and 
+\begin{align*}
+	(y_k)_t(t) = \sum_{i = 1}^k \varphi_{ik}'(t) v_i \in L^2(0, T;T)
+\end{align*}
+with $\varphi_i' \in L^2(0, T)$ the weak derivative of $\varphi_i \in H^1(0, T)$. Testing with $v_1, \dots, v_k$ in \textbf{(7.11)} yields a system of ODEs in 
+
+
+\begin{theorem}
+	Under assumption \textbf{(7.1)} the system \textbf{(7.12)} has for all $k \in \mathbb{N}$ an unique solution $y_k \in W(0, T; H, V)$ for which
+	\begin{align*}\textbf{(7.13)} \quad
+		\|y_k(t)\|_H^2 + \|y_k\|_{L^2(0, T;V)}^2 + \|(y_k)_t\|^2_{L^2(0, T;V^*)} \le C (\|y_{0, k}\|_H^2 + \|f\|_{L^2(0, t;V^*)}) \quad \forall t \in (0, T]
+	\end{align*}
+	with $C$ depending on $\beta, \gamma$ in the assumption \textbf{(7.1)}
+\end{theorem}
+\begin{proof}
+	define
+	\begin{align*}
+		&A_{ij} = \bigg((v_i, v_j)_H\bigg)_{ij} \text{ mass matrix}\\
+		&M(t):= (a(v_i, v_j ; t))_{ij} \text{ stiffness matrix} \quad \in L^\infty(0, T; \mathbb{R}^{k \times k})\\
+		&F(t):= (\langle f(t), v_j\rangle_{V^*, V})_j \in L^2(0, T, \mathbb{R}^k)
+	\end{align*}
+	\textbf{(7.12)} becomes
+	\begin{align*}
+		A^T(\varphi_{ik}'(t)_i + M(t)^T(\varphi_{ik}(T))_i &= F(t)\\
+		(\varphi_{ik}(0)_i &= (\alpha_{ik})_i
+	\end{align*}
+	From $(v_i)$ basis of $V_k$, $A$ is invertible and by standard Caratheodory's theory for ODEs the assumption 7.1 yields existence of an unique solution $(\varphi_{ik})$ with $\varphi_{ik} \in H^1(0, T)$. Theorem 7.5 yields \textbf{(7.13)}.
+\end{proof}
+
+\begin{theorem}
+	Under the assumption 7.1 the abstract problem \textbf{(7.7)} or \textbf{(7.9)} has an unique solution $y \in W(0, T; H, V)$. 
+\end{theorem}
+\begin{proof}
+	From $\|y_{0, k}\|_H \rightarrow \|y_0\|_H$ we have from \textbf{(7.13)} a $C > 0$ s.t.
+	\begin{align*}
+		\|y_k\|_{L^2(0, T;V)} < C, \quad \|(y_k)_t\|_{L^2(0, T; V^*)} < C
+	\end{align*}
+	thus there exists $(y_k)_i$ with 
+	\begin{align*}
+		y_{k_i} &\rightharpoonup y \text{ in } L^2(0, T; V)\\
+		(y_{k_i})_t &\rightharpoonup w \text{ in } L^2(0, T; V^*)
+	\end{align*}
+	one shows that this implies $w = y_t$ with 
+	\begin{align*}
+	\textbf{(7.12)} \quad
+		\int_0^T \bigg( \langle (y_k)_t, v \rangle_{V^*, V} + a(y_k(t), v ; t) - \langle f(t), v \rangle_{V^*, V}\bigg) \varphi(t) dt  = 0 \qquad \forall v \in V_k, \varphi \in C_C^\infty((0, T))
+	\end{align*}
+	with $k \rightarrow \infty$, 
+	\begin{align*}
+		&\int_0^T \bigg(\langle y_t(t), v\rangle_{V^*,V} + a(y(t), v; t) - \langle f(t), v \rangle_{V^*, V}\bigg) \varphi(t) dt = 0 
+		\qquad \forall v \in V_k, \varphi \in C_C^\infty((0, T))\\
+		\Rightarrow &\textbf{(7.7)}
+	\end{align*}
+	For $\varphi \in C^\infty([0, T])$ with $\varphi(0) = 1, \varphi(T) = 0$, the function $t \mapsto w(t) = \varphi(t) v \in W(0, T, H, V)$. Theorem 7.2 yields 
+	\begin{align*}
+		\int_0^T - \langle \varphi'(t)v, y(t)\rangle_{V^*, V} + a(y(t), \varphi(t) v ; t) - \langle f(t), \varphi(t)v \rangle_{V^*, V} dt = (y(\cdot), v)_H \quad \forall v \in V 
+	\end{align*}
+	similarly for \textbf{(7.12)}.
+	\begin{align*}
+		\int_0^T - \langle \varphi'(t)v, y_k(t)\rangle_{V^*, V} + a(y_k(t), \varphi(t) v ; t) - \langle f(t), \varphi(t)v \rangle_{V^*, V} dt = (y_k(\cdot), v)_H \quad \forall v \in V 	
+	\end{align*}
+	From $y_{k_i} \rightharpoonup y$ we know 
+	\begin{align*}
+		(y(0), v)_H = \lim_{k \rightarrow \infty} (y_{0, k}, v )_H = (y_0, v)_H \qquad \forall v \in \cup_k V_k
+	\end{align*}
+	and by density in $V$ it holds
+	\begin{align*}
+		y(0) = \lim_{k \rightarrow \infty} y_{0, k} = y_0
+	\end{align*}
+\end{proof}
+
+\begin{corollary}
+	Let $\Omega \subset \mathbb{R}^n$ be open and bounded with $\partial\Omega$ Lipschitz. Let $\frac{\partial}{\partial t} + L$ with $L$\textbf{(7.2)} be uniformly parabolic and $a_{ij}, b_i, c_0 \in L^\infty(\Omega_T)$. The problem \textbf{(7.1)} has an unique weak solution $y \in W(0, T; L^2(\Omega), H_0^1(\Omega))$ and \textbf{(7.10)} holds with
+	\begin{align*}
+		H = L^2(\Omega), V = H_0^1(\Omega), V^* = H^{-1}(\Omega)
+	\end{align*}
+\end{corollary}
+
+under the assumptions of corollary 7.1 the weak formulation of (7.1) defines a bounded linear operator 
+\begin{align*}
+	A: W(0, T; L^2(\Omega), H^1_0(\Omega)) \ni y \mapsto 
+	\begin{bmatrix}
+		y_t + Ly \\
+		y(0, \cdot )
+	\end{bmatrix}
+	\in L^2(0, T; H^1_0(\Omega)^* \times L^2(\Omega))
+\end{align*}
+in the sense that for $(f, y_0) \in L^2(0, T; H^1_0(\Omega)^* \times L^2(\Omega))$
+\begin{align*}
+	\begin{bmatrix}
+		y_t + Ly \\
+		y(0, \cdot)
+	\end{bmatrix}
+	= 
+	\begin{bmatrix}
+		f\\
+		y_0
+	\end{bmatrix}
+	\Leftrightarrow
+	\textbf{(7.5)}
+	\Leftrightarrow
+	\textbf{(7.6)}
+\end{align*}
+Moreover, by corollary 7.1 this $A$ is boundedly invertible. \\
+\quad\\
+\textbf{Assumption 7.2} In addition let 
+\begin{align*}
+	a(v, w; t) &\in C^1([0, T])\\ 
+	a_t (v, w ; t) &\le \alpha_1\|v\|_V\|w\|_V
+\end{align*}
+for all $v, w \in V$, $y_0 \in \{w \in V: a(w, \cdot; 0) \in H^* \}$, $f \in W(0, T; H, V)$. 
+
+\begin{theorem}
+	Under assumption 7.2 the solution of \textbf{(7.7)} or \textbf{(7.9)} satisfies 
+	\begin{align*}
+		y_t &\in W(0, T; H, V) \\
+		\langle y_{tt}, w \rangle_{V^*, V} + a(y_t(t), w; t) &= \langle f_t(t), w \rangle_{V^*, V} - a_t(y(t), w; t)
+	\end{align*}
+	and 
+	\begin{align*}
+		\langle y_t(0), w \rangle_{V^*, V} = (f(0), w )_H - a(y_0, w; 0) \quad w \in V
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	\text{cf.Evans}
+\end{proof}
+
+From $y_t, f \in W(0, T; H, V) \hookrightarrow C([0, T]; H)$ we get that for $H = L^2(\Omega)$ and $V = H_0^1(\Omega)$ there exists a $C > 0$ with
+\begin{align*}
+	\|y_t(t)\|_H + \|f\|_H \le C \quad \text{for } t \in (0, T) \quad a.e.
+\end{align*}
+with this
+\begin{align*}
+	a(y(t), w, t) = - \langle y_t(t), w \rangle_{H^{-1}(\Omega), H^1_0(\Omega)} + (f(t), w)_{L^2(\Omega)} = (-y_t(t) + f(t), w )_{L^2(\Omega)} \quad\forall w \in H^1_0(\Omega)
+\end{align*}
+under the assumption of theorem 7.8 it allows
+\begin{align*}
+	\|y(t)\|_{H^2} \le C (\|y_t\|_{L^\infty(0, T; L^2(\Omega)} + \|f\|_{L^\infty(0, T; L^2(\Omega))} + \|y\|_{L^\infty(0, T; H^1(\Omega))}
+\end{align*}
+for $\Omega$ with $C^2$-boundary using higher regularity estimates for elliptic equation. \text{cf.Evans}\\
+Consider now
+\begin{align*}
+\textbf{(7.14)} \quad 
+	L(y) + y_t + d(t, x, y) &= f \text{ on } \Omega_T\\
+	\frac{\partial y}{\partial \nu} + b(t, x, y) &= g \text{ on } [0, T] \times \Omega_T\\
+	y(0, \cdot) &= y_0
+\end{align*}
+with
+
+
+\begin{theorem}[well-posedness of the instationary problem]
+	
+\end{theorem}
+
+
+
+\subsection{Optimality condition}
+Consider 
+\begin{align*}
+	\textbf{(7.18) \quad}
+	\min f(y,u) &:= \frac{1}{2} \|y(T) - y_d\|_{L^2(\Omega)}^2 + \frac{\alpha}{2}\|u\|_{L^2((0, T) \times \partial\Omega)}\\
+	s.t.\\
+	y_t - \Delta y &= 0 \text{ on } \Omega\\
+	y_\nu &= u \text{ on } (0, T) \times \partial \Omega\\
+	y(0, \cdot) &= y_0 \text{ on } \Omega\\
+	a \le u &\le b \text{ on } (0, T) \times \partial \Omega
+\end{align*}
+with $a, b \in L^2((0, T) \times \partial \Omega)$, $a < b$, $y_0, y_d \in L^2(\Omega)$. 
+Observe
+\begin{align*}
+\forall v \in V:
+	\langle f(t), v(t) \rangle_{V^*, V} = \langle u(t), v(t) \rangle_{L^2(\partial\Omega)}
+\end{align*}
+The \textbf{weak form} of \textbf{(7.18)} is 
+\begin{align*}
+	\forall v \in V \forall t \in (0, T) \text{ a.e.}: 
+	\langle y_t, v \rangle_{V^*, V} + a(y, v) = \langle u, v\rangle_{L^2(\partial\Omega)}
+\end{align*}
+
+
+\subsection{Structure of optimal control for $\Omega = (0, 1)$}
+Consider for $\Omega = (0, 1)$:
+\begin{align*}
+	\textbf{(7.19)} \quad
+	y_t - \Delta y &= f \text{ on } \Omega_T\\
+	y_x &= 0 \text{ on } [0, T] \times \{0 \}\\
+	y_x + \beta y &= g \text{ on } [0, T] \times \{1\}\\
+	y(0, \cdot) &= y_0 \text{ on } \Omega
+\end{align*}
+Let
+\begin{equation*}
+	G(x, \xi, t):= 
+	\left\{
+	\begin{aligned}
+		1 + 2 \sum_{n = 1}^\infty \cos(n\pi x)\cos(n \pi \xi)e^{-n^2 \pi^2 t}
+		\quad \beta = 0\\
+		\sum_{n = 1}^\infty \frac{1}{N_n}\cos(\mu_n x ) \cos(\mu_n \xi)e^{-\mu_n^2 t} \quad \beta > 0
+	\end{aligned}
+	\right.
+\end{equation*}
+where $\mu_n$ is in the increasing order the solution of 
+\begin{equation*}
+\left\{	
+\begin{aligned}
+	&\mu_n \tan \mu_n = \beta \\
+	&N_n = \frac{1}{2} + \frac{\sin(2 \mu_n)}{4 \mu_n}
+\end{aligned}
+\right.
+\end{equation*}
+$G$ is symmetric and non-negative in $x$ and $\xi$ and in $\xi = x$ for $t = 0$ \textbf{weakly singular.} By \textbf{Tychonoff}, $y$ is the weak solution of \textbf{(7.19)} if 
+\begin{align*}
+\textbf{(7.20)} \quad
+	y(x, t) = \int_0^t G(x, \underline{1}, t - s)g(s)ds + \int_0^1 G(x, \xi, t)y_0(\xi)d\xi + \int_0^1 \int_0^tG(x, \xi, t - s) f(\xi, s) ds d\xi
+\end{align*}
+
+Consider now the optimal \textbf{boundary} control problem:
+\begin{align*}
+	\textbf{(7.21)} \quad
+	\min f(y, u) &= \frac{1}{2}\|y(T) - y_d\|_{L^2(0, 1)}^2 + \frac{\alpha}{2}\|u\|_{L^2(0, T)}^2\\
+	s.t.\\
+	y_t - \Delta y &= 0 \text{ on } \Omega_T\\
+	y_x &= 0 \text{ on } [0, T] \times \{0 \}\\
+	y_x + \beta y &= \gamma u \text{ on } [0, T] \times \{1\}\\
+	y(0, \cdot) &= 0 \text{ on } \Omega	\\
+	a \le u &\le b \text{ on } [0, T]
+\end{align*}
+with (\dots)\\
+From \textbf{(7.20)} we get
+\begin{align*}
+	\textbf{(7.22)}\quad
+	y(x, T)= \int_0^T G(x, 1, T-s) u(s) \gamma(s) ds := S(u)
+\end{align*}
+where
+\begin{align*}
+	S: L^2(0, T) \rightarrow L^1(0, 1)
+\end{align*}
+is continuous, with $U_{ad}:= \{ a \le u \le b\}$.  \\
+we obtain the reduced problem:
+\begin{align*}
+	\min_{u \in U_{ad}} \tilde{f}(u):= \frac{1}{2}\|Su - y_d\|_{L^2(0, 1)} + \frac{\alpha}{2}\|u\|_{L^2(0, T)}
+\end{align*}
+By the 1st optimality condition we have: Assuming $\bar{u}$ is an optimal control. the \textbf{variational inequality}:
+\begin{align*}
+	\textbf{(7.23)}\quad
+	\langle S^*(S\bar{u} - y_d) + \alpha \bar{u}, u - \bar{u} \rangle_{U^*, U}  \ge 0
+\end{align*}
+Now we determine $S^*$: Notice $S^*$ satisfies:
+\begin{align*}
+	\forall v \in L^2(0, 1) \forall u \in L^2(0, T): \langle S^* v , u\rangle = \langle v, Su \rangle 
+\end{align*}
+Indeed,
+\begin{align*}
+	\int_0^1 v(x) \int_0^T G(x, 1, T - s)u(s) \gamma(s) ds &= 
+	\int_0^T u(s) \underbrace{\gamma(s) \int_0^1 v(x) G(x, 1, T - s) dx}_{ = S^*(v)} ds
+\end{align*}
+rewrite:
+\begin{align*}
+	S^*v(t) = \gamma(t) \int_0^1 v(\xi) G(\xi, 1, T - t)d\xi
+\end{align*}
+
+\begin{lemma}
+	It hold that 
+	\begin{align*}
+		(S^*v)(t) = \gamma(t) p(1, t)
+	\end{align*}
+	where $p$ is the weak solution of 
+	\begin{align*}
+		-p_t - \Delta p = 0 &\text{ on } \Omega_T\\
+		p_x = 0  &\text{ on } [0, T] \times \{0\}\\
+		p_x + \beta p = 0 &\text{ on } [0, T] \times \{1\}\\
+		p(T, \cdot) = v &\text{ on } \Omega
+	\end{align*}
+\end{lemma}
+\begin{proof}
+	Define:
+	\begin{align*}
+		\tilde{p}(x, \tau) = p(x, T - t):= \int_0^1 v(\xi) G(x, \xi, T - t) d\xi
+	\end{align*}
+	Again by \textbf{Tychonoff} we get $p$ is the weak solution of the PDE above. 
+\end{proof}
+
+
+
+\begin{theorem}
+	A control $\bar{u} \in U_{ad}$ is optimal control with $\bar{y} = Su$ for \textbf{(7.21)} iff $p \in L^2(\Omega^T)$ solves the adjoint system:
+	\begin{align*}
+		-p_t - \Delta p = 0 &\text{ on } \Omega_T\\
+		p_x = 0  &\text{ on } [0, T] \times \{0\}\\
+		p_x + \beta p = 0 &\text{ on } [0, T] \times \{1\}\\
+		p(T, \cdot) = \bar{y} - y_d  &\text{ on } \Omega
+	\end{align*}
+	where the variational inequality:
+	\begin{align*}
+	\textbf{(7.24)}\quad
+		\int_0^T \bigg( \gamma(t)p(1, t) + \alpha \bar{u}\bigg)( u - \bar{u}) dt \ge 0 \quad \forall u \in U_{ad}
+	\end{align*}
+\end{theorem}
+\begin{proof}
+$p$ is the solution of the adjoint system is proved by the last lemma. The variational inequality is also trivial by inserting $S^*(y - y_d) = \gamma(t)p_{\hat{y} - y_d}(1, t)$ into the equation \textbf{(7.23)}. Moreover, by \textbf{lemma 6.5} of the 2-sided box control constraints we have:\\
+For $\alpha > 0$:
+\begin{align*}
+	\textbf{(7.25)}\quad
+	\bar{u}(t) = P_{[a, b]} \{ \bar{u}- \frac{\gamma(t)}{\alpha}p(1, t)\}
+\end{align*}
+For $\alpha = 0$:
+\begin{align*}
+	\bar{u}(t) &= a \qquad \gamma(t) p(t) > 0\\
+	&= b \qquad \gamma(t)p(t) < 0
+\end{align*}
+and $\bar{u}(t)$ is undefined in $t$ with $\gamma(t) p(1, t) = 0$. We show that the adjoints vanishes only in countable isolated points. 
+\end{proof}
+
+
+\begin{theorem}[bang-bang control]
+	let $\bar{u}$ be an optimal control of \textbf{(7.21)} with $\alpha = 0$. $a = -1, b = 1$, and $\gamma \equiv 1$. If 
+	\begin{align*}
+		\|\bar{y}( \cdot, T) - y_d \|_{L^2(0, 1)^2} \gneqq 0
+	\end{align*}
+	then the adjoint sate $p(1, t)$ has only countably many roots that can only accumulate at $t = T$. In particular
+	\begin{align*}
+		|\bar{u}(t)| = 1 \quad \text{a.e.} \quad (0, T)
+	\end{align*}
+	and $\bar{u}$ is piecewise constant $\pm 1$ with at most countably many switching points in the roots of $p(1, \cdot)$. We say that $\bar{u}$ is \textbf{bang-bang}.
+\end{theorem}
+\begin{proof}
+	let $\beta > 0$ ($\beta$ = 0 similar). Define
+	\begin{align*}
+		d:= \bar{y} (\cdot, T) - y_d \quad (\neq 0 \text{ by assumptioin})
+	\end{align*}
+	For $\bar{p}$ we have from \textbf{theorem 7.10}
+	\begin{align*}
+		p(1, t) = (S^* d)(1, t) &\overset{\gamma \equiv 1}{=} \int_0^1 G(\xi, 1, T - t) d(\xi) d\xi\\
+		&= \sum_{n = 1}^\infty \frac{1}{\sqrt{N_n}} \cos(\nu_n) \exp( - \mu_n^2(T - t)) \underbrace{\int_0^1  \frac{1}{\sqrt{N_n}} \cos(\mu_n \xi) d(\xi)}_{:= d_n} d\xi
+	\end{align*}
+	the sequence $(d_n)^\infty_{n = 1}$ is quadratic summable by \textbf{Bessel}. The $\mu_n$ are for $n \rightarrow \infty$ asymptotically $(n - 1) \pi$. This shows
+	\begin{align*}
+		\exp\bigg( - \mu_n^2(T - t) \bigg) \rightarrow 0 \quad \text{for } n \rightarrow \infty
+	\end{align*}
+	The extension to the complex plain:
+	\begin{align*}
+		\varphi(z) = \sum_{n = 1}^\infty \frac{1}{\sqrt{N_n}} \cos(\mu_n) \exp(-\mu_n^2 (T - z) ) d_n
+	\end{align*}
+	is an analytic function in $Re(z) < T$. 
+	Thus 2 possibility remains:
+	\begin{enumerate}
+		\item $\varphi(z)$ not constant 0: As an analytic function, $\varphi$ can within every compact set of $Re(z) < T$ has only finitely many roots. In particular, on $[0, T - \epsilon], 0 < \epsilon < T$.
+		\item $\varphi(z) \equiv 0$. Then $p(1, t) \equiv 0$ on $(-\infty, T)$, i.e. 
+		\begin{align*}
+			\sum_{n = 1}^\infty \frac{1}{\sqrt{N_n}} \cos(\mu_n) \exp(-\mu_n^2(T - t))d_n \equiv 0 \quad \forall t < T
+		\end{align*}
+		multiplying by $\exp(\mu_1^2(T - t))$ gives
+		\begin{align*}
+			\frac{1}{\sqrt{N_1}} \cos(\mu_1) d_1 + \sum_{n = 2}^\infty \cos(\mu_n) \exp( - (\mu_n^2 - \mu_1^2) (T - t))d_n
+		\end{align*}
+		$t \rightarrow \infty$ yields $d_1 = 0$. Multiplying by $\exp(\mu_n^2 (T - t))$ yields $d_2 = 0$, $\dots$. This shows that $d_n =0$ for all $ n \in \mathbb{N}$ and implies $d \equiv 0$. Contradiction. 
+	\end{enumerate}
+\end{proof}
+
+\begin{example}
+\begin{align*}
+	\min
+\end{align*}	
+\end{example}
+
+\section{Numerical Methods}
+consider \textbf{(8.1)}
+\begin{align*}
+	\min f(y, u) &= \frac{1}{2}\|y - z\|^2_{L^2(\Omega)} + \frac{\alpha}{2}\|u\|_U^2 \quad (y, u) \in Y \times U\\
+	s.t.\\
+	-\Delta y &= B u \text{ on } \Omega\\
+	y &= 0 \text{ on } \partial \Omega\\
+	u &\in U_{ad} \subset U
+\end{align*}
+with $\alpha > 0$, $\Omega \subset \mathbb{R}^n$ open, bounded and $\partial \Omega$ sufficiently smooth. 
+\begin{align*}
+	Y = H_0^1(\Omega), B : U \rightarrow H^{-1}(\Omega) = Y^*
+\end{align*}
+and $U_{ad}$ closed and convex in $U$ Hilbert.
+
+\begin{example}\quad\\
+$U = L^2(\Omega)$, $B: L^2(\Omega) \rightarrow H^{-1}(\Omega)$. The injection, $U_{ad} = \{ v \in L^2(\Omega): a \le v(x) \le b \text{ a.e. on } \Omega\}$. \\
+$U := \mathbb{R}^n$, $B: \mathbb{R}^m \rightarrow H^{-1}(\Omega)$, $Bu := \sum_{j =1}^m u_j F_j$. $F_j$ fixed, $U_{ad} = \{v \in \mathbb{R}^m: a_j \le v_j \le b_j \}$. $a < b$. 	
+\end{example}
+
+By \textbf{theorem 4.5} the problem \textbf{(8.1)} has an unique solution $(y, u) \in Y \times U$. We know:
+\begin{align*} \textbf{(8.2)} \quad
+	\min_{u \in U_{ad}} \hat{f}(u) := f(y(u), u) = f(SBu, u) 
+\end{align*}
+with 
+\begin{align*}
+	S: Y^* \rightarrow Y \text{ the solution operator of $-\Delta$ with Dirichlet condition}
+\end{align*}
+The optimality conditions are (ness and suff)
+\begin{align*}
+\textbf{(8.3)} \quad
+	\langle \hat{f}'(u), v - u \rangle \geq 0 \quad \forall v \in U_{ad}
+\end{align*}
+with 
+\begin{align*}
+	\hat{f}'(u) = \alpha u + B^* S^* (S B u - z) = \alpha u + B^* p \in U^*
+\end{align*}
+for $p$ satisfying:
+\begin{align*}
+	- \Delta p &= y - z \text{ on } \Omega\\
+	p &= 0 \text{ on } \partial \Omega
+\end{align*}
+
+\quad\\
+\textbf{Assumption 8.1}\\
+$\Omega$ convex and polygonal, $\bar{\Omega} = \bigcup_{j = 1}^{nt} \bar{T}_j $ with a sequence of partitions
+\begin{align*}
+	\{T_j\}_{j =1}^{nt} \text{ of $\Omega$}
+\end{align*}
+with
+\begin{align*}
+	h_{nt}&:= \max \text{ diam} T_j\\
+	\sigma_{nt}&:= \min_j \{ \sup \text{ diam} K : K \subset T_j\}
+\end{align*}
+
+\qquad\\
+\textbf{First descretize, then optimize.}\\
+we replace $y$ and $u$ by finite dimensional space $Y_h$ and $U_h$ and $U_{ad}$ by $U_{ad}^d$ and integrals, dual pairings, etc. by finite dimensional. For $k \in \mathbb{N}$ and let 
+\begin{align*}
+	W_h &:= \{ v \in C^0(\bar{\Omega}): v|_{T_j} \in P_k(T_j), 1 \le j \le nt\} := \langle, \phi_1, \dots, \phi_{ng}\rangle\\
+	Y_h &:= \{ v \in W_h: v|_{\partial\Omega} = 0 \} := \langle \phi_1, \dots, \phi_n \rangle \subset Y \text{ with } 0 < n < j\}
+\end{align*}
+For $y_h$ we choose the ansatz:
+\begin{align*}
+	y_h(x) = \sum_{i = 1}^n y_i \phi_i
+\end{align*}
+
+For $u^1, \dots, u^n \in U$ let $U_d:= \langle u^1, \dots, u^n \rangle$. and $U_{ad}^d := U_{ad} \cap U_d$. We assume that
+\begin{align*}
+	U_{ad}^d = \{u \in U: u = \sum_{j = 1}^n s_j u^j, s \in S \subset \mathbb{R}^n \text{ closed and convex} \}
+\end{align*} 
+Finally, let $z_h:= I_h, z = \sum_{i = 1}^{n_h} z_i \phi_i$ with a continuous interpolation operator 
+\begin{align*}
+	I_h:= L^2(\Omega) \rightarrow W_h
+\end{align*}
+with this we replace \textbf{(8.1)} by 
+\begin{align*}
+\textbf{(8.5)} \quad
+	\min f_{h,d} (y_h, u_d) &:= \frac{1}{2}\|y_h - z_h\|_{L^2(\Omega)}^2 + \frac{\alpha}{2}\|u_d\|^2_U \quad (y_h, u_d) \in (Y_h \times U_d)\\
+	s.t.\\
+	a(y_h, v_h) &= \langle Bu_d, v_h \rangle_{Y^*, Y} \quad \forall v_h \in Y_h, u_d \in U_{ad}^d\\
+	with\\
+	a(y, v) &= \int_\Omega \nabla y \cdot \nabla v dx
+\end{align*}
+
+\begin{align*}
+	A&:= (a_{ij})_{i, j = 1}^n, a_{ij} := a(\phi_i, \phi_j) \quad \text{stiffness matrix}\\
+	M&:= (m_{ij})_{i, j = 1}^{ng}, m_{ij} := \int_\Omega \phi_i \phi_j dx \quad \text{ mass matrix}\\
+	E&:= (e_{ij})_{i = 1, \dots, n, j = 1, \dots, m}, e_{ij} = \langle Bu^j, \phi_i \rangle_{Y^*, Y}\\
+	F&:= (f_{ij})_{i, j = 1}^m, f_{ij}:= (u^i, u^j)_U \quad \text{ control-mass-matrix}
+\end{align*}
+problem \textbf{(8.5)} becomes:
+\begin{align*}
+\textbf{(8.6) }
+	\min Q(y, s)&:= \frac{1}{2}(y - z)^T M(y - z) + \frac{\alpha}{2} s^T F s  \quad (y, s) \in \mathbb{R}^n \times \mathbb{R}^m\\
+	s.t.\\
+	Ay &= Es, s \in S 
+\end{align*}
+
+One can show that $A = A^T$ and $A > 0$. Hence \textbf{(8.6)} $\Leftrightarrow$
+\begin{align*}
+\textbf{(8.7)} \quad
+	\min_{s \in S} \hat{Q}(s):= Q(A^{-1}Es, s )
+\end{align*}
+this problem has an unique solution with the ness. and suff. condition:
+\begin{align*}
+\textbf{(8.8)} \quad
+	\langle \hat{Q}'(s), t - s \rangle_{\mathbb{R}^m} \ge 0 \qquad \forall t \in S
+\end{align*}
+with
+\begin{align*}
+	\hat{Q}'(s) &= \alpha F s + E^T(A^{-1})^T M(A^{-1} Es - z)\\
+	&= \alpha F s + E^T p
+\end{align*}
+with
+\begin{align*}
+	p = A^T M (A^{-1} Es - z)
+\end{align*}
+Here
+\begin{align*}
+	p_h:= \sum_{i = 1}^n p_i \phi_i 
+\end{align*}
+is the discrete adjoint state. Compared with \textbf{(8.3)} and \textbf{(8.4)} we have:
+\begin{align*}
+	B \approx E, S \approx A^{-1}
+\end{align*}
+we can solve \textbf{(8.8)} numerically. The discretization of $p$ is given by the discretization of $y$
+
+\quad\\
+\textbf{First optimize, then discretize}
+consider
+\begin{align*}
+	-\Delta y = Bu \text{ on } \Omega, y = 0, \text{on } \partial \Omega\\
+	-\Delta p = y - z \text{ on } \Omega, p = 0, \text{ on } \partial \Omega\\
+	\langle \alpha u + B^*p , c - u \rangle_{U^*, U} \geq 0 \quad \forall v 
+	\in U_{ad}
+\end{align*}
+\end{document}

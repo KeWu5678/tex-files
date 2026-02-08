@@ -1,0 +1,1663 @@
+\documentclass[a4paper,11pt,fleqn, draft]{book}
+
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[colorlinks = true, linkcolor = blue]{hyperref}
+
+%algorithm
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amsmath,amssymb,amsthm,textcomp}
+\usepackage{multicol}
+\usepackage{tikz}
+\usepackage[normalem]{ulem}
+\usepackage{newunicodechar}
+\newunicodechar{⇒}{\Rightarrow}
+\usepackage{bbm} % using for the characteristic function
+\usepackage{ulem}
+\usepackage{cancel}
+\usepackage{esint} %integral mean
+
+\usepackage{geometry}
+\geometry{left=10mm,right=10mm,%
+bindingoffset=0mm, top=10mm,bottom=5mm}
+
+
+
+\renewcommand{\thechapter}{\Roman{chapter}}
+\renewcommand*\thesection{\arabic{section}}
+
+
+%\newtheorem{theorem}{Theorem}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{algorithmthm}{Algorithm}[section]
+\renewcommand{\thetheorem}{\arabic{section}.\arabic{theorem}}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\renewcommand{\thedefinition}{\arabic{section}.\arabic{definition}}
+
+\newtheorem*{example}{Example}
+\newtheorem{assumption}{Assumption}[section]
+\newtheorem{exercise}{Exercise}[chapter]
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem{review}{Review}
+
+%contradiction
+\usepackage{marvosym}
+
+\linespread{1.3}
+\newcommand{\linia}{\rule{\linewidth}{0.5pt}}
+
+
+% my own titles
+\makeatletter
+\renewcommand{\maketitle}{
+\begin{center}
+\vspace{2ex}
+{\huge \textsc{\@title}}
+\vspace{1ex}
+\\
+\linia\\
+\@author \hfill \@date
+\vspace{4ex}
+\end{center}
+}
+\makeatother
+%%%
+
+% custom footers and headers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\setlength{\headheight}{14pt}
+\lhead{}
+\chead{}
+\rhead{}
+\lfoot{}
+\cfoot{}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+%
+
+% code listing settings
+\usepackage{listings}
+\lstset{
+    language=Python,
+    basicstyle=\ttfamily\small,
+    aboveskip={1.0\baselineskip},
+    belowskip={1.0\baselineskip},
+    columns=fixed,
+    extendedchars=true,
+    breaklines=true,
+    tabsize=4,
+    prebreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+    frame=lines,
+    showtabs=false,
+    showspaces=false,
+    showstringspaces=false,
+    keywordstyle=\color[rgb]{0.627,0.126,0.941},
+    commentstyle=\color[rgb]{0.133,0.545,0.133},
+    stringstyle=\color[rgb]{01,0,0},
+    numbers=left,
+    numberstyle=\small,
+    stepnumber=1,
+    numbersep=10pt,
+    captionpos=t,
+    escapeinside={\%*}{*)}
+}
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+
+% shortcuts
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Rn}{\mathbb{R}^n}
+\newcommand{\xkone}{\ensuremath{x_{k+1}}}
+% \xk is sometimes defined by packages; define/override safely
+\makeatletter
+\@ifundefined{xk}{%
+  \newcommand{\xk}{\ensuremath{x_k}}%
+}{%
+  \renewcommand{\xk}{\ensuremath{x_k}}%
+}%
+\makeatother
+
+%symbol
+\AtBeginDocument{
+  \let\ran\relax
+  \DeclareMathOperator{\dom}{dom}
+}\AtBeginDocument{
+  \let\ran\relax
+  \DeclareMathOperator{\ran}{ran}
+}
+\DeclareMathOperator{\var}{Var}
+\AtBeginDocument{
+  \let\div\relax
+  \DeclareMathOperator{\div}{div}
+}
+\DeclareMathOperator*{\esssup}{ess\, sup}
+\DeclareMathOperator*{\spa}{span}
+\DeclareMathOperator*{\dist}{dist}
+\DeclareMathOperator*{\supp}{supp}
+\DeclareMathOperator*{\rank}{rank}
+\DeclareMathOperator*{\interior}{int}
+\DeclareMathOperator*{\epi}{epi}
+\DeclareMathOperator*{\lin}{lin}
+\DeclareMathOperator*{\core}{core}
+\DeclareMathOperator*{\prox}{prox}
+\DeclareMathOperator*{\cl}{cl}
+\DeclareMathOperator*{\conv}{conv}
+
+%%%----------%%%----------%%%----------%%%----------%%%
+
+\begin{document}
+\chapter{Nonlinear Optimization}
+\section{Linear Optimization}
+Observe the Linear Program \textbf{LP)}: Given $x \in \mathbb{R}^n, A \in \mathbb{R}^{n \times n}, b \in \mathbb{R}^n$, 
+\begin{align*}
+	\max_{w \in \mathbb{R}^n} \langle w , x \rangle\\
+	Aw \le b
+\end{align*}
+
+\section{Unconstrained line search}
+In the central of smooth optimization is the Newton method. 
+
+\subsection{1st order method}
+
+\subsubsection{The Wolfe--Powell conditions}
+\begin{definition}[Wolfe--Powell step size]
+	Given $F: \Rn \rightarrow \R$, differentiable at $x$, the step size $\alpha$ satisfies the Wolfe--Powell conditions for the direction $d$ if there exists $\delta \in (0, 1), \tau \in (\delta, 1)$ such that 
+	\begin{align*}
+		& f( x + \alpha d ) \le f(x) + \delta \alpha \langle \nabla f(x), d \rangle\\
+		& \langle \nabla f(x + \alpha d), d \rangle \ge \tau \langle \nabla f(x), d\rangle
+	\end{align*}
+\end{definition}
+
+
+\subsection{2nd order optimization}
+Questions: 
+\subsubsection{The Newton method}
+\begin{enumerate}
+	\item The Newton method is scalling invariant, Why?
+\end{enumerate}
+
+
+\subsubsection{The quasi-Newton methods}
+Questions: 
+\begin{enumerate}
+	\item What is the norm in the minimization problem to compute the pseudo Hessian?
+	\item Can we always find a solution for the minimization problem of the quasi-Hessian?
+\end{enumerate}
+The objective is to define a method that avoids complex calculation of the inverse Hessian. To illustrate the method we define:
+\begin{align*}
+	&y_k:= \nabla F(x_{k + 1}) - \nabla F(x_k)\\
+	&s_k:= x_{k + 1} - x_k
+\end{align*}
+
+\begin{definition}[quasi-Newton condition]
+	
+\end{definition}
+
+\subsubsection{BFGS method}
+
+
+
+\section{Unconstraint trust-region method}
+Why $\Delta$ is decreased here
+What $\Delta$ is: In trust-region methods,$\Sigma$ is the trust-region radius. It bounds how far the step can move so that the local model (quadratic/SSN model) remains reliable.
+Failed step then shrink radius: If loss is NaN, Inf, or even larger than j (worsened objective), the trial step is deemed unsuccessful. Standard trust-region policy is to reject the step and reduce the radius: the model was not accurate at that scale, or the step left the domain. Shrinking $\Sigma$ keeps the next trial closer to the current iterate where the model is more trustworthy and evaluations are more likely to be finite.
+Why not increase $\Delta$: Increasing the radius after a failed step would allow even larger moves in a region where the model already failed, typically making divergence/invalid evaluations more likely. You increase $\Delta$ only after a clearly successful step (large actual reduction).
+Rule of thumb:
+Unsuccessful step (bad or invalid loss) leads to decreased loss.
+Successful step (good ratio of actual to predicted reduction) $\Rightarrow$ possibly increase $\Delta$.
+If you need broader exploration despite frequent invalid evaluations, that’s usually handled by different safeguards (projection onto feasible set, robust objective evaluation, modified model, or fallback line search), not by increasing the trust-region radius after a rejection.
+Reduced $\Delta$ on NaN/Inf or worse loss is correct for trust-region logic.
+Increase $\Delta$ only after successful steps; use feasibility/robustness safeguards if you need broader exploration.
+
+
+
+For the trust-region method, we observe the local modal of $f$:
+\[
+m_k(p) = f(x_k) + \langle \nabla f(x_k), p \rangle + \langle p, H(x_k) p \rangle
+\]
+and the local optimization problem:
+\begin{align*}
+	& \min_p m_k(p)\\
+	& \|p\| \le \Delta_k
+\end{align*}
+
+We evalate the local model by 
+\[\rho_k := \frac{f(x_k) - f(x_k + p_k)}{m(0) - m(p_k)}\]
+
+\begin{algorithm}
+\caption{Vanilla trust-region method}
+\begin{algorithmic}[1]
+\Require $f$ twice differentiable
+\Require $\bar{\Delta}>0$, $\Delta_0\in(0,\bar{\Delta})$, acceptance parameter $\eta\in(0,1/4)$, initial point $x_0\in\Rn$
+\For{$k = 0, 1, 2, \dots$}
+  \State Compute $\rho_k$ 
+  \If{$\rho_k < 1/4$}
+    \State $\Delta_{k+1} \gets \Delta_k/4$
+  \ElsIf{$\rho_k > 3/4 \ \textbf{and}\ \|p_k\| = \Delta_k$}
+    \State $\Delta_{k+1} \gets \min(2\Delta_k,\bar{\Delta})$
+  \Else
+    \State $\Delta_{k+1} \gets \Delta_k$
+  \EndIf
+  \If{$\rho_k > \eta$}
+    \State $x_{k+1} \gets x_k + p_k$ \Comment{accept}
+  \Else
+    \State $x_{k+1} \gets x_k$ \Comment{reject}
+  \EndIf
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+
+
+\subsubsection{The conjugate gradient method}
+Observe the problem
+\[ Ax = b\]
+Where A is a $n \times n$ matrix with full rank, this problem is therefore a determined linear equation. 
+
+
+
+\subsection{CG-Steihaug method}
+\begin{enumerate}
+	\item Why CG-method can be used to solve trust-region subproblem with indifinite Hessian?
+	\item What is the difference between CG-method and CG-Steihaug method?
+\end{enumerate}
+
+The local modal relies on the hessian (or the qusai-Hessian). If the Hessian is indefinite, the optimization problem of the trust-region iterate may not admit a minimizer. 
+
+
+
+\newpage
+\section{Convex Constraint Optimization}
+\begin{definition}[feasible set]
+\end{definition}
+
+Given a point $x \in M$, where $M$ is a star-shaped domain. The structure of the tangent cone can be written as the closure of a cone. It describe the feasible direction of a given point. 
+\begin{definition}[tangent cone]
+\end{definition}
+
+With Taylor we can linearize the objective function and constraints to get an alternative (linearized) form of the feasible direction: 
+\begin{definition}[linearized feasible directions]
+\end{definition}
+
+However, this only holds if the linearized structure really capture the geometric structure around the feasible set: 
+
+
+\section{Equality Constrained Optimization}
+\subsection{the constraints qualification}
+
+
+\subsection{the optimality condition}
+\begin{theorem}[the implicit function theorem]
+\end{theorem}
+
+\begin{definition}[Regular Point]
+	Given $X \subset \mathbb{R}^n$ open and $f \in C^1 (X, \mathbb{R}^m)$. A point $x \in X$ is a \textit{regular point} if 
+	\begin{equation}
+		D f(x)  \text{ surjective}
+	\end{equation}
+	and $y = f(x)$ is a \textit{regular value} is 
+	\begin{equation}
+		f^{-1}(y) \text{ consists of regular point}
+	\end{equation}
+\end{definition}
+
+\begin{theorem}[the regular value theorem]
+	Given $X \subset \mathbb{R}^n$ open, $Y \subset \mathbb{R}^m$ , $f \in C^1(X, Y)$. $c$ a regular value. Then we $f^{-1}(c)$ is a $m - n$ dimensional manifold. 
+\end{theorem}
+\begin{proof}
+	w.o.l.g. we observe $c = 0$. Since $0$ is a regular value, for $x_0 \in f^{-1}(c)$ we know the map
+	\begin{align*}
+		\partial f(x_0): \mathbb{R}^n \rightarrow \mathbb{R}^m
+	\end{align*}
+	is surjective. By permuting the coordinate we have 
+	\begin{align*}
+		\frac{\partial f}{\partial x_{m - n + 1} \dots \partial x_m}(x_0) \neq 0. 
+	\end{align*}
+	By the implicit function theorem we know there exists a neighborhood around $x_0$ such that
+	\begin{align*}
+		(x_{m - n + 1}, \dots, x_m) \mapsto f(x_{m-n+1} \dots, x_m)
+	\end{align*}
+	is bijective. There for given $c \in \mathbb{R}^n$ a regular value, $n$ coordinates of the pre-image are fixed. $f^{-1}(c)$ is hence a $m - n$ dimensional manifold. 
+\end{proof}
+
+\begin{definition}[Tangent space in $\mathbb{R}^n$]
+	Given $X \subset \mathbb{R}^n$ open, the tangent space $T_pX = \{p\} \times \mathbb{R}^n$ is the linear space equipped with the induced Hilbert structure:
+	\begin{equation}
+	\begin{aligned}
+		& (p, v) + \lambda (p, w) = (p, v + \lambda w)\\
+		& \langle(p, v), (p, w) \rangle = \langle v, w \rangle_p
+	\end{aligned}
+	\end{equation} 
+\end{definition}
+
+\begin{definition}[Tangential in $\mathbb{R}^n$]
+	Given $Y \subset \mathbb{R}^l$ open, we define the map
+	\begin{equation}
+		T_p f: T_pX \rightarrow T_{f(p)} Y, \quad (p, v) \mapsto (f(p), \partial f(p) \cdot v). 
+	\end{equation}
+	as the \textbf{tangential} of $f$ at $p$. 
+\end{definition}
+
+\begin{theorem}[The Regular Value Theorem]
+	Given $X \subset \mathbb{R}^n$ \textit{open}, $c \in \mathbb{R}^l$ a regular value of $f \in C^q(X, \mathbb{R}^l)$. For the $(l - n)$ dimensional submanifold $M = f^{-1}(c)$ we have 
+	\begin{equation}
+		T_p M = \ker (T_p f). 
+	\end{equation}
+\end{theorem}
+\begin{remark}
+$\dim (T_p M) = n - l$. 	
+\end{remark}
+\begin{proof}
+    
+\end{proof}
+
+\begin{proposition}
+	Given $X \subset \mathbb{R}^n$ open and $c$ a regular value, $T_p M^\perp$ admits the basis
+	\begin{equation}
+		\mathcal{B} = \{ \nabla f^1(p) \dots \nabla f^l(p) \}. 
+	\end{equation}
+\end{proposition}
+
+
+\begin{theorem}[Constrained Extrema]
+	Given $X \subset \mathbb{R}^n$ open, $F, h^1, \dots, h^l \in C^1(X, \mathbb{R})$. 0 is a regular value of $h$ and $M:= h^{-1}(0)$ not empty. If $p \in M$ is a critical point, then there exists \textit{Lagrange multiplier} $\lambda_1 ,\dots, \lambda_l$ such that 
+	\begin{equation}
+		F - \sum_{i = 1}^l \lambda_i h^i \in C^1(X, \mathbb{R}) \text{ w.r.t. }\lambda
+	\end{equation} 
+\end{theorem}
+\begin{remark}
+By the theorem we have
+\begin{equation}
+	\nabla F = \sum_{i = 1}^k \lambda_i \nabla h^i.
+\end{equation}	
+\end{remark}
+
+
+\subsection{the algorithms}
+\subsubsection{the naive Newton method}
+\textbf{Questions}: 
+\begin{enumerate}
+	\item what is the null space method
+\end{enumerate}
+
+
+\subsubsection{the penalty approaches}
+\textbf{Questions}:
+\begin{enumerate}
+	\item what is the intention for penalty method and how to construct the minimization problem?
+\end{enumerate}
+
+
+\subsubsection{sequential quadratic programming}
+\paragraph{the vanilla SQP}
+\begin{equation}
+	\begin{aligned}
+		& \min_d \langle \nabla F(x+k), d \rangle + \langle d, H d \rangle\\
+		& \text{s.t.}\\
+		& G(x_k) + \langle \nabla G(x_k), d \rangle = 0
+	\end{aligned}
+\end{equation}
+
+
+\paragraph{the line-search SQP}
+
+\begin{equation}
+	\Psi_r(x) = F(x) + \sum_{i = 1}^l r_i G_i(x)
+\end{equation}
+
+\begin{algorithm}
+	\begin{algorithmic}
+		\Require \State $x_0 \in \Rn, \lambda_0 \in \Rn, \epsilon > 0, r > 0$
+		\For{$ k = 1, \dots$}
+		\State $d_k \gets (QP_k)$
+		\State $\alpha_k \gets \arg\min_\alpha \Phi_r ( x_k + \alpha d_k)$
+		\State $\lambda_{k + 1} \gets $  updated
+		\State $x_{k + 1} = x_k + \alpha_k d_k$
+		\EndFor
+	\end{algorithmic}
+\end{algorithm}
+
+
+\paragraph{the trust-region SQP}
+
+
+
+
+\newpage
+\section{Inequality Constrained Optimization}
+The problem under consideration is 
+\begin{equation}
+	\left\{
+	\begin{aligned}
+	&\min_{x \in \mathbb{R}^n} f(x)\\
+	&\texttt{s.t.}\\
+	&c_i(x) = 0 \quad i \in \mathcal{E},\\
+	&c_i(x) = 0 \quad i \in \mathcal{I}.
+\end{aligned}
+\right.
+\end{equation}
+
+The objective function $f$, $c_i$, $i \in \mathcal{E} \cup \mathcal{I}$ are assumed to be smooth. 
+\begin{definition}[active set]
+Given a feasible point $x$, the active set $\mathcal{A}(x)$ is defined as 
+\begin{align*}
+	\mathcal{A}(x):= \mathcal{E} \cup \{i \in \mathcal{I} | c_i(x) = 0\}.
+\end{align*}
+where $\mathcal{E}$ is the set of equality constraints and $\mathcal{I}$ the inequality constraints. 
+\end{definition}
+
+
+
+
+\chapter{Convex Analysis}
+\section{Basic properties}
+\subsection{convex functions}
+For this section we extend our function class, more specifically:
+\begin{enumerate}
+	\item $f$ need not to be differentiable
+	\item $f$ may take the value of $+ \infty$ (but never the $-\infty$). 
+\end{enumerate}
+
+The objective is to formulate the optimality condition of the function above with more sophisticated than what used in the smooth optimization. we define the domain of $f$ as
+	\begin{equation}
+		\dom(f):= \{ x\in E| f(x) < \infty \}. 
+	\end{equation}
+    
+Given a set $C \subset E$, the core of $C$ is defined as
+\begin{equation}
+	\core(C):= \{ x \in C: \quad \forall d \in E: x + td \in C \texttt{ for $t$ sufficient small} \}. 
+\end{equation}
+The core contains $\interior(C)$ but can be potentially larger.\par
+
+Recall the \textbf{lower level set} of a function $f$ on $E$ is defined as 
+$$
+E^\alpha := \{ x \in E: f(x) \le \alpha \}
+$$ 
+The epigraph of the function $h$ is defined as:
+\begin{equation}
+	\epi(h):= \{(y, r) \in D \times \mathbb{R}: \quad h(y) \le r \}.
+\end{equation}
+
+\begin{definition}[convex and proper functions]
+Given a function $h:[-\infty, \infty] \rightarrow \mathbb{R}$,\\
+\textbf{1. }We say $h$ is \textbf{convex} if $\epi(h)$ is a convex set. \\
+\textbf{2. }We say $h$ is \textbf{proper} if $h$ \textbf{never} takes the value of $-\infty$. \\
+\textbf{3. }We say $h$ is \textbf{closed} if its epigraph is closed.
+\end{definition}
+The concepts of closeness and lower-semiconitinuous are intimately related for the convex functions. 
+
+\begin{example}[$\operatorname{core} \neq \operatorname{dom}$]
+Let $Y=\mathbb{R}$, take $E=\{0\}$, $A=0$, $f(0)=0$, and define the convex lsc function
+\[
+g(u)=
+\begin{cases}
+-\sqrt{u}, & u\ge 0,\\
++\infty, & u<0.
+\end{cases}
+\]
+Then $\operatorname{dom}g=[0,\infty)$, so $0\in\operatorname{dom}g$ but $0\notin\operatorname{core}(\operatorname{dom}g)$ (the core is $(0,\infty)$).
+
+Here $h(u)=g(u)$, so $p=h(0)=g(0)=0$ is finite. However, $g$ has no subgradient at $0$ because the right-derivative is $-\infty$:
+\[
+\partial g(0)=\varnothing.
+\]
+As a result, the associated dual supremum is not attained (one can compute it explicitly; it approaches $0$ only as $\phi\to\infty$).
+\end{example}
+
+\begin{theorem}[continuity of convex functions]
+Suppose $f: E \mapsto (-\infty, + \infty]$ is convex, then $f$ is locally Lipschitz if and only if $f$ is bounded locally in a neighborhood. 
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+\begin{definition}[Directional Derivative]
+	Given an open domain, The function $f:D \longrightarrow \mathbb{R}^m, D \subset \mathbb{R}^n$ is directional differentiable if $\forall s \in \mathbb{R}^n$, the directional derivative:
+	\begin{equation}
+		f'(x,s) := \lim_{t \rightarrow 0^+}\frac{f(x + ts) - f(x)}{t} 
+	\end{equation}
+ exists.
+\end{definition}
+
+\begin{lemma}[the difference quotient]
+	Given a convex function(has to be defined on a convex set in order to be well-defined):$f: D \longrightarrow \mathbb{R}^n$, $\forall d \in \mathbb{R}^n$ the function:
+	\begin{equation}
+		g_x(d, t) = \frac{f(x + td) - f(x)}{t}
+	\end{equation}
+	is well-defined and monotone increasing in t.
+\end{lemma}
+
+\begin{definition}[subgradient]
+	Given $f: E \rightarrow (-\infty, +\infty]$, we define the \textit{subgradient} at $\bar{x}$:
+	\begin{equation*}
+		\partial f(\bar{x}):= \{ d \in E| \quad \forall x \in E: \langle d, x - \bar{x} \rangle \le f(x) - f(\bar{x})\}.
+	\end{equation*}
+	with 
+	\begin{align*}
+		\dom(\partial f):= \{ x \in E: \partial f(x) \neq \emptyset\}. 
+	\end{align*}
+\end{definition}
+The subgradient is a multifunction (the set-valued function). There are nice things about the subgradient. As one-sided local approximation it alleviate the differentiability assumption. Second, the subgradient is alway \textbf{closed and convex} set. 
+
+
+Next we introduce the concept of subadditivity and sub-linearity. The sub-linearity is essential in penalized learning. The conclusion is that convex functions admit sublinear directional derivatives. (How to use that in the optimization algorithm??)
+
+
+
+\begin{definition}[sublinear function]
+	A function $f:E \rightarrow \mathbb{R}$ is sublinear if 
+	\begin{align*}
+		\forall \lambda, \mu \in \mathbb{R} \quad \forall x, y \in E : \quad f(\lambda x + \mu y) \le \lambda f(x) + \mu f(y). 
+	\end{align*}
+\end{definition}
+
+\begin{proposition}[characterization of sublinear functions]
+	A function $f: E \rightarrow (-\infty, +\infty]$ is sublinear if and only if it is sub-additive and positive homogeneous.  
+\end{proposition}
+\begin{remark}
+For positive homogeneous function $f$ it's necessary to have
+\begin{align*}
+	f(0) = 0. 
+\end{align*}	
+\end{remark}
+
+
+% \begin{definition}[the linearity space]
+% 	Given a sublinear function (which in general satisfies $-f(x) \le f(-x)$), the linearity space is defined as 
+% 	\begin{align*}
+% 		\lin f:= \{x \in E| -f(x) = f(-x)\}. 
+% 	\end{align*}
+% \end{definition}
+
+\begin{lemma}
+	Given a sublinear function $p: E \rightarrow (-\infty, + \infty]$ and $q(\cdot):= p'(x, \cdot)$,  it holds
+	\begin{enumerate}
+		\item $q(\lambda x ) = \lambda p(x)$
+		\item $q \le p$ 
+		\item $\lin q \supset \lin p + \spa\{x\}$ 
+	\end{enumerate}
+\end{lemma}
+\begin{proof}
+\end{proof}
+
+\begin{theorem}[Max formula]
+	Given a convex function $f: E \rightarrow (-\infty, +\infty]$, then it holds
+	\begin{equation}
+		\forall x \in \core(f) \quad \forall d \in E: \quad f'(x, d) = \max_{\phi \in \partial f(x) } \langle \phi, d \rangle_E
+	\end{equation} 
+	In particular, $f'(x, d)$ is nonempty. 
+\end{theorem}
+\begin{remark}
+This is a powerful existence result. However, it should be noted that the Gateau derivative of convex exists \textbf{only in the core}.	
+\end{remark}
+\begin{proof}
+\end{proof}
+
+\begin{corollary}[Gateau differentiability of convex functions]
+	(On a open and convex set in $\mathbb{R}^n$ )The convex function admits every directional derivative everywhere and the directional derivative is \textbf{sublinear. }
+\end{corollary}
+
+Notice that the subgradient, it is not only defined in a neighborhood of $x$ but globally. The following theorem states, for the convex function, the relationship between the Gateau derivative and the sub-gradient exists. 
+
+\begin{theorem}
+The subderivative of a convex function are the vectors with dual norm smaller than that of all directional derivative, i.e., given a convex function on a open and convex subset of $\mathbb{R}^n$, $\forall x \in D$ we have:
+	\begin{equation}
+		\partial f(x) = \{ g \in \mathbb{R}^n \mid g^\top s \leq f'(x,s)\quad \forall s \in \mathbb{R}^n\}
+	\end{equation}
+	If the function if also differentiable, subderivative is equivalent to gradient.
+\end{theorem}
+
+
+\begin{definition}[Fenchel conjugate]
+Given a function $h: E \rightarrow (-\infty, +\infty]$, we define the Fenchel conjugate 
+\begin{align*}
+	h^*(\phi):= \sup_{x \in E} \bigg\{ \langle \phi, x\rangle_E - h(x) \bigg\}. 
+\end{align*}
+\end{definition}
+
+
+
+\begin{lemma}[Fenchel-Young duality]
+	Given $h:E \rightarrow (-\infty, +\infty]$, it holds
+	\begin{align*}
+		\forall x \in E \forall \phi \in E: \quad  h(x) + h^*(\phi) \ge \langle \phi, x\rangle
+	\end{align*}
+\end{lemma}
+
+\begin{theorem}[Fenchel duality and convex calculus]
+Given $f: E \rightarrow (-\infty, +\infty], g: Y \rightarrow (-\infty, + \infty]$ and $A: E \rightarrow Y$ a linear operator
+\begin{align*}
+	& p = \inf_{x \in E} \bigg( f(x) + g(A x) \bigg), \\
+	& d = \sup_{\phi \in E} \bigg(-f^*(A^* \phi ) - g^*(- \phi) \bigg). 
+\end{align*}
+it holds the \textbf{weak duality:}
+\begin{align*}
+	d \le p.
+\end{align*}
+if moreover, $f$ and $g$ are convex and satisfies: 
+$$
+0 \in \core
+$$
+\end{theorem}
+
+
+\subsection{The Fenchel Biconjugation}
+
+
+\begin{theorem}
+	Given $h: E \rightarrow [-\infty, +\infty]$ a convex function, then it holds
+	\begin{enumerate}
+		\item if $h^{**}$ is somewhere finite, then $\cl(h) = h^{**}$
+		\item Given $x \in E$ where $f(x)$ is finite, then $h$ is l.s.c. if and only if $h = h^{**}$. 
+	\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[Fenchel biconjugation]
+\end{theorem}
+
+
+\begin{definition}[recession function and recession cone]
+Let $E \subset \mathbb{R}^n$ and $C \subset E$ a non-empty closed convex set, the recession cone is defined as
+	\begin{align*}
+		0^+(C):= 
+	\end{align*}
+	Given a closed and convex function $f: D \rightarrow (-\infty, +\infty]$, the recession function $f: D \rightarrow ( -\infty, +\infty]$ is defined as 
+	\begin{align*}
+		f^\infty(s):= \lim_{t \rightarrow \infty} \frac{f(x_0 + ts) - f(x_0)}{t}.
+	\end{align*}
+\end{definition}
+
+\subsubsection{the Lagrange duality}
+Observe the convex problem
+\begin{align*}
+	\inf_{x \in E} \{ f(x) | \quad g(x) \le 0 \}.
+\end{align*}
+
+% \subsection{optimal value function}
+% Objective is to investigate the problem
+% \begin{equation}
+% \label{opt_iqc_convex}
+% 	\inf_{x \in E} \{ f(x) |\quad g_i(x) \le 0, i = 1, \dots, m\} \texttt{ $g_i$, $f$ are convex.}
+% \end{equation}
+% by the approach of convex analysis. 
+% \begin{definition}[optimal value function]
+% 	Given $f, g: E \rightarrow (-\infty, + \infty]$ convex, the optimal value function is defined as 
+% 	\begin{equation}
+% 		v(b):= \inf\{f(x)|g(x) \le b\}
+% 	\end{equation}
+% \end{definition}
+% \begin{remark}
+% The Lagrange multiplier corresponds to the subgradient of $v$. 	
+% \end{remark}
+
+% \begin{lemma}
+% 	If the function $f: D \rightarrow [-\infty, +\infty]$ is convex and there exists $\hat{y} \in \interior(D)$ such that
+% 	\begin{align*}
+% 		h(\hat{y}) > -\infty,
+% 	\end{align*}
+% 	then $h$ never takes the value of $-\infty$. 
+% \end{lemma}
+
+% \begin{assumption}[Slater condition]
+% 	There exists $\hat{x} \in \dom(f)$, such that for all $i = 1, \dots, m$, $g_i(\hat{x}) < 0$. 
+% \end{assumption}
+
+
+% \begin{theorem}[KKT condition of convex optimization problem]
+% If $\bar{x}$ is a local minimum of the \textbf{convex programming}, then there exists a Lagrange multiplier vector $\bar{\lambda}$.
+% \end{theorem}
+% \begin{proof}
+% We want to show there exist \textbf{ non-negative }$\bar{\lambda}$ such that
+% \begin{enumerate}
+% 	\item $\forall x \in E: L(\bar{x}, \bar{\lambda}) \le L(x, \bar{\lambda}).$
+% 	\item The slackness condition: $\forall i$ in the active set, it holds $\bar{\lambda}_i = 0$. 
+% \end{enumerate}
+% The Slater condition implies
+% \begin{align*}
+% 	0 \in \core(v). 
+% \end{align*}
+% Therefore the Gateau derivative exists and we have
+% \begin{align*}
+% 	v(0) \le v(b) - \hat{\lambda} b 
+% \end{align*}
+% For $b > 0$ (and $b$ sufficiently small to be contained in $\core(v)$) we have by definition of $v$ $\hat{\lambda} \le 0$, we define $\bar{\lambda} = - \hat{\lambda}$ and get a non-negative vector. 
+% \end{proof}
+
+\section{Proximal Algorithms}
+The proximal operator is useful in that: if a convex function $f$ is not differentiable but only admits the subgradient at a point $x$, we can calculate the subgradient by the proximal operator:
+\begin{equation*}
+    \lambda (q - \prox\nolimits_{\lambda f}(q) ) \in \partial f(\prox\nolimits_{\lambda f}(q))
+\end{equation*}
+It is to notice that by $\partial$ we are taking the derivative w.r.t. the $\prox (q)$.
+\subsection{Proximal Operators}
+\begin{definition}[proximal operator]
+	Given a proper, convex, closed function $f$, $C \subset \mathbb{R}^n $ a convex set, the proximal operator is defined as
+	\begin{align*}
+		\prox\nolimits_f (v) = \arg \min_{x \in C} \bigg(f(x) + \frac{1}{2} \|x - v\|^2 \bigg).
+	\end{align*}
+\end{definition}
+
+\begin{lemma}
+	The proximal operator is non-expansive. 
+\end{lemma}
+
+\begin{theorem}[the fixed point property]
+	Given $f$ closed, proper, convex, if $x^*$ is a minimizer of $f$, then $x^*$ is a fixed point of $\prox_f$, i.e., 
+	\begin{align*}
+		x^* = \prox\nolimits_{\lambda f}(x^*)
+	\end{align*}
+\end{theorem}
+\begin{proof}
+\quad\\
+"$\Leftarrow$": Assume $x^*$ is a fixed point of $\prox_f$, it holds
+\begin{align*}
+	x^* = \prox\nolimits_{\lambda f}(x^*) = \arg\min_x \bigg( f(x) + \frac{1}{2}\|x - x^*\|^2 \bigg)
+\end{align*}
+Since $f$ is convex, the \textbf{sufficient} condition for $x^*$ to be the minimizer is 
+\begin{align*}
+	0 \in \partial f(x^*) = \{ v |\quad f(x^*) + v^T(x - x^*) \le f(x) \quad\forall x \in \dom (f) \}
+\end{align*}
+It holds by the definition of $\prox_f$ and the convexity of $\prox_f$ that
+\begin{align*}
+	0 \in \partial f(x^*) + (x^* - x^*) \quad \forall x \in \dom (f)
+\end{align*}
+
+\quad\\
+	"$\Rightarrow$": Assume $x^*$ minimizes $f$, i.e., $f(x^*) \le f(x)$ for all $x \in \dom(f)$, it holds
+	\begin{align*}
+		\prox_f(x^*) = \arg\min_x \bigg( f(x) + \frac{1}{2} \|x - x^*\|^2 \bigg),
+	\end{align*}
+	and for all $x \in \dom(f)$
+	\begin{align*}
+		f(x) + \frac{1}{2}\|x - x^*\|^2 \ge f(x^*) + \frac{1}{2}\|x^* - x^*\|^2.
+	\end{align*}
+	Hence 
+	\begin{align*}
+		\prox_f(x^*) = x^*. 
+	\end{align*}
+\end{proof}
+
+\begin{proposition}
+    The proximal operator from a Hilbert space $H$ to a subset $U_{ad} \subset H$ for a convex functional $f$ is a well-defined and bounded (nonlinear) operator. 
+	\begin{enumerate}
+		\item $u = \prox\nolimits_{\lambda f}(q) \Leftrightarrow \lambda(q - u) \in \partial\varphi(u)$. 
+        \item the proximal operator is firmly non-expansive, i.e., 
+        $$
+           \| \prox (q) - \prox(\tilde{q})|\|^2 \le \langle \prox (q) - \prox(\tilde{q}), q - \tilde{q}\rangle
+        $$
+	\end{enumerate}
+\end{proposition}
+\begin{proof}
+    By the NOC of convex functional in Banach space (taking the derivative w.r.t. u). 
+\end{proof}
+
+
+\begin{theorem}[the Moreau decomposition]
+	Given $f$ as before, it holds for all $v$:
+	\begin{align*}
+		v = \prox_f(v) + \prox_{f^*}(v)
+	\end{align*}
+\end{theorem}
+
+\begin{definition}[the infimal convolution]
+	Let $f$ and $g$ be 2 closed proper convex function on $\mathbb{R}^n$, the infimal convolution of $f$ and $g$ is defined as 
+	\begin{align*}
+		(f \triangledown g)(v) = \inf_{x \in \mathbb{R}^n}( f(x) + g(v - x)),
+	\end{align*}
+	with $\dom(f \triangledown g) = \dom(f) + \dom(g)$. 
+\end{definition}
+
+
+\subsubsection{The normal mapping}
+Given $n \in \mathbb{R}^{n + 1}$, the normal hyperplane at $x_0 \in \mathbb{R}^n$ is defined as 
+\begin{align*}
+	H(x_0):= \{ x \in \mathbb{R}^n: \langle n, x - x_0 \rangle = 0\}.
+\end{align*}
+To perform the scalar product on the epigraph $\{(x, y)\}$ we need to define the subdifferential in 1-dimension higher, the natural choice is $(v, -1)$, in the following we will see why.
+
+\begin{definition}[the normal cone]
+Given a convex set $C \subset \mathbb{R}^n$, the normal cone at $x \in C$ is defined as
+	\begin{equation}
+		N_C(x):= \{ d \in \mathbb{R}^n: \langle d, y - x\rangle \le 0 \quad \forall y 
+		\in C \}. 
+	\end{equation}
+\end{definition}
+
+\begin{lemma}
+	Given a convex function $\psi$, the subdifferential at $x$ is the normal cone of the epigraph at $x$, i.e., 
+	\begin{align*}
+		(\partial f(x), -1) = N_{\epi(\psi)}((x, \psi(x)).
+	\end{align*}
+\end{lemma}
+\begin{proof}
+	\quad\\
+	"$\Rightarrow$": Given $d \in \partial \psi(x)$, $(y, z) \in \epi(f)$, it holds 
+\begin{align*}
+	  \langle (d, -1), (y, z) - (x, \psi(x)) \rangle &= \langle d, y - x \rangle - (z - \psi(x)), \\
+	  & \le \langle d, y - x\rangle - (\psi(y) - \psi(x)), \\
+	  &  \le 0. 
+\end{align*}
+hence
+\begin{align*}
+	(d, -1) \in N_{\epi(f)}((x, \psi(x)). 
+\end{align*}
+"$\Leftarrow$": analog.
+\end{proof}
+
+Now we link the Robinson normal mapping condition to the proximal mapping. Observe the minimization problem:
+
+
+
+
+
+\chapter{Nonsmooth Optimization}
+\section{Convex optimization}
+\subsection{Directional Derivative}
+
+
+\begin{remark}
+	The function $f$ does not to be continuous.
+\end{remark}
+We need to establish a Existenzaussage about the directional derivative.
+
+
+This is a very important auxiliary function because in the convex function the distance between any two points is upper bounded by this function.\par The existence of directional derivative, the local Lipschitz continuity of convex function, the convexity of sub-differential, the equivalence of sub-differential and gradient for differentiable functions, and the equivalence of Clark derivative and directional derivative have all used this operator. 
+
+
+
+
+
+The sublinear function defined a half norm on the open set $D \subset \mathbb{R}^n$. Can we find a directional derivative, which for some $s, t \in \mathbb{R}^n$ admits strict sub-linearity?
+We now look into the sufficient and necessary conditions of minimal points $\hat{x}$. 
+
+
+\begin{theorem}[NOB]
+	Given a function: $f :D \longrightarrow \mathbb{R}$, where $D$ is open. For the minimal point $\hat{x} \in D$, we have:
+	\begin{enumerate}
+		\item the necessary conditions: $f$ admits directional derivative in every direction and it holds
+		\begin{equation}
+			f'(\hat{x}, x - \hat{x}) \geq 0,\quad \forall x \in \mathbb{R}^n	.
+		\end{equation}
+		\item The sufficient condition: $f$ is convex and satisfies the condition above.
+	\end{enumerate}
+\end{theorem}
+
+\begin{definition}[Star-shaped area]
+\end{definition}
+
+
+
+
+
+\begin{definition}[Lipschitz continuity]
+\end{definition}
+
+\begin{remark}
+Convexity implies locally Lipschitz-continuity. 	
+\end{remark}
+
+
+
+\begin{theorem}
+	Given a convex $f: D \longrightarrow \mathbb{R}^n$, $D$ is open and convex.Then we have:
+	\begin{enumerate}
+		\item $\forall x \in D$, the subdifferential $\partial f(x)$ is non-empty, convex, and compact.
+		\item If $f$ is Lipschitz continuous, we have: $\partial f(x) \subset U_L(x)$, and \begin{equation}
+			f'(x,s) = \max_{g \in \partial f(x)}g^\top s, \forall s \in \mathbb{R}^n
+		\end{equation}
+	\end{enumerate} 
+\end{theorem}
+
+\begin{proof}
+	The difficult part is to prove that the subdifferential is not empty for the convex function and equation (6) using the separation theorem.
+	\begin{enumerate}
+		\item $\partial f(x)$ is closed and convex:\\
+		By the definition of sub-differential we know that $M_y := \{g | f(y) - f(x) \geq g^\top(y - x) \}$ is convex for all $y$. Because the intersection of convex sets is also convex, we know the $\partial f(x)$ is convex.
+		\item  the equation is shown by separation theorem. 
+	\end{enumerate}
+\end{proof}
+
+\begin{theorem}
+\textbf{Given a convex function, a point is a minimum point iff 0 is included in the subdifferential:} For a convex function defined on a non-empty, open and convex set, the following arguments are equivalent:
+	\begin{enumerate}
+		\item The point $\hat{x}$ is local, and therefore global minimal point on the set $D$.
+		\item $0 \in \partial f(\hat{x}))$
+	\end{enumerate}
+\end{theorem}
+
+Here we have a generalisation of the necessary conditions of optimal points in the case of smooth function to the case of non-smooth(convex) functions.
+
+\begin{lemma}
+	The union of convex and compact sets is compact and we have:
+	\begin{equation*}
+		C = \{ \sum_{i = 1}^m \alpha_i x_i \mid x_i \in C_i, \alpha_i \geq 0, \sum_{i = 1}^m \alpha_i = 1\}
+	\end{equation*}
+\end{lemma}
+
+\begin{theorem}
+Given a family of \textcolor{red}{convex} continuous function $f_i: \mathbb{R}^n \longrightarrow \mathbb{R}$. We define the convex function:
+\begin{equation}
+	f(x) := \max_{1\leq i \leq m} f_i(x).
+\end{equation}
+$\forall x \in \mathbb{R}^n$, define $I(x)$ the set of indices, of which the function is active in the point $x$. Than we have :
+\begin{equation*}
+	f'(x, d) = \max_{i \in I(x)} f_i'(x) \quad \forall d \in \mathbb{R}^n
+\end{equation*}
+And the subdifferential is the convex hull of the subdifferential active functions. i.e.
+\begin{equation*}
+	\partial f(x) = \conv \{ i \in \cup_{i \in I(x)} \partial f_i(x)\}
+\end{equation*}
+\end{theorem}
+
+\begin{proof}
+The existence of the directional derivative is guaranteed by the convexity of the function. By definition we get the form of (7)\\
+To show $\partial f(x) = \conv_{i \in I} \{ \partial f_i(x) \}$\\
+"$\subset$", \\
+by definition we know:
+\begin{align*}
+	&g\top s \leq f_i'(x, s) \leq \partial f(x), \forall s\\
+	\Rightarrow & \cup \partial f_i \subset \partial f\\
+	\overset{(2)}{\Rightarrow} & \conv\{\cup_{i \in I} \partial f_i \} \subset \partial f
+\end{align*}
+(2) because the sub-differential is a convex subset of $\mathbb{R}^n$.\\
+"$\supset$"\\
+\end{proof}
+
+\begin{corollary}
+If the function $f_i:\mathbb{R}^n \longrightarrow \mathbb{R}, 1 \leq i \leq m$ are affine. i.e.
+\begin{equation*}
+	f_i = a_i^T x + b_i
+\end{equation*}
+Define:
+\begin{equation*}
+	f = \max_{1 \leq i \leq m} f_i(x)
+\end{equation*}
+Then $\forall x, d \in \mathbb{R}^n$
+\begin{equation*}
+	f'(x, d) = a_i^\top d, \quad \partial f(x) = conv\{a_i | i \in I(x)\}
+\end{equation*}
+\end{corollary}
+
+
+
+\subsection{Derivative by Clark}
+\begin{definition}[Clark derivative]
+	Given a function $f:D \longrightarrow \mathbb{R}^n, D \subset \mathbb{R}^n$ open. For $\hat{x} \in D, s \in \mathbb{R}$. The Clark derivative exists if:
+	\begin{equation*}
+		f^\circ(\hat{x}, s) := \limsup_{t \rightarrow 0_+, x \rightarrow \hat{x}} \frac{f(x + ts) - f(x)}{t} \in \mathbb{R}
+	\end{equation*}
+\end{definition}
+
+\begin{theorem}[Existence of Clark derivative]
+\textbf{Locally Lipschitz continuous function is Clark differentiable in the point}. And we have:
+\begin{equation*}
+	f^\circ(x, s) \leq L \| s \| \quad \forall s \in \mathbb{R}^n
+\end{equation*}
+\end{theorem}
+
+Form convexity follows the local Lipschitz differentiability. Therefore all the convex function is Clark differentiable.
+
+\begin{lemma}
+	Given a function $f: D \longrightarrow \mathbb{R}, D \subset \mathbb{R}^n$, locally Lipschitz continuous in the point $\hat{x}$ with Lipschitz constant $L$. Than the clark derivative $f^\circ(\hat{x}, s) $ is:
+	\begin{itemize}
+		\item sublinear: $f^\circ(x, u + v) \leq f^\circ(x, u) + f^\circ(x, v)$
+		\item reflexiv: $f^\circ(x, -u) = -f^\circ(x, u)$
+	\end{itemize}
+\end{lemma}
+
+\begin{theorem}
+	Given a convex function: $f: D \longrightarrow \mathbb{R}$ (therefore locally Lipschitz continuous, the local Lipschitz continuity is important!). Directional derivative and Clark derivative are equivalent. 
+\end{theorem}
+
+\begin{proof}
+	Aufgab 3, Set 2.
+\end{proof}
+
+
+\begin{definition}[Clarke Subdifferential]
+	$f: D \longrightarrow \mathbb{R}, D \subset \mathbb{R}^n$ open, and is local Lipschitz continuous.The Clark derivative is well defined and the Clark sub-differential could be defined as:
+	\begin{equation*}
+		\partial^C f(x) := \{ y \in \mathbb{R}^n \mid f^\circ(x,s) \geq \langle y,s \rangle , \forall s \in \mathbb{R}^n \}
+	\end{equation*}
+\end{definition}
+\begin{example}[Half pipe example]
+	in the point 0 not continuous differentiable. If we want $\partial f(\hat{x}) = \{\nabla f(\hat{x}) \}$, the smoothness of $f$ would be required. We see that even for differentiable function the gradient is not necessarily equivalent to Clark sub-derivative.(Unlike sub-derivative)\\
+	In general Banach space obvious more complicated. 
+\end{example}
+
+\begin{theorem}
+	\textbf{Locally Lipschitz continuous function admit in every point the Clark sub-derivative, and the sub-derivative} and:
+	\begin{enumerate}
+		\item $\partial^C f \subset U_L(0)$ is non-empty, convex, and compact.
+		\item $f^\circ(x, s) = \max\{y^\top s | y \in \partial^C f(x) \}$ for all $s \in \mathbb{R}^n$
+	\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[NBO: necessary condition for the optimal point]
+	
+\end{theorem}
+
+\subsection{Bouligand Differentiability(Limiting Jacobian)}
+
+\begin{theorem}[Theorem of Rademacher]
+\textbf{Local Lipschitz continuous functions are a.e. differentiable.}
+\end{theorem}
+
+\begin{definition}[Bouligand derivative and Bouligand differentiable function]
+Let $f: D \longrightarrow \mathbb{R}^m, D \subset \mathbb{R}^n$ open, local Lipschitz continuous in $D$. $D_f$ the dense subset in the sense of Rademacher. The Bouligand subdifferential(Limiting Jacobian) is defined as:
+	\begin{equation*}
+		\partial^B f(x) := \{ G \in \mathbb{R}^{m \times n} \mid \exists (x_k) \subset D_f: x_k \rightarrow x \text{ and } \nabla f(x_k) \rightarrow G \}
+	\end{equation*} 
+	A function is \textbf{B-differentiable} if it's directional differentiable and can be approximated in 1st order by the Bouligand derivative. 
+\end{definition}
+\begin{remark}
+The directional differentiability doesn't ensure the 1st order approximation by the gradient. There are functions that admit vanishing directional derivative but not even continuous. [p65, Scholtes]	
+\end{remark}
+
+
+\begin{theorem}
+	Let $f$ defined as above. The Clark derivative in any point in $D$ is the convex hull of the Bouligand derivative.:
+	\begin{equation*}
+		\partial^C f(x) = conv\{ \partial^B f(x) \}
+	\end{equation*}
+\end{theorem}
+
+\begin{example}
+\end{example}
+
+\subsection{Optimization condition for the abs-normal functions}
+We encounter constantly nonsmooth function, let $f$ be a multivariate function defined on a open set. The functions:
+	\begin{itemize}
+	\item $PC^r$-function
+	\item Piecewise Smooth function
+	\item Piecewise Linear function
+\end{itemize} 
+are all nonsmooth. 
+
+
+\begin{example}
+	niemals glatt verfahren auf nicht linear problem zu verwenden. 
+\end{example}
+
+\begin{definition}[Abs-normal function]
+	For the piecewise smooth function we define the abs-normal form. Given $d \in \mathbb{N}$, piecewise smooth function$ f: \mathbb{R}^n \longrightarrow \mathbb{R}, y = f(x)$ we define 
+	\begin{align*}
+			z &= F(x, |z|) (\text{implizit defined})\\
+			y &= \varphi(x, |z|)
+	\end{align*}
+	where $\varphi, F \in C_{abs}^c(\mathbb{R}^n, \mathbb{R}+)$.
+\end{definition}
+
+\begin{example}
+\end{example}
+
+\begin{theorem}[necessary conditions of optimization for the $C_{abs}^d$ Functions]
+	Given $f \in C_{abs}^d(\mathbb{R}^n), d \geq 1$. If $x_*$ is a minimal point, $z(x_*) = 0$, $rank(Z) := rank(z(z_*, x_*)) = s$. Then there must exist a vector of Lagrange multiplier with $\lambda_* \in \mathbb{R}^s$, such that:
+	\begin{itemize}
+		\item $a^\top (x_*, 0) + \lambda_*^\top Z(x_*, 0) = 0$  
+		\item $F(x_*, 0) = 0$
+		\item $b^\top (x_*, 0) + \lambda_* \frac{\partial F}{\partial |z|} = 0$
+	\end{itemize}
+\end{theorem}
+
+\subsubsection*{The evaluation procedure}
+
+\section{Subgradient Methods}
+\subsection{introduction}
+gradient ist immer eine abstiegrichtung. Aber sub-gradient nicht. 
+
+\begin{definition}[descent, steepest descent]
+	Given $f: D \longrightarrow \mathbb{R}, D \subset \mathbb{R}^n$ directional differentiable. We define
+	\begin{itemize}
+		\item The direction $s \in \mathbb{R}^n$ is called descent for $f$ in $x$, if 
+			\begin{equation*}
+				f'(x,s) < 0
+			\end{equation*}
+		\item The descent is called the steepest descent if
+			\begin{equation*}
+				f'(x, \frac{s}{\|s\|}) = \min_{\| d \| = 1}f'(x, d)
+			\end{equation*}
+	\end{itemize} 
+\end{definition}
+
+\begin{remark}.
+	\begin{enumerate}
+		\item $s = 0$ is allowed
+		\item Is $f$ Lipschitz continuous in $x$, it can be proved that the directional derivative is also (Lipschitz) continuous. By the theorem of Weierstrass the existence of the minimum is garanteed. 
+		\item Is $f$ differentiable in $x$, the steepest descent is $s = - \alpha \nabla f(x), \alpha > 0$.
+		\item By the theorem of Rademacher, for the Lipschitz-continuous function, the points not differentiable is a null set.
+	\end{enumerate}
+\end{remark}
+
+\begin{definition}[sub-gradient, subdifferential]
+	Given $f: D \longrightarrow \mathbb{R}$ convex on a convex, open subset of $\mathbb{R}^n$. A vector is called sub-gradient of $f$ in the point $\hat{x}$, if
+	\begin{equation}
+		f(x) - f(\hat{x}) \geq g^\top(x-\hat{x}), \forall x \in D
+	\end{equation}
+	
+	The set $\partial f(\hat{x}) \subset \mathbb{R}^n$ with 
+	\begin{equation*}
+		\partial f(\hat{x}) := \{g \in \mathbb{R}^n \mid g \text{ subgradient}\}
+	\end{equation*}
+	is called the subdifferential of $f$ in point $\hat{x}$.
+\end{definition}
+
+\subsection{subgradient method}
+\begin{algorithm}
+    \caption{subgradient algorithm}
+    $f: \mathbb{R}^n \longrightarrow \mathbb{R}$ directional differentiable for all $x \in \mathbb{R}^n$ and $x^0 \in \mathbb{R}^n$ is given. For $k = 0, 1, 2, \dots$
+    \begin{algorithmic}
+        \State $\mathrm{opt\_sub} (f, \epsilon , x_0)$
+        \State $s_0 \in \partial f(x_0)$
+            \While{$(s_k \le \epsilon)$}
+                \State Calculate \textbf{one} sub-derivative $s^k \in \partial f(x^k)$
+                \State Determine a step width $\alpha_k > 0$
+                \State Set $d^k = -\frac{s^k}{\|s\|},\quad x^{k+1} = x^k + \alpha_k d^k, \quad k = k + 1$
+            \EndWhile
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{remark}\quad
+	\begin{enumerate}
+		\item We would expect the one sub-gradient $g \in \partial f(x)$ can be calculated in every step $\Rightarrow$ Oracle.
+		\item The sub-gradient method is not a descent method.
+	\end{enumerate}
+\end{remark}
+
+
+\begin{lemma}
+	$f : \mathbb{R}^n \longrightarrow \mathbb{R}$ a convex function. $\tilde{x}$ an arbitrary minimal point of $f$ and $x^k$ the k-th iteration of the sub-gradient method and not the minimal point. Then there exists $\tilde{\alpha} > 0$ , s.t.for $x^{k + 1} = x^{k} + \alpha_k d^k$ we have:
+		\begin{equation*}
+			\| x^{k + 1} - \tilde{x} \|  < \| x^k - \tilde{x} \| \quad \forall \alpha_k \in (0, \tilde{\alpha})
+		\end{equation*}
+\end{lemma}
+
+\begin{proof}
+	By the sub-gradient method we get:
+	\begin{equation*}
+		\| x^{k+1} - \tilde{x} \| = \| x^k - \tilde{x} \|^2 + 2 \alpha_k \langle d_k, x^k - \tilde{x} \rangle + \alpha_k^2
+	\end{equation*}
+\end{proof}
+
+\begin{lemma}
+	$f : \mathbb{R}^n \longrightarrow \mathbb{R}$ convex function, $\tilde{x}, z \in \mathbb{R}^n$ with $f(z) > f(\tilde{x})$ and $s \in \partial f(z), s \neq 0$. Define $H_z = \{ x \in \mathbb{R}^n | \langle s, x - z \rangle = 0\}$. Then the optimisation problem
+		\begin{equation*}
+			\min_{x \in H_z} \frac{1}{2} \| x - \tilde{x} \|^2
+		\end{equation*}
+		has an unique deterministic solution:
+		\begin{equation*}
+			x^* = \tilde{x} + \lambda s, \text{  with } \lambda = \frac{\langle s,  z - \tilde{x} \rangle}{\| s\|^2}
+		\end{equation*}
+		
+		And we have $\lambda > 0, \|x^* - \tilde{x} \| = \lambda \|s\|$, and $f(x^*) \geq f(z)$
+\end{lemma}
+
+\begin{proof}
+	The objective function is convex and differentiable. And we have an equality constraint.
+	\begin{enumerate}
+		\item We apply the Lagrange multiplier:
+			\begin{align*}
+				\nabla f(x^*) - \lambda s = 0\\
+				\langle s, x^* - z \rangle = 0
+			\end{align*}
+			solve for the $\lambda$.
+		\item Since $f(z) > f(\tilde{x})$ we have:
+			\begin{equation*}
+				0 \geq f(\tilde{x}) - f(z) \leq \langle s, x - z \rangle = - \lambda \|s\|^2
+			\end{equation*}
+			So we have that $\lambda > 0$.
+		\item By the definition of the sub-gradient we have:
+			\begin{equation*}
+				f(x^*) - f(z) \geq \langle s, x^* - z \rangle = 0
+			\end{equation*}
+	\end{enumerate}
+\end{proof}
+
+\begin{remark}\quad
+	\begin{enumerate}
+		\item We mainly apply the Lagrange and the definition of the sub-gradient.
+		\item Notice that the sub-gradient method is not a descent method.
+	\end{enumerate}
+\end{remark}
+
+
+\begin{theorem}
+	$f : \mathbb{R}^n \longrightarrow \mathbb{R}$ the objective function, which is \textbf{convex} with $\inf_{x \in \mathbb{R}^n} f(x) := f^* > - \infty$. If the step width $\{\alpha_k \}_{k \in \mathbb{N}}$ satisfies:
+	\begin{equation*}
+		\sum \alpha_k = \infty, \quad \lim \alpha_k = 0
+	\end{equation*}
+	then the sub-gradient method will not stop in finite steps but converges to the minimal point:
+	\begin{equation*}
+		\lim f_k \longrightarrow f^*
+	\end{equation*}
+\end{theorem}
+
+
+\subsection{proximal algorithm}
+\begin{definition}[the proximal operator]
+	Given $f:\mathbb{R}^n \rightarrow \mathbb{R}$ a proper closed convex function, the proximal operator is defined as
+	\begin{align*}
+		\prox_f: \mathbb{R}^n \rightarrow \mathbb{R}^n, \quad \prox_f(x):= \arg\min_{y \in \mathbb{R}^n} \bigg(f(y) + \frac{1}{2}\|x - y\|^2 \bigg). 
+	\end{align*}
+\end{definition}
+
+The proximal operator is the generalization of the projection operator, indeed, consider $f$ the indicator function of the closed convex subset $C$, then $\prox_f(x)$ is the orthogonal projection of $x$ on $C$.  
+
+\begin{theorem}[fixed point property]
+	$x^*$ is a minimizer of $f$ (proper closed and convex) if and only if 
+	\begin{align*}
+		\prox_f(x^*) = x^*.
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	\quad\\
+	"$\Rightarrow$": $x^* \in \arg\min f$, then 
+	\begin{align*}
+		\prox_f(x^*) = \arg\min_y( f(y) + \frac{1}{2} \|y - x^*\|^2 ).
+	\end{align*}
+	It holds
+	\begin{align*}
+		f(x^*) + \frac{1}{2}\|x^* - x^*\| \le f(y) + \frac{1}{2}\|y - x^*\|^2 , \quad \forall y \in \mathbb{R}^n.
+	\end{align*}
+	Hence $\prox_f(x^*) = x^*$. \\
+	"$\Leftarrow$": assuming $x^* = \prox_f(x^*)$, then 
+	\begin{align*}
+		0 \in \partial f(x^*) + |x^* - x^*|, 
+	\end{align*} 
+	hence
+	\begin{align*}
+		0 \in \partial f(x^*). 
+	\end{align*}
+\end{proof}
+
+\begin{definition}[firmly nonexpansive operator]
+	An operator $A$ is firmly nonexpansive if 
+	\begin{align*}
+		\forall x, y: \quad \|A(x) - A(y)\|^2 \le \langle x - y, A(x) - A(y) \rangle. 
+	\end{align*}
+\end{definition}
+
+\begin{definition}[Moreau decomposition]
+	Given $f$ a proper closed convex function, it holds
+	\begin{align*}
+		\forall v \in v =  \mathbb{R}^n: \quad \prox_f(v) + (\prox_f)^*(v). 
+	\end{align*}
+\end{definition}
+
+\begin{lemma}
+	Given $I_L$ the indicator function for $L$ subspace:
+	\begin{equation*}
+	I_L(x)=\left\{
+	\begin{aligned}
+		& 0 \qquad x \in L\\
+		& + \infty \quad x \notin L, 
+	\end{aligned}	
+	\right.	
+	\end{equation*}
+
+	it holds
+	\begin{align*}
+		(I_L)^* = I_{L^\perp}. 
+	\end{align*}
+\end{lemma}
+
+\begin{corollary}[orthogonal decomposition]
+	Given $L$ a subspace, it holds
+	\begin{align*}
+		\forall v \in \mathbb{R}^n: \quad v = \Pi_{L} v + \Pi_{L^\perp}v . 
+	\end{align*}
+\end{corollary}
+
+
+\subsubsection{Interpretation}
+\begin{definition}[infimal convolution]
+	Given 2 proper closed convex function $f$, and $g$, the infimal convolution is defined as 
+	\begin{align*}
+		f \square g(v):= \inf_x \bigg( f(x) +  g(v - x) \bigg). 
+	\end{align*}
+\end{definition}
+
+\begin{lemma}
+	It holds
+	\begin{enumerate}
+		\item $(f \square g)^* = f^* + g^*$
+	\end{enumerate}
+\end{lemma}
+
+\begin{definition}[the Moreau envelop]
+	Given the convex proper closed function $f$ and $\lambda > 0$, the Moreau envelop is defined as 
+	\begin{align*}
+		M_{\lambda f}(v):= \inf_{x \in \mathbb{R}^n} \bigg( f (x) + \frac{1}{2 \lambda} \|x - v\|^2\bigg). 
+	\end{align*}
+	is the Moreau envelope of $f$ with the parameter $\lambda$. 
+\end{definition}
+
+\begin{lemma}
+	It holds
+	\begin{enumerate}
+		\item $M_f$ is differentiable, 
+		\item $\dom (M_f) = \mathbb{R}^n$, 
+		\item $\arg\min_x M_f \equiv \arg\min _x f$,
+		\item $M^{**}_f = M_f$.
+	\end{enumerate}
+\end{lemma}
+
+\begin{corollary}
+	It holds
+	\begin{align*}
+		M_f = M_f^{**} = (f^* + \|\cdot\|_2^2)^*. 
+	\end{align*}
+\end{corollary}
+
+\begin{theorem}
+	The proximal operator returns to the infimizer of $M_f$, i.e., 
+	\begin{align*}
+		M_f(x) = f(\prox_f(x)) + \frac{1}{2} \| x - \prox_f(x) \|_2^2. 
+	\end{align*} 
+	moreover, 
+	\begin{align*}
+		\prox_{\lambda f}(x) = x - \nabla M_{ \lambda f} (x) 
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	
+\end{proof}
+
+\begin{theorem}
+	It holds
+	\begin{align*}
+		\prox_{\lambda f}(x) = ( I + \lambda \partial f)^{-1}. 
+	\end{align*}
+	$(I + \lambda \partial f)^{-1}$ is called the resolvent. 
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+\begin{corollary}[proximal operator as modified gradient step]
+Assuming $f$ is twice differentiable, for $\lambda > 0$ sufficiently small, it holds
+\begin{align*}
+	\prox_{\lambda f}(x) = x - \lambda \nabla f (x) + o(\lambda). 
+\end{align*}
+\end{corollary}
+\begin{proof}
+	
+\end{proof}
+
+
+
+
+
+
+
+\subsection{cutting-plane methods}
+
+The cutting-plane method is motivated by the subdifferential. The subdifferential at each point of a function defines a linear hyperspace and a minorant of the original function. we show that the minimax of a family of functions could be transformed to a linear optimisation problem. Theorem 3.13 shows that this method indeed converges to the minimum of the function. Then 3.14 provides a valid termination criteria by stating that if by k-th iteration the approximated value is in the $\epsilon$-ball of the real value, then the approximation is within the $\epsilon$-ball of the minimum of the objective function.
+
+By the definition of sub-gradient we know that $f(x)$ is lower bounded by the function:
+\begin{equation} 
+	f^{se}_k = \max_{1 \leq j \leq k} l_j(x) = \max_{1 \leq j \leq k} \{f(x_j) + s_j^\top (x - x_j)\}
+\end{equation} 
+The next iteration $x_{j + 1}$ is determined by the function:
+\begin{equation*}
+	\min_{x \in D} f_k^{se} (x)
+\end{equation*}
+
+The advantage is that we now have a \textbf{smooth} optimisation problem:
+\begin{equation}
+	\min_{x \in D, \alpha \in \mathbb{R}^n} \alpha \quad \text{such that} \quad f_j^{se}(x) - \alpha \leq 0 \quad 0 \leq j \leq k
+\end{equation}
+
+In the case $D$ is convex we can transform it to a linear optimisation problem and it is analog easy to solve.
+
+\begin{lemma}
+	For functions $f_j: D \longrightarrow \mathbb{R}, j = 1, \cdots, k$, with $D \subset \mathbb{R}^n$, we observe the optimisation problem:
+	\begin{equation}
+		\min_{x \in D} f(x) \qquad f(x) = \max_j f_j(x)
+	\end{equation}
+	\begin{equation}
+		\min_{ a \in \mathbb{R} } a \qquad f_j(x) \leq a, x\in D, 1 \leq j \leq k
+	\end{equation}
+	The two conditions are equivalent.
+\end{lemma}
+
+\begin{algorithmthm}
+	Given $f : \mathbb{R}^n \longrightarrow \mathbb{R}$ for all $x \in \mathbb{R}^n$ directional differentiable and $x_0 \in \mathbb{R}^n$ given. For $k = 1, 2, \dots, $
+	\begin{enumerate}
+		\item calculate a sub-gradient for each point $g^k \in \partial f(x^k)$
+		\item Terminate when conditions satisfied
+		\item Calculate $x^{k + 1}$ by solving the problem (8)
+	\end{enumerate}
+\end{algorithmthm}
+
+
+\begin{theorem}
+	Let $ D \subset \mathbb{R}^n$  be closed, $f: D \longrightarrow \mathbb{R}$ Lipschitz-continuous and convex and the Algorithm 3.12 produced an unlimited sequence. Then every cluster point of the sequence is an optimal solution of
+		\begin{equation*}
+			\min_{x \in D} f(x)
+		\end{equation*}
+\end{theorem}
+
+\begin{proof}
+	idea: By showing that the minorant $f^{se}_k$ converges to a point in $f$.
+\end{proof}
+
+
+\begin{theorem}
+	Given $f: D \longrightarrow \mathbb{R}^n$ a continuous and convex function. The sequence generated by the algorithm 3.12 has a cluster point $\overline{x}$. By theorem 3.13 we know that the cluster point is an optimal solution of the objective function $\min_{x \in D} f(x)$. If we have:
+	\begin{equation*}
+		0 \leq f(x^{k + 1}) - f^{se}_k(x^{k+1}) \leq \epsilon
+	\end{equation*}
+	for an $\epsilon \geq 0$,
+	Then we have:
+	\begin{equation*}
+		0 \leq f(\overline{x}) - f(x^{k + 1}) \leq \epsilon
+	\end{equation*}
+\end{theorem}
+
+By the above theorem we have termination criteria. Moreover, we observe that the Schnittebenenverfaheren is a descendant method. \par 
+However, the problem (8) is not guaranteed to be solvable. Consider $D = \mathbb{R}$ and $s_0 \neq 0$. Then $l_0$ is not lower bounded. This problem could be dealt with by penalty term.  
+
+
+\section{The Bundle-Methods}
+\subsection{Bundle-method motivated by Schnittebeneverfahren}
+Given the objective function , observe the sub-problem:
+\begin{equation} 
+	\min_{d \in \mathbb{R}^n } f^{se}_{J_k}(x + d) + \frac{1}{2 \gamma} \| d\|^2
+\label{OF:PSE}
+\end{equation}
+
+\begin{lemma}
+Let $d^k$ be a solution of \ref{OF:PSE} , then there exists a $\Delta_k > 0$, such that $d^k$ solves the Trust-Region-Problem
+	\begin{equation*}
+		\min_{d \in \mathbb{R}^n} f_{J_k}^{se}(x^k + d), s.t \quad \|d\| \leq \Delta_k
+	\end{equation*}	
+On the other hand if $d^k$ solves the Trust-Region-Problem, and the Nebenbedingung $ \|d\| \leq \Delta_k$ is strongly active, then there exist an $\gamma_k > 0$, such that $d^k$ the penalised Schnittebene problem solves.
+\end{lemma}
+
+We transform the objective function in the neighbourhood of $x_k$:
+\begin{align*}
+	f^{se}_{J_k}(x) &= \max_{j \in J_k} l_j = \max_{j \in J_k} (s^j)^T(x - x^j) + f(x_j) \\
+	&= f(x^k) + \max_{ d \in \mathbb{R}^n}((s^j)^T(x - x^k) - \alpha_j^k) := f(x^k) + \overline{f^{se}_{J_k}}. 
+\end{align*} 
+where
+\begin{equation*}
+	\alpha_j^k = f(x^k) - l_j(x^k) \geq 0
+\end{equation*}
+
+observe now the penalised objective function:
+\begin{equation*}
+	\min_{d \in \mathbb{R}^n } \overline{f^{se}_{J_k}}(x_k + d) + \frac{1}{2 \gamma_k} \| d\|^2
+\end{equation*}
+is the error of j-th iteration evaluated at $x_k$. By lemma 3.11 the optimisation problem becomes:
+\begin{equation} 
+	\min_{d \in \mathbb{R}^n, \xi \in \mathbb{R}} \xi + \frac{\|d\|^2}{2\gamma_k}, \qquad (s^j)^T d - \alpha_k^j - \xi \leq  \qquad \forall j \in J_k
+\label{OF:PSE2}
+\end{equation}
+The pair $(d^k, \xi^k)$ is the solution of the problem.
+
+
+\begin{lemma}
+	$(d^k, \xi^k)$ is the solution of \ref{OF:PSE2} if and only if the KKT conditions is satisfied:
+	\begin{equation*}
+		\
+	\end{equation*}
+\end{lemma}
+
+\subsubsection*{pred vs. ared}
+For a step $d^k$ we compute if the iteration really reduces the value of the function. We define:
+\begin{equation*}
+	ared(d^k) = f(x^k) - f(x^k + d^k) \geq 0
+\end{equation*}
+for k large eenough, we have the predicted reduction:
+\begin{equation*}
+	pred(x_k) = f_{J_k}^{se}(x_k) - f_{J_k}^{se}(x_k + d^k) = -\xi^k
+\end{equation*}
+We have then the concept of serious step and zero step.
+
+\begin{algorithmthm}
+Given : $f: \mathbb{R}^n \rightarrow \mathbb{R}$, $\gamma_+, \gamma_- > 0$. 
+	\begin{enumerate}
+		\item choose $\gamma \in [\gamma_-, \gamma_+]$, and calculate the KKT condition : $(d^k, \lambda^k, \xi^k)$
+		\item Calculate $v^k = - \frac{d_k}{\gamma_k}$ and $\epsilon_k = \sum_{j \in J_k} \lambda_j \alpha_j^k$ (linearised error)
+		\item Termination criteria: $\| v_k \| \leq \epsilon$, or $\epsilon_k \leq \epsilon$. 
+		\item 
+	\end{enumerate}
+\end{algorithmthm}
+
+
+\subsection{Optimisation method with the $\epsilon$-subdifferential}
+
+\begin{definition}
+	Given $f :\mathbb{R}^n \rightarrow \mathbb{R}$ convex and $\epsilon \geq 0$. The vector $s \in \mathbb{R}^n$ is called $\epsilon$-subgradient of $f$ in $x$, if :
+	\begin{equation*}
+		f(y) - f(x) + \epsilon \geq s^T(y-x) \quad \forall y \in \mathbb{R}^n
+	\end{equation*}
+	and the set of $\epsilon$-subdifferential is defined as:
+	\begin{equation*}
+		\partial_\epsilon f(x):=  \{ s \in \mathbb{R}^n | \text{s  $\epsilon$-subdifferential of $f$ in $x$} \}
+	\end{equation*}
+	Alternatively we have the equivalent condition:
+	\begin{equation*}
+		l(x) := f(\hat{x}) + g^T( x - \hat{x})- \epsilon \leq f(x) \Leftrightarrow g \in \partial_\epsilon f(x)
+	\end{equation*}
+\end{definition}
+
+
+
+\begin{definition}[$\epsilon$-directional derivative]
+Given a convex function from $\mathbb{R}^n$ to $\mathbb{R}$. 
+\begin{equation*}
+	f_\epsilon'(x, s) = \inf_{t > 0} \frac{f(x + ts) - f(x) - \epsilon}{t}
+\end{equation*}
+\end{definition}
+
+
+
+\begin{theorem}
+	$f: \mathbb{R}^n \rightarrow \mathbb{R}$, $x \in \mathbb{R}$:
+\begin{enumerate}
+	\item $\partial_\epsilon f(x) = \{ s \in \mathbb{R}^n | s^T v  \leq f_\epsilon(x, v) \forall v \in \mathbb{R}^n\}$
+	\item $\partial_\epsilon f(x)$ is a convex, nonempty and compact.
+	\item $f_\epsilon'(x, v) = \max_{s \in \partial_\epsilon f(x)} s^T v \qquad \forall v \in \mathbb{R}^n$
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}
+Given $f: \mathbb{R}^n \rightarrow \mathbb{R}$ convex 
+\begin{enumerate}
+	\item $\overline{x}$ is $\epsilon$- optimal, i.e.
+	\begin{equation*}
+		f(\overline{x}) \leq f(x) + \epsilon \qquad \forall x \in \mathbb{R}^n
+	\end{equation*}
+	\item $f_\epsilon'(x, v) \geq 0$, $\forall v \in \mathbb{R}^n$
+	\item $0 \in \partial_\epsilon f(\overline{x})$
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}
+Given $f: \mathbb{R}^n \rightarrow \mathbb{R}$ convex, then 
+\begin{enumerate}
+	\item $\forall \epsilon > 0 \quad \exists \delta > 0$:
+	\begin{equation*}
+		\cup_{y \in U_\delta(x)} \partial f(y) \subset \partial_\epsilon f(x)
+	\end{equation*}
+	\item $\forall \delta > 0 \quad \exists \epsilon > 0$:
+	\begin{equation*}
+		\cup_{y \in U_\delta(x)} \partial f(y) \subset \partial_\epsilon f(x)
+	\end{equation*}
+\end{enumerate}
+\end{theorem}
+
+The definition of projector: $P$ is a projector if:
+\begin{equation*}
+	P \circ P = P
+\end{equation*}
+Observe that:
+\begin{equation*}
+	P(x) = \arg \min_{y \in Y} \| x - y \|
+\end{equation*}
+is a projector.
+
+
+\begin{theorem}
+Given $f: \mathbb{R}^n \rightarrow \mathbb{R}$ convex, $\epsilon \geq 0$ and $ x \in \mathbb{R}^n$ with $0 \notin \partial_\epsilon f(x)$. For $\tilde{d} = -s$ with $s = P_{\partial_\epsilon f(x)} (0)$, $d = \frac{\tilde{d}}{\|\tilde{d}\|}$ is a solution for:
+\begin{equation*}
+	\min_{\|v\| = 1} f_\epsilon'(x, v)
+\end{equation*}
+and we have:
+\begin{equation*}
+	f_\epsilon'(x, \tilde{d}) = - \|\tilde{d}\|^2 \leq 0
+\end{equation*}
+\begin{equation*}
+	\inf_{t > 0} f(x + t\tilde{d}) < f(x) - \epsilon
+\end{equation*}
+\end{theorem}
+
+\begin{algorithm}
+\caption{$\epsilon$-subdifferential algorithm}
+\begin{algorithmic}[1]
+\Require $f:\mathbb{R}^n\to\mathbb{R}$ directionally differentiable on $D$, $\epsilon\ge 0$, initial point $x^0\in D$
+\For{$k=0,1,2,\dots$}
+  \State Compute $s^k \gets P_{\partial_\epsilon f(x^k)}(0)$
+  \If{$s^k = 0$}
+    \State \Return $x^k$
+  \EndIf
+  \State Set $d_k \gets -s^k$
+  \State Choose $\alpha_k \in \arg\min_{\alpha>0} f(x^k + \alpha d_k)$
+  \State Update $x^{k+1} \gets x^k + \alpha_k d_k$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
+
+\begin{theorem}
+\end{theorem}
+
+
+\section{Techniques}
+\subsection{Convex functions}
+\begin{align}
+	&f(\lambda x + (1 - \lambda)y) \leq \lambda f(x) + (1 - \lambda) f(y)\\
+	&f(a) + f(b) \leq f(a + b)\\
+	&f(x + h(\tilde{x} - x)) \leq h f(\tilde{x}) + (1 - h)f(x)\\
+	&f(\tilde{x}) - f(x) \geq \frac{f(x + h(\tilde{x} - x)) - f(x)}{h} = \varphi(h)
+\end{align}
+
+
+
+
+
+
+
+
+	
+\end{document}

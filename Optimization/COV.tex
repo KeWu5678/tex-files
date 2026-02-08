@@ -1,0 +1,2496 @@
+\documentclass[a4paper,11pt,fleqn]{book}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[colorlinks = true, linkcolor = blue]{hyperref}
+
+% algorithm / pseudocode
+\usepackage{algpseudocode}
+
+\usepackage{amsmath,amssymb,amsthm,textcomp}
+\usepackage{multicol}
+\usepackage{tikz}
+\usepackage[normalem]{ulem}
+\usepackage{bbm} % characteristic function
+\usepackage{cancel}
+\usepackage{esint} % integral mean
+
+\usepackage{geometry}
+\geometry{left=10mm,right=10mm,%
+bindingoffset=0mm, top=10mm,bottom=5mm}
+
+\renewcommand{\thechapter}{\Roman{chapter}}
+\renewcommand*\thesection{\arabic{section}}
+
+\newtheorem{theorem}{Theorem}[section]
+\renewcommand{\thetheorem}{\arabic{section}.\arabic{theorem}}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\renewcommand{\thedefinition}{\arabic{section}.\arabic{definition}}
+
+\newtheorem*{example}{Example}
+\newtheorem{assumption}{Assumption}[section]
+\newtheorem{exercise}{Exercise}[chapter]
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem{review}{Review}
+
+\linespread{1.3}
+\newcommand{\linia}{\rule{\linewidth}{0.5pt}}
+
+% custom footers and headers
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\lhead{}
+\chead{}
+\rhead{}
+\lfoot{}
+\cfoot{}
+\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+
+% symbols
+\AtBeginDocument{
+  \let\ran\relax
+  \DeclareMathOperator{\dom}{dom}
+  \DeclareMathOperator{\ran}{ran}
+}
+\DeclareMathOperator{\var}{Var}
+\AtBeginDocument{
+  \let\div\relax
+  \DeclareMathOperator{\div}{div}
+}
+\DeclareMathOperator*{\esssup}{ess\, sup}
+\DeclareMathOperator*{\spa}{span}
+\DeclareMathOperator*{\dist}{dist}
+\DeclareMathOperator*{\supp}{supp}
+\DeclareMathOperator*{\rank}{rank}
+\DeclareMathOperator*{\interior}{int}
+\DeclareMathOperator*{\epi}{epi}
+\DeclareMathOperator*{\lin}{lin}
+\DeclareMathOperator*{\core}{core}
+\DeclareMathOperator*{\prox}{prox}
+\DeclareMathOperator*{\cl}{cl}
+\DeclareMathOperator*{\conv}{conv}
+
+\begin{document}
+\chapter{Calculus of Variation and Optimal Control Problem}
+\section{The Classical Calculus of Variations: Weak Solution}
+\subsection{Weak \& Strong extrema}
+First we define the solution concepts. Intuitively, "strong" means the local ball, where the extrema is attained, contains more admissible points. 
+Observe the \textbf{fixed ends problem.}
+\begin{equation}
+\begin{aligned}
+	\textbf{(P1) }& \inf_{y \in U} J(y, \dot{y}):= \int_a^b L(y, \dot{y}, t) dt,  \\
+	& \text{s.t.}\\
+	& U = \{y \in C^1([a, b], \mathbb{R}) : y(a) = y_0, y(b) = y_1\}
+\end{aligned}
+\end{equation}
+
+First we consider the classical case where the admissible sets are at least $\mathcal{C}^1$. We introduce the \textbf{strong \& weak extrema}.
+\begin{definition}[Strong \& Weak Extrema]	
+We introduce different norms:
+\begin{equation}
+\begin{aligned}
+	& \|f\|_0:= \max_{a \le x \le b} |f(x)| \qquad &f \in C([a, b])\\
+	& \|f\|_k:= \sum_{i = 1}^k \|\partial_x^i f\|_0 \quad &f \in C^k([a, b])
+\end{aligned}
+\end{equation}
+	We call $y^*$ \textbf{a local weak extremum} of \textbf{(P1)} if $y \in C^1([a, b])$ and
+	\begin{equation}
+		\exists \epsilon > 0: J(y^*) \le J(y) \text{ for all }y \in B_\epsilon^1(y^*)
+	\end{equation}
+	and a local \textbf{strong extrema} if the inequality holds for $ B_\epsilon^0(y^*)$.
+\end{definition}
+\begin{remark}
+	The stronger the norm, the smaller the admissible variation, the weaker the solution. 
+\end{remark}
+
+
+\begin{proposition}
+	If $y^*$ is a strong extremum, then $y^*$ is also a weak extremum, the converse is not true.
+\end{proposition}
+\begin{proof}
+	We give only an idea of proof here. We know
+	\begin{equation}
+		\forall \epsilon > 0: B_\epsilon^1(y^*) \subsetneqq B^0_\epsilon(y^*).
+	\end{equation}
+	If $\delta J_{y^*}(\eta) \ge 0$ for all $\eta \in B_\epsilon^0(y^*)$, then $\delta J_{y^*}(\eta) \ge 0$ for all $\eta \in B_\epsilon^1(y^*)$. 
+\end{proof}
+
+
+\subsection{1st Order Variation and Necessary Condition for Weak Extrema}
+\begin{definition}[A Gateau derivative]
+Given $J: Y \rightarrow \mathbb{R} $, $Y$ a linear space, $V$ the admissible direction. We define the Gateau derivative of $J$ at $y \in Y$ in the direction $\eta \in V$ as $\delta J|_y(\eta)$ if it holds
+\begin{equation}
+\begin{aligned}
+	 \delta J|_y(\eta):  & V \rightarrow \mathbb{R},   \\
+	& J(y + \alpha \eta) = J(y) + \alpha \delta J|_y(\eta) + o(\alpha), \quad \forall \alpha \in \mathbb{R}.
+\end{aligned}
+\end{equation} 
+\end{definition}
+\begin{remark}
+Only linearity in $\alpha$ is required. 	
+\end{remark}
+
+
+With the method of calculus and variation and integration by parts we derive the necessary condition for the weak extrema. 
+
+\begin{lemma}[Fundamental lemma of CV( in $\mathcal{C}^0$ )]
+Given $y \in \mathcal{C}([a, b])$, if 
+\begin{align*}
+	\int_a^b y \eta = 0 \qquad \forall \eta \in \mathcal{C}^1_0([a, b]).
+\end{align*}
+Then $y \equiv 0$. 
+\end{lemma}
+\begin{proof}
+	Assuming by contradiction $y(\bar{x}) \neq 0$ and deduce the contradiction. By continuity of $y$ there exits $ \bar{x} \in [c, d ] \subset [a, b]$ such that 
+	\begin{align*}
+		y > 0 \text{ on } [c, d].
+	\end{align*} 
+	We construct for example
+	\begin{align*}
+		\eta(x) &= (x - c)^2 (x - d)^2. &\text{ on $[c, d]$}\\
+		&= 0 &\text{ else}
+	\end{align*}
+	Then we have
+	\begin{align*}
+		\int_a^b y \eta < 0. 
+	\end{align*}
+\end{proof}
+\begin{remark}
+The weaker version:
+Given $f \in L^1_{loc}(\Omega)$, 
+\begin{align*}
+	\forall \eta \in C_0^\infty(\Omega): \int_\Omega f \eta = 0 \quad\Rightarrow \quad f = 0\quad a.e.
+\end{align*}
+It can be proved via mollification. 	
+\end{remark}
+
+\begin{proposition}[general necessary optimality condition]
+	If $y \in $ is a weak optima, then it holds 
+	\begin{align*}
+		\delta J|_y(\eta) = 0 \quad \forall \eta \text{ admissible direction.} 
+	\end{align*}
+\end{proposition}
+\begin{proof}
+	Assuming $y$ is a weak extrema, Taylor expand $J$ at $y$ (we assume $L$ to be sufficient regular to be Gateau differentiable), for $\eta \in \mathcal{V}$: 
+
+	Choose $\alpha$ uniformly positive or negative to get the claim.
+\end{proof}
+
+
+
+\begin{theorem}[necessary condition for weak extrema]
+	Assuming $L \in C^2$ w.r.t. $z$.  If $y$ is a weak extrema of the problem \textbf{(P1)}, then it holds
+	\begin{equation}
+	\begin{aligned}
+		& \frac{d}{dt}L_{z} = L_y\\
+		& y(a) = y_0, y(b) = y_1
+	\end{aligned}
+	\end{equation}
+	The equation
+	\begin{equation}
+		\frac{d}{dt}L_z = L_y. 
+	\end{equation}
+	is called the \textbf{Euler-Lagrange Equation}.
+\end{theorem}
+\begin{proof}\quad\\
+\textbf{1. specify the admissible set:} The weak extrema $y$ without constraints satisfies show 
+\begin{align*}
+	J(y) \le J(y + \eta) \quad \forall \eta \in B^1_\epsilon(0). 
+\end{align*}
+The $\epsilon$ $\|\cdot\|_1$-ball is modified because of the constraints. A subset of the admissible set would be
+\begin{align*}
+	\mathcal{D}_{ad}:= \{ \eta \in C^1([a, b])| \quad \eta(a) = \eta(b) = 0 \}.
+\end{align*} 
+In this way we get $y + \alpha \eta$ satisfies the constraints. 
+\quad\\
+\textbf{2. Calculate the Gateau derivative:}
+	\begin{align*}
+		J(y + \alpha \eta) &= \int_a^b L(y, y', t) + 
+		 \alpha \eta  L_y(y, y', t) + \alpha \eta' L_z(y, y', t)
+		 + o(\alpha)  \\
+		& = \int_a^b L(y, y', t) + \alpha \underbrace{ \langle \eta, L_y(y, y', t) - \frac{d}{dt} L_{z}(y, y', t) \rangle}_{ = \delta J|_y(\eta)} + o(\alpha) dt + \langle \eta, L_z \rangle|_a^b   
+	\end{align*}
+Since $\delta J|_y(\eta) \equiv 0$, by the lemma of CV we conclude:
+\begin{align*}
+	\frac{d}{dt} L_z = L_y. 
+\end{align*}
+Also by the constraints on the endpoints it must holds
+\begin{align*}
+	y(a) = y_0, \quad y(b) = y_1. 
+\end{align*}
+\end{proof}
+
+The converse is in general not true, in particular, the existence of an optimal point is not guaranteed. However in the case of ill-posed ELE we can conclude that the optimal point doesn't exits. 
+
+\begin{example}[non-optimal solution that satisfies the ELE]
+\end{example}
+
+
+\subsubsection{Relax the differentiability assumption on $L$}
+The assumption of $L \in C^2$ could be further relaxed. We observe therefore the integral form of the necessary optimality condition.
+
+\begin{lemma}
+	Given $y \in C([a, b])$ if 
+	\begin{align*}
+		\int_a^b y \eta' = 0 \quad \forall \eta \in C_0^1(a, b),
+	\end{align*}
+	then y is constant.
+\end{lemma}
+
+\begin{theorem}[relaxing the assumption on ELE]
+	Assuming $L \in C^1$, $y \in C^1$, if $y$ is a weak extrema of \textbf{(P1)}, then it holds
+	\begin{align*}
+		& \frac{d}{dt}L_z = L_y\\
+		& y(a) = y_0, \quad y(b) = y_1. 
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	Again by Taylor expansion we have
+	\begin{align*}
+		J(y + \alpha \eta) = \int_a^b L(t, y, y') + \alpha \eta \cdot L_y + \alpha \eta' \cdot L_z + o(\alpha) dt. 
+	\end{align*}
+	Integration by parts yield
+	\begin{align*}
+		J(y + \alpha\eta) = J(y) + \int_a^b \alpha \eta'(t) \int_a^t L_y(y, y', \tau) d\tau  + \int_a^b \alpha \eta'(t) \cdot L_z dt + o(\alpha) + \eta(t) \int_a^t L_x\bigg|_a^b.
+	\end{align*}
+	The boundary term vanishes since $\eta(a) = \eta(b) = 0$ and the first order optimality condition implies that 
+	\begin{align*}
+		 \int_a^b \langle \eta'(t),  L_z(t)  - \int_a^t L_y(y, y', \tau) \rangle   d\tau dt = 0.
+	\end{align*}
+	By the lemma above we get at $y$ it holds
+	\begin{align*}
+		L_z(t) = \int_a^t L_y(\tau) d\tau + C. 
+	\end{align*}
+	Hence $L_z$ is differentiable with $\frac{d}{dt}L|_y(t) = L_x|_y(t)$. 
+\end{proof}
+
+
+
+Now Observe the problem with variable endpoint. 
+\begin{equation}
+\begin{aligned}
+\textbf{(P2)} \quad
+	& \inf_{y \in U} L(t, y, \dot{y})\\
+	& \text{s.t.}\\
+	& U = \{y \in C^1([a, b], \mathbb{R}) : y(a) = y_0\}
+\end{aligned}
+\end{equation}
+
+
+\subsubsection{The special cases of the ELE.}
+\subsubsection{1. The rotation invariant Lagrangian $L = L(t, y')$.}
+The ELE states
+\begin{align*}
+	\frac{d}{dt}L_z = L_y = 0. 
+\end{align*}
+In this case 
+\begin{align*}
+	L_z \equiv C
+\end{align*}
+for some constant $C$. 
+
+\subsubsection{2. The autonomous Lagrangian $L = L(y, y')$.}
+By the ELE we get 
+\begin{align*}
+	\frac{d}{dt}L_z = L_{zy} y' + L_{zz} y'' = L_y.  
+\end{align*}
+It holds
+\begin{align*}
+	L_{zy} y' y' + L_{zz} y'' y' + L_z y'' - L_z y'' - L_y y' = 0,
+\end{align*}
+i.e., 
+\begin{align*}
+	\frac{d}{dt}(L_z y' - L) \equiv 0.
+\end{align*}
+Therefore $L_z y' - L$ is constant. The Lagrangian can be described as some gradient system. 
+
+\subsubsection{3. Free endpoint. }
+In this case, with fewer constraints the admissible set is larger, $\eta(b)$ can now be arbitrary. The Gateau derivative therefore becomes
+\begin{align*}
+	\delta J|_y(\cdot ) = \langle L_y - \frac{d}{dt}L_z, \cdot \rangle_{L^2(I)} + L|_y(b) \cdot \eta(b),
+\end{align*} 
+and it has to vanish for all $\eta \in \mathcal{D}_{ad}$.  Choose $\eta(a) = \eta(b) = 0$ to get
+\begin{align*}
+	\frac{d}{dt}L_z = L_y. 
+\end{align*} Choose $\eta(b)$ appropriately to get
+\begin{align*}
+	L_z|_y (b) = 0. 
+\end{align*}
+
+
+\subsection{The Hamiltonian Formulism}
+Assume the Lagrangian $L$ is \textit{strictly convex and differentiable}, observe the Hamiltonian: 
+\begin{equation}
+	H(t, y, z, p):= \langle p, z \rangle - L(t, y, z).
+\end{equation}
+By strict convexity of $L$ there exists a unique minimizer:
+\begin{align*}
+	\forall p \exists! z(p):  \max_z H = p \cdot z(p) - L(t, y, z(p)). 
+\end{align*}
+We therefore define
+\begin{align*}
+	z(p):= \arg\max_z H (t, y, z;p). 
+\end{align*}
+Therefore the \textbf{Legrendre transformation(the convex conjugate)} of $L$ is well-defined:
+\begin{equation}
+	L^*(t, y, z(p), p) := p \cdot z(p) - L(t, y, z(p)). 
+\end{equation}
+The convex conjugate is well-defined and is taken at the point where $p = L_z(z)$ if $L \in C^1$. 
+ it satisfies at the maximum
+\begin{align*}
+	p = L_{z}(z_p).
+\end{align*}
+Together we summarise the \textbf{duality assumption} of the Lagrangian:
+\begin{enumerate}
+	\item $p = L_{z}$. \text{generalised momentum}
+	\item $z = z(p)$. \text{generalised velocity} 
+\end{enumerate}
+We may now define the \textbf{Hamiltonian} associated with the Lagrangian.
+\begin{definition}[the Hamiltonian associated with Lagrangian]
+	Given $L$ strictly convex and differentiable, denote
+	\begin{equation}
+		p := L_z
+	\end{equation} we define the associated Hamiltonian:
+	\begin{equation}
+		H(x, y, p) = p y'(p) - L(x, y, y'(p)). 
+	\end{equation}
+\end{definition}
+
+\begin{theorem}[the Hamiltonian ODE]
+	The 1st order optimality condition of \textbf{(P1)} is equivalent in the Hamiltonian formlism:
+	\begin{align*}
+		& \dot{y} = H_p \text{ construction(duality assumption).}\\
+		& \dot{p} = - H_y \text{ ELE and duality}
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	trivial.
+\end{proof}
+
+
+
+\subsection{The Variational Problems With Constraints}
+\subsubsection{1. Integral Constraints}
+Now we observe the problem with variational constraint
+\begin{equation}
+\begin{aligned}
+\textbf{(P3)}\quad
+	& \inf_{y \in U} J(y)\\
+	& \text{s.t.}\\
+	& U = \{ y \in C^1([a, b]), y(a) = y_a, y(b) = y_b \}\\
+	& C(y) := \int_a^b M(t, y, y') dt = C_0
+\end{aligned}
+\end{equation}
+
+\begin{theorem}
+Assume $y^*$ is a weak extremum of \textbf{(P3)} , then there exists a Lagrange multiplier $\lambda^* \in \mathbb{R}$, such that,  $y^*, \lambda^* $ satisfies
+\begin{equation}
+\begin{aligned}
+	&1. \frac{d}{dt}\bigg(L_{y'} + M_{y'} \bigg) = L_y+ \lambda^* M_y, \\
+	&2.  C(y^*) = C_0, y^*(a) = y_a,  y^*(b) = y_b. 
+\end{aligned}
+\end{equation}
+\end{theorem}
+\begin{proof}\quad\\
+\textbf{1. Formulate the admissible set:}
+	By the boundary condition it holds
+	\begin{align*}
+		\mathcal{D}_{ad} \subset \{\eta | \quad \eta(a) = \eta(b) = 0\}. 
+	\end{align*}
+	Furthermore, observe the integral constraints we get for $\alpha$ small enough:
+	\begin{align*}
+		C(y + \alpha \eta ) = 0, 
+	\end{align*}
+	i.e., 
+	\begin{align*}
+		C(y + \alpha \eta) = C(y) + \alpha \delta C|_y(\eta) + o(\alpha) = 0. 
+	\end{align*}
+	the Gateau derivative is independent of $\alpha$ and hence must vanish. Apply the ansatz in ELE it holds
+	\begin{align*}
+		\int_a^b (M_y - \frac{d}{dt}M_z) \eta dt = 0, \quad \forall \eta \text{ with } \eta(a) = \eta(b) = 0.  
+	\end{align*}
+	The admissible set therefore satisfies
+	\begin{align*}
+		\mathcal{D}_{ad} \subseteq \bigg\{\eta: \quad \eta(a) = \eta(b) = 0, \quad \int_a^b(M_y - \frac{d}{dt}M_z)\eta dt = 0. \bigg\}. 
+	\end{align*}
+	\textbf{2.} Assuming $y^*$ does not satisfies the ELE of $M$, we formulate the optimality condition as
+	\begin{align*}
+		\int_a^b \delta J|_{y^*} (\eta) dt = 0 \qquad \forall \eta : \int_a^b \delta C|_{y^*}(\eta) dt = 0. 
+	\end{align*} 
+	Observe again auxiliary function:
+	\begin{align*}
+		& F: (\alpha_1, \alpha_2) \mapsto \bigg( J(y + \alpha_1 \eta_1 + \alpha_2 \eta_2), C(y + \alpha_1 \eta_1 + \alpha_2 \eta_2) \bigg), \\
+		&\text{with}\\
+		& \eta_i \in C^1(a, b), \eta_i(a) = \eta_1(b) = 0.   
+	\end{align*} 
+		As in the finite dimensional case, if $DF(0, 0)$ were nonsingular, then the feasible $y$ exists in the neighbourhood of $(y^*, 0)$( there exists a bijection $B_{(0, 0)} \rightarrow B_{(y^*, 0)}$), in particular there exists $y$ such that $y < y^*$, which contradicts to the minimality of $y^*$.\par 
+		Since $\eta_1$ with $\delta C|_{y^*}(\eta_1) \neq 0$, we can choose $\lambda^*$, such that
+	\begin{align*}
+		\delta J_{y^*}(\eta_1) + \lambda^* \delta C_{y^*}(\eta_1) = 0. 
+	\end{align*}
+	By the row singularity it holds
+	\begin{align*}
+		\delta J_{y^*}(\eta_2) + \lambda^* \delta C_{y^*}(\eta_2) = 0. \quad \forall \eta_2. 
+	\end{align*}
+	By the lemma of CV we get the ELE of the augmented form.
+\end{proof}
+
+\subsection{2nd-order Conditions(nece\&suff) Of Weak Solutions}
+We observe again the unconstrained classical Lagrange problem \textbf{(P1)}. We want to derive now the second order optimality condition of the Lagrange problem.
+
+\begin{definition}[second variation]
+Given $J: Y \rightarrow \mathbb{R}$ and $V$ the admissible direction, we define 
+\begin{align*}
+	\delta J|_y(\eta): V \rightarrow \mathbb{R}, 
+\end{align*}
+	as the second variation of $J$ at $y$ in $\eta$ if it holds
+	\begin{align*}
+		J(y + \alpha \eta) = J(y) + \alpha \delta J|_y(\eta) + \frac{\alpha^2}{2}\delta^2|_y(\eta) + o(\alpha^2). \qquad \forall \alpha \in \mathbb{R}
+	\end{align*}
+\end{definition}
+
+\begin{proposition}
+	If $y^*$ is a local minimum, then it holds
+	\begin{align*}
+		\delta^2 J|_{y^*} (\eta) \ge 0, \quad \forall \eta \in V. 
+	\end{align*}
+\end{proposition}
+
+
+\subsubsection{1. Necessary 2nd Order Conditions}
+Now we calculate the 2nd variation of $J$: observe the 2nd order Taylor variation at $y$ in the direction $\eta$:
+we get
+\begin{align*}
+	J(y + \alpha \eta) = J(y) + 
+	\alpha 
+	\underbrace{\int_a^b L_y \eta + L_z \eta' dx}_{:= \delta J|_y(\eta)} 
+	+ \alpha^2
+	\underbrace{\frac{1}{2} \int_a^b L_{yy} \eta^2 + 2 L_{yz}\eta \eta' + L_{zz} \eta'^2 dt}_{:= \delta^2 J_y(\eta)} 
+	+ o(\alpha^2). 
+\end{align*}
+Integration by parts we get
+\begin{equation}
+\begin{aligned}
+	\delta^2 J|_y(\eta) 
+	& = \frac{1}{2} \int_a^b   L_{yy} \eta^2  
+	+ L_{yz} \cdot \partial_x(\eta^2) + L_{zz} (\eta')^2 dt,\\
+	& = \frac{1}{2} \int_a^b \bigg(L_{yy} -  \frac{d}{dt} L_{yz} \bigg) \eta^2 
+	+ L_{zz} \eta'^2 dt,\\
+	& = \int_a^b Q \eta^2 + P \eta'^2dt,
+\end{aligned}
+\end{equation}
+with
+\begin{equation*}
+	Q = \frac{1}{2}\bigg(L_{yy} - \partial_t L_{yz} \bigg), \quad P = \frac{1}{2} L_{zz}. 
+\end{equation*}
+\begin{theorem}[2nd order necessary optimality condition]
+	If $y^*$ is a weak local minimum of \textbf{(P1)}, then it holds
+	\begin{equation}
+		P|_{y^*}(t) \ge 0  \quad \forall t \in [a, b].
+	\end{equation}
+\end{theorem}
+\begin{proof}
+\quad\\
+\textbf{ad 1: the feasible set:}
+Observe the feasible set 
+\begin{align*}
+	\mathcal{V}(y^*) = \{ \eta \in C^1([a, b]: \eta(a) = \eta(b) = 0\}.
+\end{align*}
+The second order optimality condition states
+\begin{align*}
+	\delta^2 J|_{y^*} (\eta) \ge 0 \qquad \forall \eta \in \mathcal{V}(y^*). 
+\end{align*}
+	
+\quad\\
+\textbf{ad 2:}
+Argue by contradiction, choose the \textbf{needle variation} with $\supp(\eta_\epsilon) = [c, d] \subset [a, b]$, $\eta > 0$ on $[c, d]$. Assume $P$ negative at $B_\epsilon(t_0) \subset [c, d]$. Observe 
+\begin{align*}
+	\delta^2 J|_y(\eta) = \int_a^b Q \eta^2 + P (\eta')^2 dt
+\end{align*}
+By the shape of $\eta$ we observe $\int_a^b Q \eta^2 dt$ is dominated by $\int_a^b P (\eta')^2 dt$. \par 
+	, by continuity $P$ must be negative on a interval with measure $\epsilon$, then 
+\begin{align*}
+	\delta^2 J|_{y^*}(\eta) \le  \int_c^d P (\eta_\epsilon ')^2 dx 
+		= - \frac{\delta}{8 \epsilon}  \longrightarrow -\infty.
+\end{align*}
+	It contradicts to the optimality condition of second order. 
+\end{proof}
+
+
+\subsubsection{Sufficient 2nd Order Conditions}
+\begin{theorem}[Sufficient 2nd order optimality condition]
+Given the problem \textbf{(P1)}, assuming
+\begin{equation*}
+	P|_{y^*} \gneqq 0 \quad \forall t \in [a, b]. 
+\end{equation*}
+If the Riccati equation
+\begin{equation}
+	P(Q + w')w^2 = 0, 
+\end{equation}
+admits a solution $w$, which holds true if the auxiliary equation
+\begin{equation}
+\begin{aligned}
+	& Qv =  \frac{d}{dt} (Pv'),\\
+	& v(a) = 0, v'(a) = 1,
+\end{aligned}
+\end{equation}
+admits no conjugate point at $y^*$, then $y^*$ is a global minimum.  
+\end{theorem}
+\begin{proof}
+\quad\\
+\textbf{ad 1. $\delta^2J|_y \gneqq 0$ if $P|_y \gneqq 0$ and Riccati equation is solvable. }
+	Define $w$ implicitly with the Riccati equation:
+	\begin{equation}
+		P(Q + w') = w^2. 
+	\end{equation}
+	(initial condition specified by choice).
+	The second variation becomes
+	\begin{align*}
+		\delta^2 J|_y(\eta) = \int_a^b P( \eta ' + \frac{w}{P}\eta)^2 dt \ge  0. 
+	\end{align*} 
+	$P$ is positive definite, the second part is zero for $\eta(a) = 0$ and 
+	the ODE
+	\begin{align*}
+		&\eta' = \frac{w(t)}{P(t)} \eta, \\
+		&\eta(a) = 0.
+	\end{align*} 
+	admits a unique solution $\eta \equiv 0$.  Therefore the second variation is positive definite if the Riccati equation is solvable. 
+	\quad\\
+	\textbf{ad 2.} Define the auxiliary variable $v$ implicitly with 
+	\begin{align*}
+		w = -P \frac{v'}{v}.
+	\end{align*}
+	The original Riccati equation becomes 
+	\begin{align*}
+		& Qv = \frac{d}{dt}(P v'), \\
+		& v(a) = 0,\\
+		& v'(a) = 1,
+	\end{align*}
+	with selected initial condition. If we can find a solution of $v$ that \textbf{doesn't vanish anywhere}, then we can construct a $w$, i.e., if the ODE of $v$ admits no conjugate point, then $v$ doesn't vanish anywhere but the initial point $a$. \\
+	 \textbf{ad 3.} By the continuity of the flow function we show for small enough positive initial condition there exists no conjugate points.\\
+	 \textbf{ad 4. $\delta^2 J_y(\eta)$ dominates $o(\alpha^2)$.} 
+\end{proof}
+\begin{remark}
+	One can show that the sufficient condition above is also necessary. 
+\end{remark}
+
+
+
+\section{The Classical Calculus of Variations: Strong Solution}
+In this section we drop the assumption that $y \in C^1$, naturally the Lagrangian $L(x, y, y')$ need not to be continuous at the corner points. However in the case where $y^*$ is a strong extrema, we may deduce certain optimality conditions. 
+
+\subsection{Necessary Conditions For $C_{PW}^1$ Strong Solutions}
+\begin{definition}[generalised 1-norm]
+	Given $f \in C_{PW}^1([1, b])$, the generalised 1-norm is defined as
+	\begin{equation}
+		\|f \|_1 := \max_{ x \in [a, b]} |f(x)| + \max_{x \in [a, b]} [f']_x
+	\end{equation}
+\end{definition}
+\begin{remark}
+If $y^*$ is a strong extrema, then $y^*$ is also a weak extrema w.r.t. the generalised 1-norm. 	
+\end{remark}
+
+
+\begin{theorem}[Weierstrass-Erdmann corner condition for strong extrema]
+	Given the problem \textbf{(P1)} and $y^* \in  C^1_{PW}$ \textbf{strong} extrema of the problem \textbf{(P1.1)}, then $y^*$ satisfies:
+	\begin{equation}
+	\begin{aligned}
+		& \frac{d}{dt} L_z - L_y = 0 \text{ at non-corner point,} \\
+		& L - L_z \cdot y',  \quad  L_z,  \text{ admits no jump(they are continuous).}
+	\end{aligned}
+	\end{equation}
+\end{theorem}
+\begin{proof}
+\quad\\
+\textbf{1. Construct the feasible set and the variational formula.}\\
+Since the extrema is strong we know the variational formula holds for all $\eta$ that is continuous.  Consider the linearisation around the \textbf{corner point} $c$:
+\begin{equation*}
+y_1(t)=\left\{
+\begin{aligned}
+	 & y(c) + y'(c^-)(t - c) &t \in [c, b]\\
+	 & y(t) &t \in [a, c]	
+\end{aligned}
+\right.
+\end{equation*}
+
+\begin{equation*}
+y_2(t) = \left\{
+\begin{aligned}
+	    &y(c) + y'(c^+)(t - c) &\qquad t \in [a, c]\\
+	 		&  y(t) & t\in [c, b]
+\end{aligned}
+\right.
+\end{equation*}
+The cost function can therefore be written as 
+\begin{equation*}
+	J(y) = J_1(y_1) + J_2(y_2) 
+	= \int_a^c L(x, y_1, y_1') dx + \int_c^b L(x, y_2, y_2') dx. 
+\end{equation*} 
+Now observe the variation 
+\begin{align*}
+	\eta_1, \eta_2 \in C^1([a, b]), \quad \eta_1(a) = \eta_2(b) = 0,
+\end{align*}
+such that $ \eta:= \eta_1 \&_{c + \alpha \Delta t} \eta_2$ is a continuous variation for $\Delta x$ arbitrary, i.e.,  
+\begin{equation}
+\begin{aligned}
+	\forall \alpha \in \mathbb{R}: & (y_1 + \alpha \eta_1)(c + \alpha \Delta t) = (y_2+ \alpha \eta_2) (c + \alpha \Delta t) = y(c) + \alpha \Delta y + o(\alpha)\\
+	& \Delta y = y'(c^-) \Delta t + \eta(c). 
+\end{aligned}
+\end{equation}
+(Remark: prove the construction of $\eta$ is independent of $\alpha$).Define
+\begin{align*}
+	& y(\cdot, \alpha) = (y_1 + \alpha \eta_1) \&_{c + \alpha \Delta t} (y_2 + \alpha \eta_2)
+\end{align*}
+The variational form of the cost function becomes:
+\begin{equation}
+	J(y(\cdot, \alpha)) = \int_a^{c + \alpha\Delta t} L(x, y_1 + \alpha\eta_1, y_1' +\alpha\eta_1')dt + \int_{c + \alpha\Delta t}^b L(x, y_2 + \alpha\eta, y_2' + \alpha\eta')dt.
+\end{equation}
+\quad\\
+\textbf{2. Derive the 1st order optimality condition.} 
+Notice $y(\cdot, \alpha) \overset{\alpha \rightarrow 0}{\longrightarrow} y(\cdot)$, the derivative w.r.t. $\alpha$ must vanish, 
+\begin{align*}
+	\frac{d}{d\alpha}  J(y(\cdot, \alpha) ) = &
+	\int_a^c \bigg(\partial_xL_z + L_y\bigg)\eta_1 dt + \int_c^b \bigg(\partial_x L_z + L_y\bigg)\eta_2dt \\
+	& +L_z(c, y(c), y'(c^-))\eta_1(c) - L_z(c, y(c), y'(c^+))\eta_2(c)\\ 
+	& + L(c, y(c), y'(c^+))\Delta t - L(c, y(c), y'(c^-)) \Delta t. 
+\end{align*}
+By the continuity assumption on $y = y_1 + \eta_1 \&_{c + \alpha \Delta x} y_2 + \eta_2$ we have (taking $\frac{d}{d\alpha}$):
+\begin{equation}
+\begin{aligned}
+	& y'(c^-)\Delta t + \eta_1(c) = y'(c^+)\Delta t + \eta_2(c) = \Delta y,\\
+	& \Rightarrow\\
+	& \eta_1(c) = \Delta y - y'(c^-) \Delta t, \\
+	& \eta_2(c) = \Delta y - y'(c^+) \Delta t. 
+\end{aligned}
+\end{equation}
+We therefore have
+\begin{equation}
+\begin{aligned}
+	& \textbf{1. } \frac{d}{dt} L_z - L_y = 0,\\
+	& \textbf{2. } [L_z]_c \cdot \Delta y = 0,\\
+	& \textbf{3. } [- L_z \cdot y'  +  L]_c \cdot \Delta t = 0.
+\end{aligned}
+\end{equation}
+Since $\Delta t, \Delta y$ can be arbitrarily chosen, we get the continuity.
+\end{proof}
+
+While the continuity condition holds at the corner points, we next observe the necessary condition of local optimality at the non-corner point. First we introduce the Weierstrass excess function:
+\begin{definition}[the Weierstrass excess function]
+	Given the Lagrangian $L(t, y, y')$, the excess function is defined as 
+	\begin{equation}
+		E(t, y, y'; w):= L(t, y, w) - L(t, y, y') - L_z(t, y, y')(w - y'). 
+	\end{equation}
+	The condition that $E(t, y, y', w) \ge 0$ for all $w \in \mathbb{R}$ implies some kind of \textbf{local convexity.}
+\end{definition}
+
+\begin{theorem}[Weierstrass condition for generalised strong extrema]If $y \in C_{PW}^1$ is a \textbf{strong local extrema}, then at all \textbf{non-corner point $t$}:
+	\begin{equation}
+	\begin{aligned}
+		& E(t, y, y'; w) \ge 0 \quad \forall w \in \mathbb{R}. 
+	\end{aligned}
+	\end{equation}
+\end{theorem}
+\begin{proof}
+Like the last theorem, the idea is to construct $y(, \epsilon) \overset{\|\cdot\|_0}{\longrightarrow} y$ for some continuous perturbation $y(\cdot, \epsilon)$. Suppose $y$ is a strong local minimum, then it must satisfy
+\begin{align*}
+	\partial_\epsilon J(y(, \epsilon)) = 0.
+\end{align*}
+\textbf{1. Construct the variation:}
+the variation we construct has the following form: Given $\bar{t}$ a non-corner point, by continuity there exists a interval $[\bar{t}, \bar{t} + d]$ on which there is no corner points, define the variation(parametrised by $\epsilon$):
+\begin{equation*}
+	y(\cdot, \epsilon) = 
+	\left\{
+	\begin{aligned}
+		& y(t)  & t \in [a, \bar{t}] \\
+		& y(\bar{t}) + w (t - \bar{t}) & t \in [\bar{t}, \bar{t} + \epsilon]\\
+		& y(t) + \frac{d - t}{d - (\bar{t} + \epsilon)}(y(\bar{t}) + w \epsilon - y(\bar{t} + w \epsilon)) & t \in [\bar{t} + \epsilon, d]
+	\end{aligned}
+	\right.
+\end{equation*}
+with the $y'(\cdot, \epsilon)$ defined as
+\begin{equation*}
+	y_t(\cdot, \epsilon) = 
+	\left\{
+	\begin{aligned}
+		& y'(t)  & t \in [a, \bar{t}] \\
+		& w  & t \in [\bar{t}, \bar{t} + \epsilon]\\
+		& y'(t) - \frac{1}{d - (\bar{t} + \epsilon)}(y(\bar{t}) + w \epsilon - y(\bar{t} + w \epsilon)) & t \in [\bar{t} + \epsilon, d]
+	\end{aligned}
+	\right.
+\end{equation*}
+At $\bar{t} + \epsilon$ the derivative $\frac{d}{d\epsilon} y( \bar{t} + \epsilon, \epsilon)$ is not only in argument but also structural, it holds
+\begin{equation}
+	\frac{d}{d\epsilon}y(\bar{t} + \epsilon, \epsilon) = y_t(\bar{t}+ \epsilon, \epsilon) + y_\epsilon(\bar{t} + \epsilon, \epsilon)
+\end{equation}
+
+
+\quad\\
+\textbf{2. Calculate the variation.}
+It holds
+\begin{align*}
+	\frac{d}{d\epsilon}J(y(\cdot, \epsilon)) =  \frac{d}{d\epsilon}\underbrace{\int_{\bar{t}}^{\bar{t} + \epsilon} L(s, y(s, \epsilon), y'(s, \epsilon) ds}_{:= I_1} + \frac{d}{d\epsilon} \underbrace{ \int_{\bar{t} + \epsilon}^d L(s, y(s, \epsilon), y'(s, \epsilon) ds}_{:= I_2}. 
+\end{align*}
+For $I_1$ the derivative is simple:
+\begin{align*}
+	\frac{d}{d\epsilon}\int_{\bar{t}}^{\bar{t} + \epsilon} L ds = L|_{y(\cdot, \epsilon) }(\bar{t} + \epsilon).
+\end{align*}
+For $I_2$ it holds
+\begin{align*}
+	\frac{d}{d\epsilon} I_2 &= -L|_{y(\cdot, \epsilon)}(\bar{t} + \epsilon) + \underbrace{ \int_{\bar{t} + \epsilon}^d L_y\bigg|_{y(\cdot, \epsilon)}(s) \cdot y_\epsilon (s, \epsilon) + L_z\bigg|_{y(\cdot, \epsilon)}(s) \cdot \frac{d}{dt} y_\epsilon(s, \epsilon) ds }_{:= I_3}
+\end{align*}
+Integration by parts
+\begin{align*}
+	I_3 = \int_{\bar{t} + \epsilon}^d (L_y - \frac{d}{ds}L_z)\bigg|_{y(\cdot, \epsilon)}(s) \cdot y_\epsilon(s, \epsilon) ds + \bigg[L_z\bigg|_{y(\cdot, \epsilon)} \cdot y_\epsilon(\cdot, \epsilon) \bigg]_{\bar{t} + \epsilon}^d. 
+\end{align*}
+Hence
+\begin{align*}
+	\frac{d}{d\epsilon}J(y(\cdot, \epsilon))\bigg|_{\epsilon = 0} &= L|_{y(\cdot, 0)}(\bar{t}^-) -L|_{y(\cdot, 0)}(\bar{t}^+)  - (w - y')L_z|_{y, y'}(\bar{t}), \\
+	&= L(\bar{t}, y, w) - L(\bar{t}, y, y') - (w - y')L_z(\bar{t},y, y') \\
+	& = E(\bar{t}, y, w; y') \ge 0
+\end{align*}
+
+
+
+\end{proof}
+\begin{remark}
+\quad\\
+\textbf{1.} The Weierstrass condition is equivalent in the Hamiltonian formulation: For the strong minimum $y^*$, it holds
+\begin{align*}
+	\max_w H(x, y, w, p) = H(x, y, y', p). 
+\end{align*}
+It can be proved by using the duality assumption $p = L_z$.
+
+\quad\\
+\textbf{2.}The Weierstrass condition implies the Weierstrass-Erdmann corner conditions. 	
+\end{remark}
+
+
+
+\subsection{Sufficient Condition Of The $C^2$ Solution}
+
+In the light of Weierstrass excess function we would like to get some \underline{sufficient} condition for the local strong extrema. By the last chapter we know the local strong extrema admits certain local convexity formulated by the excess function and  satisfies the ELE at all non-corner points. Based on this we want to formulate the sufficient conditions.
+\begin{definition}[fields of extremals \& simple field]
+	We define the \textbf{fields of extremals } as functions that satisfy the Euler-Lagrange-Function, i.e., 
+	\begin{equation}
+		\mathcal{C}:= \{ y \in C^2([a, b]): \quad \frac{d}{dt} L_z = L_y \}. 
+	\end{equation}
+	Moreover, observe the following property of the field of extremal:
+	\begin{enumerate}
+		\item \textbf{non-intersection:} $\exists t \in \mathbb{R} \text{ with } y_1(t) = y_2(t)$, then $y_1 = y_2$ in $\mathcal{C}$. 
+		\item \textbf{surjectivity: }$\forall (x, y) \in \mathbb{R}^2 \exists \hat{y} \in \mathcal{C}: \hat{y}(x) = y$. 
+	\end{enumerate}
+	Accordingly, we define the \textbf{simple field of extremals:}
+	\begin{equation}
+		\mathcal{S}:= \{ y \in \mathcal{C}: \quad y \text{ satisfies 1) and 2)}\}. 
+	\end{equation}
+\end{definition}
+
+\begin{definition}[the slope of extremal]
+Given $y^* \in \mathcal{S}$, We define the slope of extremal:  
+\begin{equation*}
+\begin{aligned}
+	& p:  [a, b] \times B_\epsilon^0(y^*) \rightarrow \mathbb{R}, 
+\end{aligned}
+\end{equation*}
+such that $\forall y_\sigma \in \mathcal{S}$, 
+\begin{align*}
+	& p(t, y_\sigma) = y_\sigma'(t).
+\end{align*}
+For $y \notin \mathcal{S}$, it could be arbitrarily defined. 
+\end{definition}
+\begin{remark}
+It holds
+\begin{equation}
+	y_\sigma''(t) = p_t(t, y_\sigma(t)) + p_y(t, y_\sigma(t))y_\sigma'(t). 
+\end{equation}	
+\end{remark}
+
+\begin{theorem}[Sufficient condition for strong(local) minimum]
+	Given \textbf{(P1)} and $y^* \in \mathcal{S} $ , assuming the slope of extremal $p$ exists in a neighbourhood of $y^*$, if 
+	\begin{enumerate}
+		\item $E(t, y, p(t, y); w ) \ge 0$,  for all $(t, y) \in [a, b] \times B^0_\epsilon (y^*)$,  $w \in \mathbb{R}$. 
+		\item $y^*(a) = y_a, y^*(b) = y_b$. 
+	\end{enumerate} 
+	Then $y^*$ is a strong(local) minimum of the problem \textbf{(P1.1)}.
+\end{theorem}
+\begin{proof}
+	Define the function: 
+	\begin{align*}
+		K: &B_\epsilon^0(y^*) \rightarrow \mathbb{R}\\
+		   &K(y) = \int_a^b - L(t, y, p(t, y)) - (y' - p(t, y))L_z(t, y, p(t, y)) dt 
+	\end{align*}
+	Define
+	\begin{align*}
+		& u = -L + pL_z,\\
+		& v = -L_z.
+	\end{align*}
+	We may rewrite $K$ as 
+	\begin{align*}
+		K(y) = \int_a^b u + y' v dt
+	\end{align*}
+	Since $\partial_y u - \partial_t v = 0$ by the ELE, there exits $S$, such that
+	\begin{align*}
+		\partial_t S = u,\quad \partial_y S = v.
+	\end{align*}
+	Hence
+	\begin{align*}
+		K(y) = \int_a^b \partial_t(S) dt = S(b, y(b)) - S(a, y(a)) = S(a, y_a) - S(b, y_b),
+	\end{align*}
+	which is independent of $y$ (path-independent). Observe
+	\begin{align*}
+		\Delta J: &= J(y) - J(y^*) \\
+		& = J(y) + K(y^*)\text{ (since $K(y^*) = -J(y^*)$)}\\
+		& = J(y) + K(y) \text{ (path-independence)}\\
+		& = \int_a^b L(t, y, y') -L(t, y, p) - (y' - p)L_z(t, y, p)dx \\
+		& = \int_a^b E(t, y, p, y') dx
+	\end{align*}
+	By the assumption we have $E(t, y, p, w) \ge 0$ for all $y$ close enough to $y^*$  w.r.t. $\|\cdot\|_0$, therefore
+	\begin{align*}
+		\Delta J \ge 0,
+	\end{align*}
+	and $y^*$ is a strong extrema.
+\end{proof}
+
+
+\subsection{Variational Approach To Optimal Control}
+Now for the first time we introduce the optimal control problem. Given $t_0, t_1$ fixed,  
+\begin{equation}
+\begin{aligned}
+	\textbf{(P2.1) }
+	& \min_{u } J(u)= \int_{t_0}^{t_1} L(t, x, u)dt + K(x(t_1)).\\
+	& \text{s.t.}\\
+	& x(t_0) = x_0\\
+	& \dot{x} = f(t, x, u)\\
+	& u \in C^0_{PW}([t_0, t_1], U), \quad U \subset \mathbb{R}^m.
+\end{aligned}
+\end{equation}
+
+\begin{definition}[optimal control]
+	$u^*$ is an optimal control of \textbf{(P2.1)}, if for all feasible control $u  \in C_{PW}([t_0, t_1])^m$, we have
+	\begin{align*}
+		J(u^*) \le J(u),
+	\end{align*}
+	i.e., $u^*$ provides a global minimum. 
+\end{definition}
+
+
+In the next section we will introduce the indirect method: the maximum principle to determine the structures of the optimal control. In this section we try the direct method for some simple problems. 
+
+\begin{theorem}[necessary condition for global minimum]
+Given \textbf{(P2.1)}, for $p \in C^1([t_0, t_1])$, define the Hamiltonian:
+\begin{equation}
+	H(t, x, u, p):= \langle p(t), f(t, x, u) \rangle_{\mathbb{R}^n} - L(t, x, u). 
+\end{equation}
+If $u^* \in C_{PW}([t_0, t_1])$ is the optimal control for the global minimum. Define the admissible perturbed control:
+\begin{equation}
+\begin{aligned}
+	& \Xi = C_{PW}^0([t_0, t_1])^m
+\end{aligned}
+\end{equation}
+Assume:\quad\\
+\textbf{i.} $K$ is $C^1$ w.r.t. $x$. \quad\\
+\textbf{ii.} $H$ is $C^1$ w.r.t. $x$ and $u$. 
+
+\quad\\
+\textbf{1).} The adjoint equation satisfies 
+\begin{equation}
+\left\{
+\begin{aligned}
+	& \dot{p} = - \partial_xH|_*,\\
+	& p(t_1) = - \partial_x K|_* (t_1). 
+\end{aligned}
+\right.
+\end{equation}
+\textbf{2).} In the case of no terminal cost, it holds
+\begin{equation*}
+\begin{aligned}
+	& \forall \xi \in C_{PW}^0([t_0, t_1])^m: \int_{t_0}^{t_1} \langle H_u|_*, \xi \rangle dt = 0, \\
+	& \text{i.e., }\\
+	& \partial_u H|_{u^*}(t) \equiv 0.
+	\end{aligned}
+\end{equation*}
+\end{theorem}
+
+\begin{proof}(scratch).
+\quad\\
+\textbf{1.The admissible directions(trajectory)}
+\begin{align*}
+	\forall \xi \in \Xi \text{ with } u = u^* + \alpha \xi \quad \text{want to find } \eta \in C^1:  \quad x = x^* + \alpha \eta + o(\alpha),
+\end{align*}
+where $o(\alpha)$ describe the potential non-linearity. Define
+\begin{align*}
+	x(\cdot, \alpha) = x^* + \alpha \eta + o(\alpha).
+\end{align*}
+It holds
+\begin{align*}
+	\partial_\alpha x(\cdot, 0) = \eta . 
+\end{align*}
+Hence
+\begin{align*}
+	\dot{\eta}(t) &= \partial_t \partial_\alpha x(\cdot, 0) = \partial_\alpha|_{\alpha = 0} \dot{x}(\cdot, \alpha) = \partial_\alpha|_{\alpha = 0}f(x^* + \alpha \eta + o(\alpha), u^* + \alpha \xi)\\
+	& = \partial_x f(x^*, u^*) \eta + \partial_uf(x^*, u^*)\xi.
+\end{align*}
+The variation $\eta$ is described by the ODE:
+\begin{equation}
+\begin{aligned}
+	& \eta(0) = 0, \\
+	& \dot{\eta}(t) = \partial_xf|_* \cdot \eta + \partial_u f_*. 
+\end{aligned}
+\end{equation}
+
+\quad\\
+\textbf{2. The optimality condition. }
+Observe the \underline{augmented Lagrangian}:
+\begin{equation}
+\begin{aligned}
+	J(u)&:= \int_{t_0}^{t_1} L +  \langle p , \dot{x} - f \rangle  dt + K(x(t_1)) \\
+	&= \int_{t_0}^{t_1} - H + \langle p, \dot{x} \rangle dt + K(x(t_1)) \qquad(*).
+	\end{aligned}
+\end{equation}
+Objective is to get the 1st variation $\delta J|_{u^*}(\xi)$ with
+\begin{align*}
+	J(u) - J(u^*) = \alpha \delta J|_{u^*}(\xi) + o(\alpha), \quad \forall u = u^* + \alpha \xi .
+\end{align*}
+Observe 
+\begin{align*}
+	J(u) - J(u^*) = \int -\bigg( H(x^*, u^*, p) - H(x, u, p) \bigg) + \langle p, \dot{x} - \dot{x^*} \rangle dt + K(x(t_1)) - K(x^*(t_1)). 
+\end{align*}
+For the terminal cost, since $K \in C^1$ w.r.t. $x$, we have
+\begin{align*}
+	K(x^*(t_1) + \alpha \eta(t_1) + o(\alpha)) - K(x^*(t_1)) = \langle \partial_x K(x^*(t_1)),   \alpha \eta(t_1) \rangle  + o(\alpha).
+\end{align*}
+For the running cost, since $H \in C^1$ w.r.t. $x$, $u$, we have
+\begin{align*}
+	\int_{t_0}^{t_1} -H(x, u, t) + H(x^*, u^*, t)dt =  \int_{t_0}^{t_1}-  \langle \partial_xH|_*, \alpha \eta  \rangle - \langle \partial_u H|_*, \alpha \xi  \rangle dt + o(\alpha) ,
+\end{align*}
+and by the integration by parts
+\begin{align*}
+	\int_{t_0}^{t_1} \langle p , \dot{x} - \dot{x^*} \rangle dt = \langle p, x - x^* \rangle\bigg|_{t_0}^{t_1} - \int_{t_0}^{t_1} \langle \dot{p}, x - x^* \rangle dt = \langle p(t_1), \alpha \eta(t_1) \rangle - \int_{t_0}^{t_1} \langle \dot{p}, \alpha \eta \rangle dt + o(\alpha). 
+\end{align*}
+Altogether we have
+\begin{equation}
+	\delta J|_{u^*}(\xi) = \int_{t_0}^{t_1} \langle -\dot{p} - \partial_x H|_*, \alpha \eta \rangle - \langle \partial_u H|_*, \alpha\xi \rangle dt + \langle \partial_xK|_*(t_1) + p(t_1), \alpha \eta(t_1) \rangle.
+\end{equation}
+\end{proof}
+
+
+
+
+
+\section{The Maximum Principle}
+In this section we observe the time-optimal control problem:
+\begin{equation}
+\begin{aligned}
+\textbf{(P3.1)} \quad
+	& \min_{u \in \mathcal{U}} J(u):= \int_{t_0}^{t_f} L(x(t), u(t))dt \\
+	& \text{s.t.}\\
+	& \dot{x} = f(x, u)\\
+	& x(t_0) = x_0, \\
+	& (t_f, x(t_f)) \in S:= [t_0, \infty) \times \{x_1\},\\ 
+	& \mathcal{U}:= P_{PW}^0([t_0, t_f], U), U \subset \mathbb{R}^m
+\end{aligned}
+\end{equation}
+
+\subsection{Statement}
+\begin{theorem}[the maximum principle(necessary condition for global maximum)]
+Given \textbf{(P3.1)} above and define the Hamiltonian:
+\begin{equation}
+	H(x, u, p, p_0):= \langle p, f \rangle + p_0 L(x, u). 
+\end{equation}
+Assuming
+\begin{enumerate}
+	\item $S_1$ is a differentiable manifold with 
+	\begin{align*}
+		S_1:= \{x \in \mathbb{R}^n: h_1(x) = \dots = h_{n - k}(x) = 0\}
+	\end{align*}
+	\item $f, L \in \mathcal{C}^1$.  . 
+\end{enumerate}
+If $u^*$ is the \textbf{global} optimal control and $x^*$ the corresponding optimal trajectory, then there exits $p^* \in C^1([t_0, t_f])^m$, with $p_0^* \le  0$,  $(p^*_0, p^*(t)) \neq 0$,  such that:
+\begin{enumerate}
+	\item $\dot{p}^* = - \partial_x H|_{x^*, u^*, p^*}$ and $\dot{x}^* = \partial_p H$. 
+	\item $\forall u \in U$: 
+	\begin{equation}
+		H_{x^*, u^*, p^*, p_0^*}(t) \ge H_{x^*, u, p^*, p_0^*}(t). 
+	\end{equation}
+	\item $\forall t \in [t_0, t_f]:$
+	\begin{equation}
+		H_{u^*, x^*, p^*, p_0^*}(t) \equiv 0. 
+	\end{equation}
+	\item $p^*(t_f)$ is orthogonal to the tangent space of $S_1$ , i.e., 
+	\begin{align*}
+		\langle p^*(t_f), d \rangle = 0 \quad \forall d \in T_{x^*(t_f)}S_1
+	\end{align*}
+	with 
+	\begin{align*}
+		T_{x^*(t_f)}S_1 = \{ d \in \mathbb{R}^n: \langle h_1',  d \rangle = \dots = \langle h_{n - k}', d \rangle = 0 \}. 
+	\end{align*}
+\end{enumerate}
+\end{theorem}
+
+Several remarks regarding the statement of maximum principle:
+\begin{enumerate}
+	\item In the assumption the minimum is global, hence alway locally strong. 
+\end{enumerate}
+
+
+\subsection{Pertubations}
+First we introduce the Mayer's cost, which transform the variational cost to the terminal cost:
+\subsubsection{I. Mayer's form}
+Define
+\begin{align*}
+	x^0(t) = \int_{t_0}^t L(s, x, u) ds.
+\end{align*}
+we rewrite \textbf{(P3.1)} as : 
+\begin{equation}
+\begin{aligned}
+	& \min_u J (u) = x^0(t_f),\\
+	& \text{s.t.}\\
+	& y = (x^0, x)^T,\\
+	& \dot{y} = 
+		\begin{bmatrix}
+		L(t, x, u) \\
+		f(t, x, u)
+		\end{bmatrix},\\
+	& (t_f, y(t_f)) \in [t_0, \infty) \times \mathbb{R} \times \{x_1\}, \\
+	& u \in \mathcal{U} = P^0_{PW}([t_0, t_f], U^m).
+\end{aligned}
+\end{equation}
+
+
+\subsubsection{II. The temporal perturbation}
+Denote $t^*$ the terminal time. For $\tau \in \mathbb{R}$(time perturbation), $\epsilon > 0$(infinite dismal), we define the \textbf{temporal control} as:
+\begin{equation}
+u_\tau(t):= u^* (\min\{t, t^* \}), \qquad t \in [t_0, t^* + \epsilon \tau]
+\end{equation}
+Linearise around $t^*$, we have
+\begin{align*}
+	&y(t^* + \tau\epsilon) = y^*(t^*) + \epsilon \tau t_t(t^*) + o(\epsilon) := y(t^*) + \epsilon \tau  g|_{y^*, u^*}(t^*) + o(\epsilon) := y^*(t^*) + \epsilon \delta(\tau) + o(\epsilon). \\
+	&\text{with }\\
+	& g|_{y, u}(t): = y_t = 
+	\begin{bmatrix}
+		L(x, u)\\
+		f(x, u)
+	\end{bmatrix},\\
+	&\delta(\tau):= \tau g. \\
+\end{align*}
+
+
+\subsubsection{III. The spatial perturbation(Pontryagin-McShane needle variation)}
+\textbf{1. }For $b \in [t_0, t_f], w \in U \subseteq \mathbb{R}^m, a >0$, we define the needle variation
+\begin{equation}
+u_{w, I}:= \left\{
+\begin{aligned}
+&u^*(t) & \text{else},\\
+&w	& t \in [b - \epsilon a , b].
+\end{aligned}
+\right.
+\end{equation}
+
+At the corner point $b$, the perturbed trajectory is 
+\begin{align*}
+	y(b, \epsilon) &= y(b - \epsilon a, \epsilon) + g|_{y(\cdot, \epsilon) , w}(b - \epsilon a) \cdot \epsilon a + o(\epsilon)\\
+	& = y^*(b - \epsilon a) + g|_{y^*, w} (b - \epsilon a) \cdot \epsilon a + o(\epsilon).
+\end{align*}
+To get rid of $\epsilon$ in the nonlinear term:
+\begin{align*}
+	y^*(b - \epsilon a, \epsilon) = y^*(b) - \epsilon a \cdot g|_{y^*, u^*}(b) + o(\epsilon),
+\end{align*}
+and
+\begin{align*}
+	g|_{y^*, w}(b - \epsilon) \cdot \epsilon a \approx g|_{y^*, w}(b) \cdot \epsilon a + o(\epsilon). 
+\end{align*}
+At the point $b$ we get the spatial perturbation:
+\begin{equation}\label{needle variation 1}
+\begin{aligned}
+	& y(b) = y^*(b) + v_b(w) \epsilon a + o(\epsilon), \\
+	& \text{with}\\
+	& v_b(w) = g|_{y^*, w}(b) - g|_{y^*, u^*}(b). 
+\end{aligned}
+\end{equation}
+
+\quad\\
+\textbf{2. The variational equation: } We now want to perturb w.r.t. $\epsilon$ at $t \in [b, t_f]$,  We use the ansatz: assuming $y(t, \epsilon)$ is differentiable w.r.t. $\epsilon$(not yet known) and show the derivative actually exists, i.e., assuming 
+\begin{equation}
+	y(t, \epsilon) = y^*(t) + \epsilon \psi(t) + o(\epsilon),
+\end{equation}
+and try to formalise $\psi$ with a differential equation. For the ansatz above we have
+\begin{align*}
+	&y_\epsilon (t, 0) = \Psi(t), \\
+	&\psi(b) = v_b(w)a. 
+\end{align*}
+For the differential equation we observe the evolution process of $y(\epsilon, t)$ is also controlled by $y$, therefore for fixed $\epsilon$:
+\begin{align*}
+	y(t, \epsilon) = y(b, \epsilon) + \int_b^t g|_{y(\epsilon, \cdot), u^*(\cdot)}(s) ds.
+\end{align*}
+Hence linearise around $y^*(t)$, i.e.,  as $\epsilon \rightarrow 0$:
+\begin{align*}
+	& \underbrace{y_\epsilon(t, 0)}_{= \Psi(t)}  = v_b(w) a  + \int_b^t g_y\bigg|_{y(0, \cdot), u^*(\cdot)}(s) \cdot  \underbrace{y_\epsilon (s, 0)}_{= \Psi(s)} ds
+\end{align*}
+Since $y(0, s) = y^*(s)$, we get the sensitivity ODE:
+\begin{equation}
+\begin{aligned}
+	& \dot{\psi}(t) =  g_y\bigg|_{y^*, u^*}(t) \psi(t) \\
+	& \psi(b) = v_b(w)a. 
+\end{aligned}
+\end{equation}
+Since $y(t) \in \mathcal{C}^2$, $g_y$ exists, hence $y(t, \epsilon)$ is differentiable w.r.t. $\epsilon$. Denote 
+\begin{align*}
+	\psi = (\eta^0, \eta)^T.
+\end{align*}
+Then we have
+\begin{equation*}
+\begin{aligned}
+	& \dot{\eta}^0 = \langle \partial_x L|_*, \eta \rangle\\
+	& \dot{\eta} = \langle \partial_x f|_*, \eta \rangle. 
+\end{aligned}
+\end{equation*}
+Define
+\begin{align*}
+A^*(t):= 
+\begin{bmatrix}
+	0 & \partial_x L|_*(t)\\
+	0 & \partial_xf|_*(t)
+\end{bmatrix}
+\end{align*}
+
+
+we have the compact form:
+\begin{equation}
+\begin{aligned}
+	&\dot{\psi}(t) = A^* \psi(t),\\
+	&\psi(b) = v_b(w)a.
+\end{aligned}
+\end{equation}
+We arrive at the compact formula with the transition matrix: variation of $y(t^*)$ w.r.t. the needle variation
+\begin{equation}\label{needle variation}
+\begin{aligned}
+	& y(t^*) = y^*(t^*) + \epsilon \delta(w, I) + o(\epsilon)\\
+	& \text{with}\\
+	& \delta(w, I):= \Phi(t^*, b)v_b(w) a. 
+\end{aligned}
+\end{equation}
+
+\quad\\
+\textbf{IV. The convex cone property:}
+Now the question: Given 2 needle variation $\delta(w_1, I_1)$ and $\delta(w_2, I_2)$, is $\beta_1 \delta(w_1, I_1) + \beta_2 \delta(w_2, I_2)$ also a needle variation? Also, given $\delta(w, I)$, is $\beta \delta(w, I)$ a needle variation for $\beta \in \mathbb{R}$?
+
+
+\begin{theorem}
+	at $t^f$, the set of all needle and temporal variation forms a convex cone, i.e., \\
+	\textbf{1).}  given $\delta(w_1, I_1), \delta(w_2, I_2)$, 
+	\begin{align*}
+		\forall \beta_1, \beta_2 > 0 \quad \exists w \in \ran U, I \subset [t_0, t_f]: \delta(w, I) = \beta_1 \delta(w_1, I_1) + \beta_2 \delta (w_2, I_2). 
+	\end{align*}
+	\textbf{2).} given $\delta(w, I)$
+	\begin{align*}
+		\forall \beta >0  \quad \exists \hat{I} \subset T: \delta(w, \hat{I}) = \beta \delta(w, I). 
+	\end{align*}
+	i.e., all the variations forms a terminal cone $C_{t^*}$. 
+\end{theorem}
+\begin{proof}\qquad\\
+\textbf{ad 1.} Observe that $\delta(I, w)$ is linear w.r.t. $a$.\\
+\textbf{ad 2.} w.l.o.g. $b_1 < b_2$, since the transition matrix $\Phi^*$ is determined only by the optimal control, at the terminal time $t^*$ we have 
+\begin{align*}
+	\psi(t^*) &=   \bigg( \Phi^*(b_1, b_2)v_{b_1} a \bigg) + \Phi^*(b_2, t_*) \bigg(\Phi^*(b_1, b_2)v_{b_1} a  \bigg)\\
+	& = \delta(w_1, b_1) + \delta(w_2, b_2). 
+\end{align*}
+\end{proof}
+
+
+\subsection{Geometry}                         
+\subsubsection{The terminal cone}
+By the argument above we define the convex cone:
+\begin{equation}
+	C_{t^*}:= \bigg\{y^*(t^*) + \epsilon\bigg( \beta_0 \delta(\tau)+ \sum_{w_i \in \ran (U)} \beta_i \delta(w_i, I_i) \bigg). | \beta_i \in \mathbb{R}, I_i \subset [t_0, t_f]. \bigg\}.
+\end{equation}
+\begin{remark}
+The terminal cone is uniquely determined by the optimal control $u^*$. 	
+\end{remark}
+
+
+By the definition of $y^*$, the perturbed trajectories $y$ can only hit below $y^*$(in terms of $x_0$). We prove the important geometrical lemma
+\begin{lemma}
+	Define $\mu = (-1, 0, \dots, 0) \in \mathbb{R}^{n + 1}$, we have
+	\begin{align*}
+		\mu \cap C_{t^*} \neq \emptyset. 
+	\end{align*}
+\end{lemma}
+\begin{proof}
+\end{proof}
+
+
+
+
+\begin{lemma}[separating hyperplane]
+	Given $C, D$ 2 non-empty convex subspace of the Banach space $X$, then there exists some linear functional $\Lambda \in L(X, \mathbb{K}), b \in \mathbb{K}$, such that 
+	\begin{equation}
+		\forall x \in C: \Lambda(x) \le b \quad \forall y \in D: \Lambda(y) \ge b. 
+	\end{equation}
+\end{lemma}
+\begin{proof}
+Hahn-Banach
+\end{proof}
+
+\begin{theorem}[Terminal state of the adjoint]
+	For $C:= int(C_{t^*})$, $D:= \mu$, there exists $p := (p^*_0, p^*(t))$ and $b \in \mathbb{R}$, such that 
+	\begin{align*}
+		\langle p, y^*(t^*) \rangle = b.
+	\end{align*}
+	Define the hyperplane
+	\begin{align*}
+		M = \{y | \langle p, y \rangle = b \}
+	\end{align*}
+	We have
+	\begin{equation}
+		\forall y^*(t^*) + \delta \in C_{t^*}: \langle p, \delta \rangle \le 0  \text{ and } \langle p, \mu \rangle \ge 0
+	\end{equation}
+\end{theorem}
+
+\subsubsection{Transversality condition: For general terminal state $S_1$.}
+If the range of the admissible terminal state is not a single point but a differentiable manifold of the form
+\begin{align*}
+	S:= \{x \in \mathbb{R}^n: \quad h_i(x) = 0, i = 1, \dots, n -k \}. 
+\end{align*}
+The terminal cone might change due to the fact that the terminal point is no longer a single point. However, we may keep the terminal cone unchanged and define the following set instead of $\mu$: 
+\begin{align*}
+	T:= \{ y^*(t^*) +  (0, d)^T + \beta \mu: \quad d \in T_{x^*(t_f)}S_1, \beta \ge 0 \}. 
+\end{align*}
+The geometrical lemma we proved above then becomes:
+\begin{lemma}
+Given $T$ and $C_{t^*}$ defined above we have
+\begin{align*}
+	T \cap C_{t^*} = \emptyset. 
+\end{align*}
+\end{lemma}
+\begin{proof}
+	Followed likewise by Brouwer. 
+\end{proof}
+
+
+
+
+\subsection{Adjoints}
+\subsubsection{IV. Adjoint ODEs}
+\begin{definition}[the adjoint ODE]
+Given the linear ODE
+\begin{align*}
+	\dot{x}(t) = A(t) x. 
+\end{align*}	
+We define the \textbf{adjoint ODE}
+\begin{align*}
+	\dot{z}(t)= - A^T(t) z.
+\end{align*}
+It holds
+\begin{align*}
+	\frac{d}{dt} \langle z, x\rangle = \langle \dot{z}, x\rangle + \langle z, \dot{x} \rangle = -\langle  z, A x \rangle + \langle z, Ax \rangle = 0.
+\end{align*}
+i.e., $\langle z, x \rangle $ remains the constant. 
+\end{definition}
+\begin{remark}
+The adjoint ODE is a family of ODEs and is independent of the initial condition, therefore in general \textbf{not} unique. 
+\end{remark}
+
+\subsubsection{The adjoint system $p^*$}
+We now investigate the question: given the sensitivity ODE $\psi$, how do we find a \textbf{unique} adjoint ODE $p$. Observe
+\begin{align*}
+	& \dot{\psi} = A_* \psi.
+\end{align*}
+(initial condition not specified but implied by finite number of perturbations), we define the adjoint system
+\begin{align*}
+	&\dot{\begin{bmatrix}
+		p_0\\
+		p(t)
+	\end{bmatrix}} = - A_*^T 
+	\begin{bmatrix}
+		p_0\\
+		p(t)
+	\end{bmatrix}.
+\end{align*} 
+For the initial condition, by the separating hyperplane, there exists $ a = (p_0^*, p^*(t^*))$ such that 
+\begin{align*}
+	\langle (p_0^*, p^*(t^*))^T, \psi^*(t^*) \rangle = 0, \quad \langle (p_0^*, p^*(t^*))^T, \mu \rangle = 0. 
+\end{align*}
+
+The existence of adjoint system guarantees the time-invariance of the scalar product, which is applied later to prove the Hamiltonian remains the constant.  
+
+
+\subsection{Properties of Hamiltonian}
+\textbf{1).} By the definition of the adjoints we have
+\begin{align*}
+	\dot{p} = \langle -\partial_x f, p \rangle  - \langle \partial_x L , p_0 \rangle = - \partial_x H. 
+\end{align*}
+\textbf{2).The maximality condition} $\forall t \in [t_0, t_f] \forall w \in U: H|_*(t) \ge H_{x^*, w, p^*}(t)$. 
+\begin{proof}  At continuity point $b$(we can insert the needle variation), we observe the terminal cone at $t^*$, by separation property we have
+\begin{align*}
+	\langle (p_0^*,  p^*(t^*))^T, \Phi(t_*, b)v_b(w) \rangle \le 0.
+\end{align*}	
+Notice $\Phi(t^*, b)v_b(w) = \psi(t^*)$, and $p$ and $\psi$ are adjoint, we conclude
+\begin{align*}
+	&\langle (p_0^*, p^*(b))^T , v_b(w) \rangle \le 0\\
+	&\Rightarrow\\
+	&H|_{x^*, w}(b) \le H|_{*}(b)
+\end{align*}
+At the point of discontinuity we use $H$ is continuous w.r.t. $t$ and $x$, $p$ are continuous in time. 
+\end{proof}
+
+\quad\\
+\textbf{3). $H|_* \equiv 0$:}
+\begin{proof}
+\textbf{ad 1. $H$ is continuous w.rt. $t$:} Since $H$ is continuous w.r.t $x, u, p$ w.r.t. in the strong sense and $f$, $p$ are continuous, the discontinuity can only occur at the discontinuous point of $u^*$. Assuming $t$ is a point of discontinuity, we get by the maximisation property, for $b < t$:
+\begin{align*}
+	\lim_{b \uparrow t} H(x^*(b), u^*(t_+), p^*(b), p_0^*) \le \lim_{b \uparrow t}H(x^*(b), u^*(b), p^*(b), p_0^*), 
+\end{align*}
+by continuity it holds
+\begin{align*}
+	H(x^*(t), u^*(t_+), p^*(t), p_0^*) \le H(x^*(t), u^*(t_-), p^*(t), p_0^*).
+\end{align*}
+Analogously we have
+\begin{align*}
+	H(x^*(t), u^*(t_-), p^*(t), p_0^*) \le H(x^*(t), u^*(t_+), p^*(t), p_0^*).
+\end{align*}
+Therefore $H$ is continuous w.r.t. $t$.
+
+\quad\\
+\textbf{ad 2. $H$ is differentiable a.e.}: We show that the function is Lipschitz continuous. Observe the function
+\begin{align*}
+	m(x^*(t), p^*(t)) = \max_u H(x^*, u, p^*).
+\end{align*}
+We show it's Lipschitz continuous w.r.t. $t$. Indeed for $t, t' \in (t_0, t_f)$, we fix the $t$ in the argument $u^*$.  
+\begin{align*}
+	m|_*(t) - m|_*(t') \le H|_*(t) - H(x^*(t'), u^*(t), p^*(t')).
+\end{align*}
+Since $H \in C^1$ w.r.t. $x$ and $p$ and $x, p \in C^1$ w.r.t. $t$, we know the righthand side is Lipschitz continuous with the Lipschitz constant determined by $\max_{t \in [t_0, t_f]} \partial_t H$. Analogously we determine the lower bound and get 
+\begin{align*}
+	|m|_*(t) - m|_*(t')| \le L |t - t'|. 
+\end{align*}
+\quad\\
+\textbf{ad 3.} $H|_*(t^*) = 0$. Observe the temporal variation at the terminal time with $\tau > 0$, by the separation property it holds
+\begin{align*}
+	& \langle p^*(t^*), \delta(\tau) \epsilon \rangle \le 0\\
+	\Rightarrow & \tau \epsilon H|_*(t^*) \le 0 \\
+	\Rightarrow & H_*(t^*) \le 0
+\end{align*}
+choose $\tau < 0$ to get $H_*(t^*) \ge 0$. 
+\quad\\
+\textbf{ad 4. $\partial_t H$ vanishes a.e.} Observe
+\begin{align*}
+	\frac{H|_*(t) - H|_*(t')}{t - t'} \le \frac{ H|_*(t) - H|_{x^*(\cdot), u^*(t), p^*(\cdot)}(t')}{t - t'},
+\end{align*}
+hence
+\begin{align*}
+	\frac{d}{dt} H|_*(t) &\le \langle \partial_x H|_*(t), \dot{x^*}(t) \rangle + \langle \partial_pH|_*(t), \dot{p}^*(t) \rangle \\
+	&= 0,
+\end{align*}
+Flip the sign to get $\frac{d}{dt}H|_*(t) \ge 0$ for all $t$. Hence we have $\frac{d}{dt}H|_* \equiv 0$ a.e.. 
+\end{proof}
+
+\subsection{Variants of Problems}
+\subsubsection{Fixed Terminal Time}
+\textbf{Summary:} In the case of the fixed terminal time the $H|_*$ is no longer constant 0, but remain to a constant $-p_3^*(t_f)$, the existence of which is guaranteed by the separation theorem, however unknown.\\
+\textbf{Proof}: Assume now the cost function becomes
+\begin{align*}
+	\int_{t_0}^T L(x, u) dt,
+\end{align*}
+for some fixed time $T$. We want to derive the necessary optimality condition by maximum principle. Strategy is to introduce an auxiliary variable $x_{n + 1} $ with $\bar{x} = (x, x_{n + 1})$, $\bar{f} = (f, 1)$, i.e.,  
+\begin{align*}
+	&\dot{x}_{n+1} = 1,\\
+	&x_{n + 1}(0) = t_0. 
+\end{align*}
+with the terminal constraint
+\begin{align*}
+	x_{n+1}(t_f) \in \{T \}.
+\end{align*}
+The problem then becomes
+\begin{align*}
+	& \min_{t_f, u \in U_{t_f}} \int_{t_0}^{t_f}L(\bar{x}, u) dt \\
+	& \text{s.t.}\\
+	& \dot{\bar{x}} = \bar{f}, \\
+	& \bar{S}_1 = S_1 \times \{T\}. 
+\end{align*}
+The maximum principle state that the Hamiltonian
+\begin{align*}
+	H(x, u, p, p_0) = \langle p, f \rangle + p_{n + 1} + \langle p_0, L(\bar{x}, u) \rangle = H + p_{n + 1} 
+\end{align*}
+is equivalent 0 at the global minimum, therefore
+\begin{align*}
+	H|_* + p^*_{n + 1}(t_f) \equiv 0, 
+\end{align*} 
+i.e., it's a constant. However we don't have any information regarding $p_{n + 1}^*$. 
+
+\subsubsection{Time-dependant System and Cost}
+In the time-dependent system $f(t, x, u)$ and the time-dependent cost $L(t, x, u)$ we introduce likewise the auxiliary variable
+\begin{align*}
+	& \dot{x}_{n +1} = 1\\
+	& x_{n + 1}(t_0) = t_0.\\
+	& \bar{x}:= (x, x_{n + 1}). 
+\end{align*}
+The revised problem becomes
+\begin{align*}
+	&\min_{u, t_f} \int_{t_0}^{t_f} L(\bar{x}, u)dt \\
+	& \text{s.t.}\\
+	& \dot{\bar{x}} = (f, 1)^T\\
+	& \bar{x}(t_0) = (x_0, t_0)^T\\
+	& (t_f, \bar{x}(t_f)) \in [0, \infty) \times S^1 \times [0, \infty)
+\end{align*}
+The Hamiltonian becomes
+\begin{align*}
+	H(\bar{x}, u, \bar{p}, p_0) = \langle p, f \rangle + \langle p_{n + 1}, 1 \rangle - p_0 L(\bar{x}, u). 
+\end{align*}
+By the canonical equation we have
+\begin{align*}
+	\dot{p}_{n +1}^* = - \partial_t H|_*
+\end{align*}
+Since now the system is time-dependant the Hamiltonian is not constant anymore. However if the terminal time is free, we have
+\begin{align*}
+	p^*_{n + 1}(t_f) = 0.
+\end{align*}
+In this case it holds
+\begin{align*}
+	0 - H|_*(t) = \int_t^{t_f} H_t|_* ds, 
+\end{align*}
+
+
+
+\quad\\
+\textbf{Terminal State}\quad\\
+If we change the terminal state from a single point $\{x_1\}$ to a differentiable manifold( $k$-dimensional)
+\begin{align*}
+	S:= \{x \in \mathbb{R}^n: \quad h_i(x) = 0, \quad i= 1, \dots, n - k\}
+\end{align*}
+Observe the transversality condition
+\begin{align*}
+	T \cap C_{t^*} = \emptyset. 
+\end{align*} 
+
+\subsubsection{Terminal Cost}
+Assume now the cost function has no running cost but terminal cost $K$, namely $L \equiv 0$ and the cost function becomes $K(x(t_f))$ and the Mayer's form is no longer applicable. Intuitively, since $K(x^*(t^*))$ attains the minimum, we have
+\begin{align*}
+	\langle -\partial_x K(x^*(t^*)) , \delta \rangle \le 0, \quad \forall x^*(t^*) + \delta \in C_{t^*}. 
+\end{align*}
+Recall in the separating hyperplane we have
+\begin{align*}
+	\langle p^*(t^*), \delta \rangle \le 0, \quad \forall x^*(t^*) + \delta \in C_{t^*}. 
+\end{align*}
+We make the assumption that 
+\begin{align*}
+	p^*(t^*) = \partial_x K(x^*(t^*)). 
+\end{align*}
+To construct a rigorous proof observe that
+\begin{align*}
+	K(t_f) = K(t_0) + \int_{t_0}^{t_f} \partial_x K (s) ds. 
+\end{align*}
+
+
+\subsubsection{Initial Set}
+In the case where we have the initial set constraints 
+\begin{align*}
+	x_0 \in S_0. 
+\end{align*}
+
+\subsubsection{State Constraints}
+Use of KKT conditions
+
+
+
+\section{Time-Optimal Control Problems}
+\subsection{Controllability of linear system}
+\subsubsection{Linear control problems and controllability(reachability).}
+We consider the time-optimal control problem:
+\begin{equation}
+\begin{aligned}
+\textbf{(P4.1) }
+	&\min_{u \in U_{t_f}, t_f} \int_{t_0}^{t_f} 1 dt.   \\
+	&\text{s.t.}\\
+	& \dot{x} = Ax + Bu, \\
+	& x(t_0) = x_0,\\
+	& u \in U_{t_f} = C_{PW}^0([0, t_f], U), U \subset \mathbb{R}^m \\
+	& (t_f, x(t_f)) \in [0, \infty) \times S_1. 	
+\end{aligned}
+\end{equation}
+where $B \in \mathbb{R}^{n \times m}, A \in \mathbb{R}^{n \times  n}, x \in \mathbb{R}^n, u \in \mathbb{R}^m $. 
+
+\begin{definition}[trajectory of the linear system]
+	The linear system admits the solution
+	\begin{equation}
+		x(t, t_0;x_0, u):= e^{A(t - t_0)} x_0 + \int_{t_0}^{t} e^{A(t - s)} Bu(s)ds. 
+	\end{equation}
+	we short the notation if we start at the initial time $t_0 = 0$:
+	\begin{equation}
+		x(t; x_0, u):= x(t, 0;x_0, u).
+	\end{equation}
+\end{definition}
+
+
+\begin{definition}[controllable and reachable state]
+Given $x_1 \in \mathbb{R}^n$, a state $x_0 \in \mathbb{R}^n$ is called controllable in time $t$, if there exits $u \in U_t$, such that
+\begin{align*}
+	x(t; x_0, u) = x_1. 
+\end{align*}
+Analogously we define the reachable state w.r.t. $x_0$ at time $t$. 
+\end{definition}
+
+The controllable(reachable) set of the linear system above depends generically only on $A, B$, i.e., the change of initial state affects the controllable set only by a affine linear factor. 
+
+\begin{lemma}[Structure of the reachable set of the linear system]
+	For the linear system defined above, the following statement is equivalent 
+	\begin{enumerate}
+		\item $x_0$ is controllable to $x_1$ at time $t$. 
+		\item $0$ is controllable to $\tilde{x}_1 = x_1 - \underbrace{ x(t; x_0, 0)}_{\text{transportation vector}}$ at time $t$.
+	\end{enumerate}
+\end{lemma}
+\begin{proof}
+\quad\\
+$\Rightarrow$: By assumption we have $\exists u : \quad x(t; x_0, u) = x_1$. Observe
+\begin{align*}
+	\tilde{x}_1 = e^{At }x_0 + \int_0^t e^{A(t - \tau)} Bu (\tau) d\tau - e^{At}x_0.
+\end{align*}
+We conclude that there exists the same $u$ with 
+\begin{align*}
+	x(t; 0, u) = \tilde{x}_1. 
+\end{align*}
+$\Leftarrow$: analoge. 
+\end{proof}
+
+\begin{remark}
+In the linear system, the reachable state can be decomposed into a controlling part and a null-control part. 	
+\end{remark}
+
+
+With the lemma above we know the reachability set only shift linearly if we observe $x_0 =0$. We can observe w.l.o.g. the controllable set at the initial state $0$. We will see later
+\begin{enumerate}
+	\item If the goal is to prove $\mathcal{R}(t) = \mathbb{R}^n$, the shift of a vector plays no role. 
+	\item By setting $x_0 = 0$ the initial term $e^{At} x_0$ vanishes and simplifies the calculation. 
+\end{enumerate}
+
+
+\begin{definition}[controllability set and reachability set]
+We define the controllability set as the controllable state to the final state $x_1 = 0$:
+\begin{equation}
+	\mathcal{C}(t) := \{x_0 \in \mathbb{R}^n: \quad \exists u \in U_t: x(t; x_0, u) = 0 \}.
+\end{equation}
+Likewise we define the reachable set
+\begin{equation}
+	\mathcal{R}(t):= \{x_1 \in \mathbb{R}^n: \quad \exists u \in U_t: x(t; 0, u) = x_1 \}. 
+\end{equation}
+\end{definition}
+
+\begin{lemma}[algebraic properties of reachable sets]
+	It holds
+	\begin{enumerate}
+		\item $\forall t \ge 0$: $\mathcal{R}(t)$ is a subspace of $\mathbb{R}^n$. 
+		\item \textbf{time-invariance:} $\forall s, t > 0$: $\mathcal{R}(s) = \mathcal{R}(t)$. 
+	\end{enumerate}
+\end{lemma}
+\begin{proof}
+\quad\\
+\textbf{1.} Exploit the linearity of the solution w.r.t. the control. 
+\quad\\
+\textbf{2.}"$\subseteq$":\\
+ show for $t_2 \ge t_1 > 0$, it holds
+\begin{align*}
+	\mathcal{R}(t_1) \subset \mathcal{R}(t_2). 
+\end{align*}
+want to show $\forall x \in \mathcal{R}(t_1) \exists u_2 : x(t_2, 0, u_2) = x$. Since $x \in \mathcal{R}(t_1)$, there exists $u_1$ such that 
+\begin{align*}
+	x(t_1; 0, u_1) = x.
+\end{align*}
+Construct the concatenating control
+\begin{equation}
+	u_2:= 0 \&_{t_2 - t_1} u_1. 
+\end{equation} 
+Observe that $x(t_2; 0, u_2) = x$. 
+\quad\\
+$"\supseteq$ :\\
+\textbf{ad1. conditional consistency:} Show for $t_2 \ge t_1 > 0$, it holds
+\begin{align*}
+	\mathcal{R}(t_1) = \mathcal{R}(t_2) \Rightarrow \forall t \ge t_2: \mathcal{R}(t) = \mathcal{R}(t_2). 
+\end{align*}
+\textbf{ad2: discrete conditional consistency: }First we expand $t_2$ by $t_2 - t_1$ and show:
+\begin{align*}
+	\mathcal{R}(t_2) = \mathcal{R}(t_1) \Rightarrow \mathcal{R}(2t_2 - t_1) = \mathcal{R}(t_2) = \mathcal{R}(t_1). 
+\end{align*} 
+Equivalent to show
+\begin{align*}
+	\forall x \in \mathcal{R}(2t_2 - t_1) \quad \exists u_2: \quad x(t_2; 0, u_2) = x.
+\end{align*}
+Since $x \in \mathcal{R}(2t_2 - t_1)$, there exits $u$ such that
+\begin{align*}
+	x(2 t_2 - t_1; 0, u ) = x , \text{ and } x(t_2;0, u) \in \mathcal{R}(t_2). 
+\end{align*}
+Since $\mathcal{R}(t_1) = \mathcal{R}(t_2)$, there exits $v$ such that 
+\begin{align*}
+	x(t_2; 0, u) = x(t_1;0, v). 
+\end{align*}
+Construct the concatenating control:
+\begin{equation}
+	u_2:= v \&_{t_1} u(t_2 - t_1 + \cdot).
+\end{equation}
+It holds
+\begin{align*}
+	x(t_2;0, u_2) &= x(t_2 - t_1; x(t_1;0, v), u(t_2 - t_1 + \cdot))\\
+	&= x(2t_2 - t_1; x(t_2; 0, u), u(t_2 - t_1 + \cdot)) \text{ (move forward to align control)}\\
+	&= x. \text{ (final state unchanged)}
+\end{align*} 
+\textbf{ad3}: $\mathcal{R}(t) = \mathcal{R}(s)$. Argue by contradiction there exits $s, t$ such that 
+\begin{align*}
+	\mathcal{R}(s) \subsetneqq \mathcal{R}(t).
+\end{align*}
+If there exits $s <  p< t $ such that $\mathcal{R}(s) = \mathcal{R}(p)$, then it holds
+\begin{align*}
+	\mathcal{R}(s) \subsetneqq \mathcal{R}(t) \subset \mathcal{R}((p - s)\cdot k + s) = \mathcal{R}(s) \text{ for some $k \in \mathbb{N}$ \Lightning}
+\end{align*}
+Otherwise there exits no $p$ such that $\mathcal{R}(s) = \mathcal{R}(p)$, by monotonicity the basis of the linear subspace would increase at every point between $t$ and $s$, which contradicts to the reachability set is finite-dimensional. 
+ 
+\end{proof}
+
+\begin{theorem}[A-invariant subspace]
+	Given $V \subset \mathbb{R}^n$ and $A \in \mathbb{R}^{n \times n}$, we define 
+	\begin{equation}
+		\langle A| V \rangle:= \{ \tilde{V} \subset \mathbb{R}^n \text{ subspace}:  \quad \tilde{V} \text{ is smallest subspace containing $V$, s.t. $A \tilde{V} \subset \tilde{V}$} \}.
+	\end{equation}
+	The $A$-invariant is decomposable into potential ranges:
+	\begin{equation}
+		\langle A| V\rangle =  V + AV + \dots + A^{n -1} V . 
+	\end{equation}
+\end{theorem}
+\begin{proof}
+ \quad\\ 
+  "$\supseteqq$": Since $A^k V \subset \langle A| V \rangle $ for all $k \in \mathbb{N}_0$, all the image of the potential map belongs to the $A$-invariant set. 
+  \quad\\ 
+"$\subseteqq$": Suffice to show the RHS is $A$-invariant, by definition it holds $\langle A|V \rangle \subseteq RHS$. \\ Multiply the RHS by A and use Cayley-Hamilton to prove that $A^n V$ can be represent as the $AV, A^2 V \dots, A^{n -1}V$.
+We showed the RHS is A-invariant and contains $V$, hence $\langle A | V \rangle \subset RHS$. 
+\end{proof}
+
+\begin{corollary}[Kalmann matrix]
+	define the \textbf{Kalman matrix(reachability matrix)}:
+\begin{equation*}
+	[B|AB|A^2B|\dots| A^{n -1}B] \quad \in \mathbb{R}^{n \times mn} .
+\end{equation*}	
+By the lemma of A-invariant subspace above we get 
+\begin{align*}
+	\ran [B|AB|\dots|A^{n -1}B] = \langle A| \ran B\rangle. 
+\end{align*}
+\end{corollary}
+\begin{proof}
+	trivial.
+\end{proof}
+
+Now for $t \in \mathbb{R}$, we define the matrix
+\begin{equation}
+		W_t := \int_0^t \langle  e^{A\tau} B, (e^{A\tau} B)^T\rangle d\tau \quad \in \mathbb{R}^{n \times n}.
+\end{equation}
+Observe the $W_t$ is a \underline{symmetric positive semidefinite} matrix, i.e., 
+\begin{align*}
+	\langle x, W_t x \rangle \ge 0 \quad \forall t 
+\end{align*}  we will prove 
+\begin{align*}
+	\langle A|\ran B \rangle = \ran [B|\dots|A^{n -1}B] = \ran W_t.
+\end{align*}
+
+
+\begin{lemma}
+It holds
+\begin{equation}
+	\langle A| \ran B \rangle = \ran  W_t, 
+\end{equation}	
+where $\ran W_t$ is the image of the bilinear map defined by $W_t$. 
+\end{lemma}
+\begin{remark}
+Observe the range of $W_t$ is independent of $t$. 	
+\end{remark}
+
+\begin{proof}
+w.t.s. 
+\begin{align*}
+	\langle A| \ran B\rangle^\perp = W_t^\perp
+\end{align*}
+"$\subseteq$": Given $x \in \langle A|\ran B \rangle^\perp$, it holds by the last lemma that
+\begin{align*}
+	\langle x, \ran A^kB \rangle = 0 \quad \forall k \in \mathbb{N}_0. 
+\end{align*}
+Hence
+\begin{align*}
+	\langle x, \sum_{k = 0}^\infty \frac{t^k A^k B}{k!}  \rangle = \langle x, e^{At} B  \rangle = 0.
+\end{align*}
+Therefore
+\begin{align*}
+	\langle x, W_t\rangle = 0 \Rightarrow x \perp \ran W_t. 
+\end{align*}
+\quad\\
+"$\supseteq$": Given $x \in W_t^\perp$, it holds
+\begin{align*}
+	\int_0^t \langle x^T e^{A\tau} B, (e^{A\tau}B)^T x \rangle  d\tau = 0. 
+\end{align*}
+Taking derivative w.r.t. $\tau$:
+\begin{align*}
+	\int_0^t x^T A^k e^{A\tau} B d\tau = 0 \quad \forall k \in \mathbb{N}. 
+\end{align*}
+Since $e^{A\tau}$ is monotone positive, we take $\tau = 0$ to get $\langle x, A^kB\rangle \le 0$, and take $\tau = t$ to get $\langle x, A^k B \rangle \ge 0$. Hence we have 
+\begin{align*}
+	\langle x, A^k B x \rangle = 0 \qquad \forall k \in \mathbb{N},  
+\end{align*}
+i.e., 
+\begin{align*}
+	x \in \langle A| \ran B\rangle^\perp. 
+\end{align*}
+\end{proof}
+
+\begin{theorem}[Reachability set is a A invariant set of $\ran B$ ]
+	It holds
+	\begin{equation}
+		\mathcal{R}(t) = \mathcal{C}(t) = \langle A |\ran B  \rangle. 
+	\end{equation}
+\end{theorem}
+\begin{proof}
+w.r.t. 
+\quad\\
+"$\subseteq$": Given $x \in \mathcal{R}(t)$, then there exists $u$ such that $x = x(t; 0, u)$, it holds 
+\begin{align*}
+	x = \int_0^t e^{A(t - s)} Bu(s) ds. 
+\end{align*}
+The matrix exponential gives
+\begin{align*}
+	e^{A(t - s)} B u(s) = \sum_{k = 0}^\infty \frac{(t-s) A^k}{k!} B  u(s) \in \langle A| \ran B\rangle. 
+\end{align*}
+\quad\\
+"$\supseteq$": Given $x \in \langle A| \ran B\rangle$, it holds that there exists $z \in \mathbb{R}^m$ such that $x =  \int_0^t \langle e^{A(t - s)}B, (e^{A(t - s)}B)^T z \rangle$. 
+Define 
+\begin{align*}
+	u(s):= (e^{A(t - s)}B)^T z, 
+\end{align*} 
+to get the result.
+\end{proof}
+
+\begin{definition}[controllable pair $(A, B)$ with no control constraints]
+	Given the linear optimal control problem with $U = \mathbb{R}^m$, $(A, B)$ is called controllable if it holds $\mathcal{R}(t_f) = \mathbb{R}^n$. 
+\end{definition}
+
+\begin{corollary}[Kalmann criterion]
+Consider $U = C_{PW}^0([0, t_f])$ with the corresponding reachable and controllable set, it holds
+\begin{align*}
+	\rank([ B |AB|\dots |A^{n -1}B ] ) = n \Leftrightarrow (A, B) \text{ is controllable. }
+\end{align*}
+\end{corollary}
+\begin{remark}
+Kalman matrix is usually applied with left multiplication to verify the rank condition. 	
+\end{remark}
+
+
+By high dimension the Kalman matrix is huge, as usual we observe now the eigenvalue decomposition and derive the equivalent conditions. 
+
+\begin{lemma}[decomposition of non-controllable pair]
+	Assuming $(A, B)$ non-controllable with
+	\begin{align*}
+		\dim \langle A|\ran B \rangle = r \lneqq n . 
+	\end{align*}
+	Then there exists $T \in GL(n)$ with $\tilde{A} = T^{-1} A T$ and $\tilde{B} = T^{-1} B$, such that, $(\tilde{A}, \tilde{B})$ can be decomposed with controllable pair $(A_1, B_1)$ in $\mathbb{R}^r$. 
+	\begin{align*}
+		\tilde{A}= 
+		\begin{bmatrix}
+			A_1 & A_2 \\
+			0 & A_3
+		\end{bmatrix}
+		\qquad \tilde{B} = 
+		\begin{bmatrix}
+			B_1\\
+			0
+		\end{bmatrix}
+	\end{align*}
+\end{lemma}
+
+\begin{theorem}[Hautus criterion]
+	The following statements are equivalent. 
+	\begin{enumerate}
+		\item $(A, B)$ is controllable.
+		\item $\rank[A - \lambda I | B] = n $ for all $\lambda \in \mathbb{C}$.
+		\item $\rank[A - \lambda I | B] = n $ for all $\lambda \in \mathbb{C}$ eigenvalue of $A$. 
+	\end{enumerate}
+\end{theorem}
+\begin{proof}
+\quad\\
+\textbf{ad1:} $2 \Leftrightarrow 3$: clear. \\
+\textbf{ad2:} $1 \Leftrightarrow 2$: \\
+"$\Rightarrow$": Argue by contradiction, assuming 2. doesn't hold, i.e., 
+\begin{align*}
+	\rank[B|\dots|A^{n -1}B] \neq n.
+\end{align*}
+w.t.s. $(A, B)$ is not controllable. 
+By assumption there exists $p \in (\ran[A - I\lambda])^\perp $, such that, 
+\begin{align*}
+	\langle \lambda , p \rangle = \langle p, A \rangle , \quad \langle p, B \rangle = 0. 
+\end{align*}
+It follows
+\begin{align*}
+	\langle p, A^{k}B \rangle = \lambda^k \langle p, B\rangle =  0 \quad k = 0, \dots, n - 1. 
+\end{align*}
+Hence
+\begin{align*}
+	\rank [B|\dots|A^{n -1}B] \neq n.
+\end{align*}
+By Kalman we know $(A, B)$ is not controllable. 
+ \\
+"$\Leftarrow$":  Argue by contradiction, assuming $(A, B)$ is not controllable, then by the last lemma there exists transformation matrix $T$, such that $\tilde{A} = T^{-1} A T$ with 
+\begin{align*}
+	\tilde{A} = 
+	\begin{bmatrix}
+		A_1 & A_2\\
+		0 & A_3
+	\end{bmatrix}
+	\quad 
+	B = 
+	\begin{bmatrix}
+		B_1\\
+		0
+	\end{bmatrix}.
+\end{align*} 
+choose $(\lambda, v)$ the eigenpair of $A_3^T$ and set $w:= (0, v)^T \in \mathbb{R}^n$, it holds
+\begin{align*}
+	\langle w, \lambda I - \tilde{A} \rangle  = \lambda w - w A_3^T = 0\\
+	\langle w, B \rangle = 0  
+\end{align*}
+Hence
+\begin{align*}
+	&w \in \ran ([\lambda I - \tilde{A}|B])^\perp, \\
+	\Rightarrow & \rank ([\lambda I - \tilde{A}|B]) \lneqq n . 
+\end{align*}
+\end{proof}
+
+
+
+
+
+\subsubsection{Controllability with control constraints $U$.}
+Now we consider the case where $U$ is only a subset of $\mathbb{R}^m$ and derive the condition for controllability. First we define the $U$ reachable set and $U$-controllability:
+
+\begin{definition}[$U$-controllable state and $U$-controllable pair]
+Define the $U$-controllable set
+\begin{align*}
+	\mathcal{R}_U := \cup_{t \ge 0} \mathcal{R}_U(t), \text{ with } \mathcal{R}_U(t):= \{ x(t, 0, u): \quad u :[0, t] \rightarrow U\}.
+\end{align*}
+We say the linear time-optimal control system admits a $U$-controllable pair $(A, B)$ if 
+\begin{align*}
+	\mathcal{R}_U = \mathbb{R}^n. 
+\end{align*}
+\end{definition}
+\begin{remark}
+Notice that if we impose the control constraints, the reachability set may not be time-invariant anymore. 	
+\end{remark}
+
+Main result of the subsection is to derive the necessary and sufficient condition of $U$-controllability. To prove this, we introduce several lemmata, 
+
+\begin{lemma}[algebraic characterisation of $U$-reachable set]
+	The $U$-reachable set is \textbf{continuously compounding}
+	\begin{enumerate}
+		\item $\mathcal{R}_U(t) + e^{t A} \mathcal{R}_U(s) = \mathcal{R}_U(s + t)$. 
+		\item $\mathcal{R}_U(qt) = \mathcal{R}_U(t) + e^{tA}\mathcal{R}_U(t) + \dots + e^{(q - 1)tA} \mathcal{R}_U(t)$. 
+	\end{enumerate}
+\end{lemma}
+\begin{proof}
+	\quad\\
+	1. treating $\mathcal{R}_U(s)$ as the initial states, by the formula of the linear system we get 1. \\
+	2. By induction. 
+\end{proof}
+\begin{remark}[Question]
+	Does the algebraic property of $U = \mathbb{R}^n$ still holds? 
+\end{remark}
+
+\begin{lemma}[topologicel property of $U$-reachable set]
+\quad
+	\begin{enumerate}
+		\item \textbf{convexity: }If $U$ is convex, then $\forall t : \mathcal{R}_U(t)$ is convex. Moreover, if $0 \in U$, then $\mathcal{R}_U$ is convex. 
+		\item \textbf{openness: }If $(A, B)$ is controllable and $U \subset \mathbb{R}^n$ is a neighbourhood of 0, then $\mathcal{R}_U$ is open. 
+	\end{enumerate}
+\end{lemma}
+\begin{remark}
+why does $0 \in U$ in 1. Answer: it's a sufficient condition. 
+\end{remark}
+
+
+\begin{proof}
+	\quad\\
+	\textbf{1.} By continuity of the linear operator $A[t](u):= \int_0^t e^{t - s} B u(s) ds$. If 0 is contained, the convex inclusion is closed. \\
+	\textbf{2.} \textbf{ad1: $\mathcal{R}_U$ contains a neighbourhood of $0$ (arbitrarily small) in $\mathbb{R}^n$}. \par 
+	First, $0 \in U$, therefore $0 \in \mathcal{R}_U$. \par 
+	Second, since $(A, B)$ is controllable, there exists $u_i$, $i= 1, \dots, n$, such that for all $t > 0$:
+	\begin{align*}
+		\{x(t;0,u_i) \}_{i = 1, \dots, n} \text{ form a basis of $\mathbb{R}^n$.}
+	\end{align*}
+	Since $U$ contains a neighbourhood of $0$ we can contracting the basis to make it contain in $U$. By the linearity of $x(t;0, u)$ w.r.t. $u$, for any $x \in B_\epsilon(0)$ for $\epsilon$ small, we can find a $u$ to reach $x$. \\
+	\textbf{ad2: $\mathcal{R}_U$ is open:} By \textbf{ad1} assume $V \subset \mathcal{R}_U$ is a open neighbourhood of $0$. Fix $\hat{t}$ such that 
+	\begin{align*}
+		B_\epsilon(0) \subset V \subset  \mathcal{R}_U(\hat{t}).
+	\end{align*}
+	Want to show: $\forall x \in \mathcal{R}_U$, $\mathcal{R}_U$ contains a neighbourhood of $x$. To this end we fix $x$ in reachable set at certain time and wrap it with $V$. Since $x \in \mathcal{R}_U$, there exist $t >0$, $u \in U$ such that
+	\begin{align*}
+		x = x(t; 0, u) \in \mathcal{R}_U(t)
+	\end{align*}
+	By the algebraic property of reachable set it holds
+	\begin{align*}
+		x + e^{At} \mathcal{R}_U(\hat{t}) \subset \mathcal{R}(t + \hat{t}) \subset \mathcal{R}_U. 
+	\end{align*}
+	The map $e^{At}$ is surjective therefore open and we have 
+	\begin{align*}
+		e^{At} \mathcal{R}_U(\hat{t}) \overset{open}{\subset} \mathcal{R}_U. 
+	\end{align*}
+	We proved that $\mathcal{R}_U$ contains neighbourhood of $x$. 
+\end{proof}
+
+\quad\\
+\textbf{Review on Jordan decomposition:}
+Given a square matrix $A$ in $\mathbb{R}^n$, define the \textbf{subspace}
+\begin{enumerate}
+	\item $J_{\lambda, k}:= \ker (\lambda I - A)^k $, $k \in \mathbb{N}$,
+	\item $J_{\lambda, k}^\mathbb{R} := Re \ker (\lambda I - A)^k$, $k \in \mathbb{N}$, 
+	\item $J_{\lambda, 0}:= \ker (\lambda I - A)^0 = \ker E_n = \{0\}. $
+\end{enumerate}
+Define 
+\begin{align*}
+	& L:= \sum_{ Re\lambda > 0, k \in \mathbb{N}_0} J_{\lambda, k}^{\mathbb{R}}.\\
+	& M:= \sum_{ Re\lambda < 0, k \in \mathbb{N}_0} J_{\lambda, k}^{\mathbb{R}}.
+\end{align*}
+\begin{remark}
+$L$ and $M$ are defined as \textbf{sum} not \textbf{union} of the \textbf{subspace}.	
+\end{remark}
+
+\quad\\
+It holds by the Jordan decomposition: 
+\begin{align*}
+	\mathbb{R}^n = L \oplus M. 
+\end{align*}
+
+\begin{lemma}[]
+	Given $C \subset \mathbb{R}^n$ open and convex, $L \subset C$ \textbf{subspace}, it holds
+	\begin{align*}
+		C + L = C. 
+	\end{align*}
+\end{lemma}
+\begin{proof}
+\quad\\
+"$\supseteq$":Trivial. \\
+"$\subseteq$": Given $c \in C, l \in L$, observe
+\begin{align*}
+	\frac{1}{1 + \epsilon} \underbrace{ (1 + \epsilon) c}_{\in C  } + \frac{\epsilon}{1 + \epsilon} \underbrace{(\frac{1 + \epsilon}{\epsilon})l}_{ \in L \subset C } . 
+\end{align*}
+By the convexity of $C$ the statement holds.
+\end{proof}
+
+
+\begin{lemma}
+	If $(A, B)$ is controllable and $U$  and contains a neighbourhood of $0$, then it holds for $\lambda = \alpha + i \beta$ with $\alpha > 0$,
+	\begin{align*}
+		J_{\lambda, k}^{\mathbb{R}} \subseteq \mathcal{R}_U \quad \forall k \in \mathbb{N}_0.
+	\end{align*}
+\end{lemma}
+\begin{remark}
+Is $(A, B)$ controllable really necessary in this lemma? Yes, since $U$ contains a 0-neighbourhood is not enough to guarantee $\mathcal{R}_U$ contains a 0-neighbourhood.  	
+\end{remark}
+
+\begin{proof}
+	Prove by induction, $J_{\lambda, 0} = \{0\} \in \mathcal{R}_U$ is trivial since $0 \in U$. Now assume $J_{\lambda, k - 1} \in \mathcal{R}_U$, want to show for $\tilde{v}_1 \in J_{\lambda, k}$, it holds $\tilde{v}_1 \in \mathcal{R}_U$. \\
+	\textbf{ad1:}  w.o.l.g. we can consider $\lambda$ with only real part, since we can choose $t$ such that 
+	\begin{align*}
+		e^{\lambda tj} = e^{\alpha tj } \quad \forall j \in \mathbb{N}_0.  
+	\end{align*}
+	(This could be achieve by choosing $t = \frac{2\pi}{\beta}$). \\
+	Since $U$ contains a neighbourhood of $0$ and $(A, B)$ is controllable, $\mathcal{R}_U$ contains a neighbourhood of $0$,  contracting $\tilde{v}_1$ by the scalar $\delta$ such that
+	\begin{align*}
+		v_1 := \delta \tilde{v}_1 \in B_\delta (0) \subseteq \mathcal{R}_U(t).  
+	\end{align*}
+	Since we are working in the 0-neighbourhood of $U$ we may w.l.o.g. assume $U$ to be convex  \\
+	\textbf{ad 2:}
+	Want to find a scaling factor $p$ \textbf{large enough} such that $|q v_1| \ge |\tilde{v}_1|$( $q \ge \frac{1}{\delta}$)  and $q v_1 \in \mathcal{R}_U$. We use the exponential function to decompose the Jordan-block:
+	\begin{align*}
+		e^{(A - \lambda I)s} v_1 = (I + s (A - \lambda I) +  \dots +  \frac{ s^l (A - \lambda I)^l}{l!} +  \dots ) v_1 = v_1 +  w_1 \text{ with } w_1 \in J_{\lambda, k -1}. 
+	\end{align*}
+	(since $(A - \lambda I)^l v_1$ vanishes for $l \ge k$). Therefore
+	\begin{align*}
+		v_1 &= e^{(A - \lambda I)s} v_1 - w_1\\
+		e^{\lambda s}v_1 &= e^{A s}v_1 - e^{\lambda s }w_1\\
+		e^{\alpha s }v_1 &= e^{A s}v_1 - e^{\alpha s }w_1. 
+	\end{align*}
+	 Choosing $s = jt$ for $j = \mathbb{N}_0$ as in  \textbf{ad 1.}
+	\begin{align*}
+		e^{\alpha jt } v_1 = e^{Ajt}v_1 - e^{\alpha jt}w_1,
+	\end{align*}
+	Since $\alpha$ is positive, all the exponential scalar is greater than 1. We get
+	\begin{align*}
+		\bigg(\sum_{j = 0}^{q - 1} e^{\alpha jt}\bigg) v_1 = \bigg( \sum_{j = 0}^{ q- 1} e^{A j t}\bigg) v_1 + \bigg(\sum_{j = 0}^{q - 1} e^{\alpha jts}\bigg) w_1 \in \mathcal{R}_U(qt) + J_{\lambda, k -1}
+	\end{align*}
+	The first part on the RHS belongs to $R_U(qt)$ by the algebraic property of the reachable set. The second part of the RHS belongs to $\mathcal{R}_U$ since $J_{k - 1, \lambda}$ is a subspace. Hence by the last geometrical lemma the LHS belongs to $\mathcal{R}_U$. 
+	\begin{align*}
+		q v_1 \le \underbrace{(\sum_{k = 0}^{ q - 1} e^{\alpha j kt})}_{:= p}v_1 \in \mathcal{R}_U(t). 
+	\end{align*}
+	Since $0 \in \mathcal{R}_U$, by convexity of the neighbourhood and openness of $U$:  
+	\begin{align*}
+		|p \delta \tilde{v_1}| \ge |\frac{1}{\delta} \delta \tilde{ v_1}| = |\tilde{v_1}|,
+	\end{align*}
+	hence
+	\begin{align*}
+		\tilde{v_1} \in [0, pv_1] \Rightarrow \tilde{v_1} \in \mathcal{R}_U. 
+	\end{align*}
+\end{proof}
+
+\begin{corollary}
+	If $(A, B)$ is controllable, $U$ convex and contains a neighbourhood of $0$, then $L \subset \mathcal{R}_U$. 
+\end{corollary}
+\begin{proof}
+	By the last decomposition lemma it holds: since $U$ convex with $0 \in U$,  the subspaces $J_{\lambda, k}$ with positive real $\lambda$ satisfies
+	\begin{align*}
+		J_{\lambda, k} \subset \mathcal{R}_U \quad \forall k \in \mathbb{N}. 
+	\end{align*}
+	Moreover since $U$ convex with $0 \in U$ and $(A, B)$ controllable, it holds $\mathcal{R}_U$ is convex and open, hence the sum remains in $\mathcal{R}_U$, it holds
+	\begin{align*}
+		L \subseteq \mathcal{R}_U. 
+	\end{align*}
+\end{proof}
+
+
+
+\begin{lemma}[decomposition of $\mathcal{R}_U$]
+Let $(A, B)$ be controllable, $U \subset \mathbb{R}^m$ a \textbf{convex and bounded} neighbourhood of 0, then there exist set $B$ \textbf{convex, relatively open in $M$,  and bounded} such that
+	\begin{align*}
+		& \mathcal{R}_U:= L + B 
+	\end{align*}
+\end{lemma}
+\begin{proof}
+\quad\\
+\textbf{ad 1: } w.t.s. $\mathcal{R}_U = L + \mathcal{R}_U \cap M$. \\
+"$\subseteq$": Given $x \in \mathcal{R}_U$ written as $x = l + m$ with $l \in L, m \in M$, w.r.t. $m \in \mathcal{R}_U$, indeed, 
+\begin{align*}
+	m = x - l \in \mathcal{R}_U + L \subset \mathcal{R}_U.
+\end{align*}
+\textbf{ad 2: $B$ in convex, relatively open in $M$}. True since $M$ subspace orthogonal to $L$, $\mathcal{R}_U$ convex and open. \\
+\textbf{ad 3: $B$ is bounded:}   
+\end{proof}
+
+With the lemmata above we finally prove the theorem: 
+\begin{theorem}
+	Given $U$ a convex bounded neighbourhood of $0$, then it holds
+	\begin{align*}
+		(A, B) \text{is $U$-controllable.} \Leftrightarrow  \quad \forall \lambda \text{ EV of $A$: } \text{Re} \lambda \ge 0  \text{ $\wedge$ }(A, B) \text{ is controllable. }
+	\end{align*}
+\end{theorem} 
+\begin{proof}
+	\quad\\
+	$\Rightarrow$: ad 1: $(A, B)$ is $U$-controllable, $U \subset \mathbb{R}^m$ $\Rightarrow$ $(A, B)$ is controllable. \\
+	ad 2: Assuming $A$ admits EV of negative real, by assumption that $U$ is a convex and bounded neighbourhood of $0$ and 
+\end{proof}
+
+
+
+\subsection{Bang-Bang control and linear systems}
+\begin{enumerate}
+	\item $\mathcal{U}_t:= C^0_{PW}([0, t], [-1, 1]^m)$, $S_1 = \{x_1\}.$ 
+	\item $(A, b_i)$ is controllable for all $i = 1, \dots, m$, where $b_i$ the column vector of $B$. 
+	\item $A$ admits no eigenvalue with negative real. 
+\end{enumerate}
+
+
+
+
+
+\subsubsection{Weak Bang-bang Principle}
+Weaken the assumption by
+\begin{enumerate}
+	\item $\mathcal{U}_t:= L^\infty([0, t], U)$ with $U$ compact and convex. 
+\end{enumerate}
+Denote 
+\begin{align*}
+	& U^{ext}:= \{\text{ extremal points of $U$ }\}\\
+	& \mathcal{U}_t^{ext}:= L^\infty([0, t], U^{ext})
+\end{align*}
+
+\begin{lemma}[Krein-Milman]
+	Let $K \subseteq \mathbb{R}^n$ be compact and convex, it holds
+	\begin{align*}
+		K = \overline{co}\{K^{ext}\}. 
+	\end{align*}
+\end{lemma}
+
+\begin{theorem}
+	It holds
+	\begin{align*}
+		\mathcal{R}_U(t) = \mathcal{R}_U^{ext}(t).
+	\end{align*}
+\end{theorem}
+
+\begin{corollary}[the weak bang-bang principle]
+	If $U$ is convex and compact, then for the time-optimal control problem, there exist an optimal control $u^*$ such that 
+	\begin{align*}
+		u^* \in \mathcal{U}^{ext}_t. 
+	\end{align*}
+\end{corollary}
+
+
+
+\subsection{Existence of time-optimal controls}
+We consider the time-optimal control problem:
+\begin{align*}
+	& \min_{u \in U_{t}} \int_{t_0}^{t} 1 ds\\
+	& \dot{x} = A x + Bu\\
+	& x(t_0) = x_0\\
+	& (x(t), u) \in \{x_1\} \times  U_t\\
+	& U_t =  L^\infty([0, t], U), \quad U \subset \mathbb{R}^m 
+\end{align*}
+
+In this section we explore the condition for the time-optimal control problem to have a global minimizer. 
+\begin{remark}
+\quad
+\begin{enumerate}
+	\item The result can be extended to the optimal control problem of Mayer's form with continuous cost function, fixed terminal time, free terminal condition. 
+\end{enumerate}
+\end{remark}
+
+
+\begin{theorem}[Fillippov]
+	Given $x_0 \in \mathbb{R}^n$, assuming 
+	\begin{enumerate}
+		\item $\forall u \in U_t:$ the nonlinear control system admits a realisable $x(t)$. 
+		\item $\forall (t, x): \bigg\{f(t, x, u): u \in U \bigg\}$ is compact and convex. 
+	\end{enumerate}
+	Then it holds
+	\begin{align*}
+		\forall t \in [t_0, t_f]: \mathcal{R}_U^{x_0}(t) \text{ is compact.}
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	 \quad\\
+	 \textbf{Existence of realisable control:}\\
+	 \textbf{ad 1:} Choose a sequence $x_n:= x(t; x_0, u_n)$, w.t.s. 
+	 \begin{align*}
+	 	x_n \rightarrow x \quad \text{ in } \mathcal{C}([t_0, t_f], \mathbb{R}^n) \text{ for some $x$. }
+	 \end{align*} 
+	 Existence of $x_n$ is guaranteed by the assumption, since $\{f(t, x, u): u \in U\}$ is compact hence bounded, $x_n$ is uniformly Lipschitz continuous and uniformly bounded. By Arzela-Ascoli the strong limit exists. \\
+	 \textbf{ad 2:} Since $f$ is continuous every $t \in [t_0, t_f]$ is a Lebesgue point and $\{ f(t, x, u)|u \in U\}$ convex, it holds
+	 \begin{align*}
+	 	\frac{1}{\epsilon}(x(t + \epsilon) - x(t)) &= \frac{1§}{\epsilon} \int_t^{t+ \epsilon} f(s, u(s), x(s)) ds, \\
+	 	&= \overline{\text{co}} \bigcup_{ \tau \in  B_\epsilon(t)} \{f (\tau, u(\tau), x(\tau)) \}. 
+	 \end{align*}
+	 converges, hence the limit is realisable.\\
+	 \textbf{ad 3:} Use measurable selection to prove there exists a $u \in L^\infty([t_0, t_f], U)$. \\
+	 \textbf{Compact reachable set.}\\
+	 Fix $t$, we observe every bounded realisable $x_n(t)$ admits a convergent subsequence. 
+\end{proof}
+
+
+\begin{theorem}
+	Given $x_0, x_1 \in \mathbb{R}^n$ with $x_1 \in \mathcal{R}_U^{x_0}(t)$ for \textbf{some} $t \ge t_0$. $U \subset \mathbb{R}^n$ convex and compact. Then there exits a time-optimal control $u \in U_t$. 
+\end{theorem}
+\begin{proof}
+	Since the infimizing sequence always exists, there exists 
+	\begin{align*}
+		t_k \downarrow t^*,
+	\end{align*}
+	where $t^*$ is the infimum of the time-optimal control problem. It holds that 
+	\begin{align*}
+		x_1 \in \mathcal{R}_U^{x_0}(t_k),
+	\end{align*}
+	i.e., there exists some $u_k \in U_{t_k}$, such that
+	\begin{align*}
+		x_1 = e^{A(t_k - t_0)}x_0 + \int_{t_0}^{t_k} e^{A(t_k - s)} Bu_k(s) ds 
+	\end{align*}
+	The objective is to show the infimum is indeed a minimum, i.e., $x_1 \in \mathcal{R}_U^{x_0}(t^*)$. Define
+	\begin{align*}
+		x_k:= x(t^*; x_0, u_k) \in \mathcal{R}_U^{x_0}(t^*)
+	\end{align*}
+	We have
+	\begin{align*}
+		|x_1 - x_k| = |e^{A(t^* - t_0)}x_0(e^{A \epsilon_k} - I) + \int_0^{\epsilon_k} e^{A(t_k - s)} Bu_k(t^* + s)ds| \overset{\epsilon \rightarrow 0 }{\longrightarrow} 0 .
+	\end{align*}
+	By theorem Fillippov $\mathcal{R}^{x_0}_U(t^*)$ is compact in $\mathbb{R}^n$ hence closed, therefore $x_1 \in \mathcal{R}_U^{x_0}(t^*)$. 
+\end{proof}
+
+
+
+\section{The Hamilton-Jacobi-Bellmann Equation}
+\subsection{Dynamic Programming}
+Assuming $X = \mathbb{R}^{n_X}, U = \mathbb{R}^{n_U}, T = \mathbb{R}^{n_T}$, with $M, N, T$ integers. Observe the problem
+\begin{align*}
+	\tag{$P_D$}
+	& \min_{u \in U} J(u):= \int_{t_0}^{t_1} L(t, x, u)dt + K(x(t_1)). \\
+	&\text{s.t.}\\
+	& \dot{x} = f(t, x, u)\\
+	& (t_f, x(t_f)) \in S\\
+	& u \in U
+\end{align*}
+
+The naive iteration over all the possible outcome of $J$ is as following: starting from  $x_0$, the number of all possible outcomes is $(n_U)^{n_T}$. For each possible trajectory we need again $n_T$ addition hence the cost is roughly
+\begin{align*}
+	\mathcal{O} \bigg( (n_U)^{n_T} n_T \bigg).
+\end{align*}
+
+The idea of dynamic programming runs backwards: choose $x_T$ at terminal time $T$ arbitrary, the terminal cost is then known. At the time $k + 1$, we compute and compute the backward jump at time $k$ such that the cost is minimized. Repeat the procedure till we reach an initial point $x_0$. The claim is that each of the policy generated is optimal. The computation cost is roughly:
+\begin{align*}
+	\mathcal{O}\bigg( n_X \cdot  n_U \cdot n_T \bigg).
+\end{align*}
+
+The \textbf{curse of dimensionality} states, when the state space $X$ is large, the computation is still formidable.\par 
+\quad\par 
+Now return to the continuous setting, define the optimal value function:
+\begin{align*}
+	V(t, u):= \inf_{u \in U|_{[t, t_1]}} J(t, x, u),
+\end{align*}
+(the infimum could be replaced by minimum upon existence of minimizer). Notice the value function satisfies the boundary condition:
+\begin{align*}
+	V(t_1, x) = K(x(t)).
+\end{align*}
+The principle of optimality implies the following decomposition: 
+\begin{align*}
+	V(t, x) = \bar{V}(t, x) := \inf_{u \in U|_{[t, \Delta t]}} \bigg( \int_{t}^{t + \Delta t} L(s, x, u) ds + V(t + \Delta t, x(t + \Delta t)) \bigg)
+\end{align*}
+The proof is an exercise of definition of infimum. We transformed the global problem to a local problem. Observe the first-order Taylor expansion on the right-hand side:
+\begin{align*}
+	V(t, x) = \bar{V}(t, x) = &\inf \bigg(L(t, x, u) \Delta t +   \\ &V(t, x) + \Delta t V_t(t, x) + \Delta t \langle V_x(t, x),  f(t, x) \rangle \bigg)  
+\end{align*} 
+We have the \textbf{Hamiltonian-Jacobi-Bellman Equation}:
+\begin{align*}
+	-V_t(t, x^*) &= \inf_{u \in U} \bigg(L + \langle V_x , f \rangle\bigg)\\
+	&=  H(t, u^*, x^*, - V_x).
+\end{align*}
+
+\begin{theorem}
+	Consider $(P_D)$, suppose that $C^1$ function $V: [t_0, t_1] \times \mathbb{R}^{n_x} \rightarrow \mathbb{R} $ satisfies
+	\begin{align*}
+		-V_t = \inf_{u \in U} \bigg\{L + \langle \nabla V, f \rangle_{\mathbb{R}^{n_x}} \bigg\},
+	\end{align*}
+	with the boundary condition
+	\begin{align*}
+		V(t_1, x) = K(x). 
+	\end{align*}
+	Then there exists a optimal control $u^*$ such that the minimum is attained and we have
+	that
+	\begin{align*}
+		H|_*(t, x, u, - \nabla V) = \max_u H(t, x, u, -\nabla V ). 
+	\end{align*}
+\end{theorem} 
+
+\subsection{Open-loop vs. Closed loop}
+
+
+\section{Finite-Horizon Linear Quadratic Problems}
+The problem formulation:
+\begin{align*}
+	\tag{$P_{DL}$}
+	& \min_{u \in U} J = \int_{t_0}^{t_1} \langle x, Q(t)x\rangle  + \langle u, R(t)u \rangle dt + \langle x(t_1), M x(t_1) \rangle , \\
+	&\text{s.t.}\\
+	& \dot{x} = A(t) x + B(t)u, \\
+	& x(t_0) = x_0 \in \mathbb{R}^n
+\end{align*}
+
+
+We have
+\begin{align*}
+	u^*(t) = - R^{-1}(t) B(t)^T P(t) x^*(t),
+\end{align*}
+with $P(t)$ defined by the Riccati Equation
+\begin{align*}
+	\dot{P} = -P(t) A(t) - A^T(t) P(t) - Q(t) + P(t)B(t)R(t)^{-1} B^T(t)P(t). 
+\end{align*}
+
+
+\section{The representation formula}
+\subsection{The generalised controls}
+
+
+\section{Other: The Pontryagin maximum principle in Hilbert space}
+Observe the optimisation problem of the linear autonomous dynamic system
+\begin{align*}
+	& J(y, u) = \int_0^T f^0(s, y, u) ds \\
+	& \text{s.t.}\\
+	& \partial_t y + A y = f(t, y, u)\\
+	& (y(0), y(T)) \in S
+\end{align*}
+$\mathcal{A}$: set of all feasible pairs. \\
+$\mathcal{A}_{ad}$: set of all admissible pairs.
+
+\subsubsection*{The Assumptions}
+\textbf{(H1):}
+
+
+\begin{definition}[The Pontryagin maximum principle]
+	The pair $(\bar{y}, \bar{u})$ in the optimisation problem is said to satisfies the Pontryagin maximum principle, if there exists a \textbf{non-trivial} pair $(\psi_0, \psi) \in \mathbb{R} \times C([0, T], X^*)$ that satisfies\\
+	\textbf{(P1)}: $\psi^0 \le 0$\\
+	\textbf{(P2)}: $\psi(t) = \psi(T) e^{A^*(T - t)} + \int_t^T e^{A^*(s - t)} f_y^*(\bar{y}, \bar{u}) \psi(s) ds + \int_t^T e^{A^*(s - t)} f^0_y(\bar{y}, \bar{u}) \psi^0 ds  $ $\quad\forall_{a.e.} t \in [0, T]$\\
+	\textbf{(P3)}: $\forall (x_0, x_1) \in S: \langle \psi(0), x_0 - \bar{y}(0) \rangle - \langle \psi(T), x_1 - \bar{y}(T) \rangle \le 0$\\
+	\textbf{(P4)}: $H(t, \bar{y}, \bar{u}, \psi^0, \psi) = \max_{u \in U} H(t, \bar{y}, u, \psi^0, \psi)$
+	\\
+	with the Hamiltonian defined as
+	\begin{align*}
+		H(t, \psi_0, \psi, u, y):= \psi^0 f^0 + \int_0^t \langle \psi, f \rangle ds
+	\end{align*}
+\end{definition}
+
+\begin{theorem}[The main theorem]
+	
+\end{theorem}
+
+
+\begin{lemma}[Ekeland's variational principle]	
+\end{lemma}
+
+\begin{corollary}
+	Let the assumption in the last lemma holds, let $\epsilon >0$ and $v_0 \in V$ be such that 
+	\begin{align*}
+		F(v_0) \le \inf_{v \in V} F(v) + \epsilon
+	\end{align*}
+	then there exists $v_\epsilon$ such that 
+	\begin{align*}
+		F(v_\epsilon) \le F(v_0) \qquad d(v_\epsilon, v_0) \le \sqrt{\epsilon}
+	\end{align*}
+	and $\forall v \in V$
+	\begin{align*}
+		F(v_\epsilon) \le F(v) + \sqrt{\epsilon} d(v_\epsilon, v)
+	\end{align*}
+\end{corollary}
+
+
+\subsection{Regarding the finite codimensionality}
+
+\subsubsection*{Proof of the Pontryagin maximum principle}
+
+
+
+
+\subsection{The Controllability}
+In this section we consider the following type of optimization problems:
+\begin{align*}
+\textbf{(P1)} \quad
+	&\min_{t_f, u \in U} \int_0^{t_f} 1 dt \\ 
+	& x_t + Ax = Bu\\
+	& x(0) = x_0
+\end{align*}
+
+\begin{definition}
+	The linear time-varing system is called controllable, if $\forall (x_0, x_1) \in  $
+\end{definition}
+
+The definition of controllability is essentially the surjectivity of the operator map $ F:u \rightarrow (x_0, x_1)$. Recall in the functional analysis, an operator is surjective iff its dual is surjective
+
+
+\subsection*{An integral criterion for the controllability}
+
+\begin{definition}[resolvent]
+\end{definition}
+
+\begin{theorem}[Duhamel's principle]
+\end{theorem}
+
+\begin{definition}[The controllable Gramian]
+\end{definition}
+
+\begin{theorem}[1. controllability condition]
+\end{theorem}
+
+We will show that the observability implies the controllability. And the Kalman condition is equivalent to the controllability
+
+\begin{theorem}[The Kalman's rank condition]
+Cosider the adjoint system:
+\begin{align}
+	-\varphi' + A^* \varphi &= 0\\
+	\varphi(T) &= \varphi^1
+\end{align}	The problem \textbf{(P1)} is controllable if and only if there exists a positive constant $C(T)$ such that
+\begin{align}
+	\varphi^1 \le \int_0^T | B^*|
+\end{align} 
+\end{theorem}
+
+
+\subsection{The transport equation}
+Observe the transport equation:
+\begin{equation*}
+\textbf{(TE)}
+	\left\{
+	\begin{aligned}
+		&y_t + y_x = 0 \quad \text{on } \Omega \\
+		&y(0, x) = y_0 \quad y_0 \in L^2(0, L)\\
+		&y(t, 0) = u(t) \quad u(t) \in L^2(0, T)
+	\end{aligned}
+	\right.
+\end{equation*}
+
+
+\begin{definition}[controllable and null controllable]
+	The system \textbf{(TE)} is \textbf{controllable in $T$} if 
+	\begin{align*}
+		\forall y_0 \in L^2(0, L) \forall y_1 \in L^2(0, L) \exists u \in L^2(0, T):\quad  y(T,\cdot) = y_1
+	\end{align*} 
+	The system is \textbf{null controllable in time $T$} if 
+	\begin{align*}
+		\forall y_0 \in L^2(0, L) \exists u \in L^2(0, T):\quad  y(T,\cdot) = 0
+	\end{align*}
+\end{definition}
+
+
+\begin{theorem}
+	The transport equation is controllable in time $T$ iff
+	\begin{align*}
+		T \geq L
+	\end{align*}
+\end{theorem}
+
+\subsubsection*{The extension method}
+\begin{lemma}
+	The system is controllable in time $T$ iff it's \textbf{null} controllable in time $T$. 
+\end{lemma}
+\begin{proof}
+	First we prove given the \textbf{Assumption (A1)}:
+	\begin{align*}
+		\forall y^1 \in L^2(0, L) \exists \bar{y}^0 \in L^2(0, L): \text{ there exists a $\bar{u}$ that steer the dynamic system from $\bar{y}^0$ to $y^1$ }
+	\end{align*}
+	null controllable implies controllable. Indeed, by the assumption we have
+	\begin{align*}
+		& \bar{y}_t + \bar{y}_t = 0\\
+		& \bar{y}(0, x) = \bar{y}^0 \\
+		& \bar{y}(t, 0) = \bar{u}\\
+		s.t.\\
+		& \bar{y}(T, x) = y^1
+	\end{align*}
+	By the null controllability, any initial condition in the dynamic system could be steer to $0$, we define for arbitrary initial condition $y^0 \in L^2(0, L)$ the modified initial condition 
+	\begin{align*}
+		\tilde{y}^0 = y^0 - \bar{y}_0 \in L^2(0, L)
+	\end{align*}
+	that is steer by some control $\tilde{u}$ to $0$
+	\begin{align*}
+		& \tilde{y}_t + \tilde{y}_x = 0\\
+		& \tilde{y}(0, x) = \tilde{y}^0\\
+		& \tilde{y}(t, 0) = \tilde{u}\\
+		s.t.\\
+		& \tilde{y}(T, x) = 0
+	\end{align*}
+	Define $y = \tilde{y} + \bar{y}$, by the superposition principle we know $y(T, x) = y^1$. \\
+	Now we prove the assumption:
+	Observe the feedback system:
+	\begin{align*}
+		& z_x + z_t = 0\\
+		& z(t, 0) = 0\\
+		& z(0, x) = y^1(L - x)
+	\end{align*}
+	and define for $y^1 \in L^2(0, L)$ 
+	\begin{align*}
+		& \bar{y}^0 := z(T, L - x)\\
+		& \bar{u} = z(T - t, L)
+	\end{align*}
+\end{proof}
+
+
+\begin{lemma}
+	The transport equation is controllable iff the optimal control map
+	\begin{align*}
+		\mathcal{F}_T: L^2(0, T) &\rightarrow L^2(0, L) \\
+		u &\mapsto y(T, \cdot)
+	\end{align*}
+	is onto
+\end{lemma}
+\end{document}
