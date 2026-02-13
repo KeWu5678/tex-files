@@ -119,6 +119,7 @@ bindingoffset=0mm, top=10mm,bottom=5mm}
 \newcommand{\R}{\mathbb{R}}
 \newcommand{\Rn}{\mathbb{R}^n}
 \newcommand{\xkone}{\ensuremath{x_{k+1}}}
+\newcommand{\ci}{\le_\mathcal{K}}
 % \xk is sometimes defined by packages; define/override safely
 \makeatletter
 \@ifundefined{xk}{%
@@ -278,23 +279,99 @@ The local modal relies on the hessian (or the qusai-Hessian). If the Hessian is 
 
 
 \newpage
-\section{Convex Constraint Optimization}
+\section{Constraint qualification}
+The problem under consideration is 
+\begin{equation}
+	\left\{
+	\begin{aligned}
+	&\min_{x \in \mathbb{R}^n} f(x)\\
+	&\texttt{s.t.}\\
+	&g_i(x) = 0 \quad i \in \mathcal{E},\\
+	&h_i(x) \le 0 \quad i \in \mathcal{I}. 
+\end{aligned}
+\tag{NLP}
+\label{NLP}
+\right.
+\end{equation}
+The objective function $f$, $c_i$, $i \in \mathcal{E} \cup \mathcal{I}$ are assumed to be smooth. 
+
 \begin{definition}[feasible set]
 \end{definition}
 
 Given a point $x \in M$, where $M$ is a star-shaped domain. The structure of the tangent cone can be written as the closure of a cone. It describe the feasible direction of a given point. 
 \begin{definition}[tangent cone]
+	Given $M \subset \Rn, x \in M$, the $u$ is a tagent vector of $x$ in $M$ if 
+	\begin{equation}
+		\exists \lambda_n \rightarrow \infty, x_n \rightarrow x: \lim_n \lambda_n (x_n - x) \rightarrow u
+	\end{equation} 
+	The tagent cone is defined as 
+	\[
+	T(x)_M:= \{u \in \Rn: u \text{ is tagent vector} \}
+	\]
 \end{definition}
 
-With Taylor we can linearize the objective function and constraints to get an alternative (linearized) form of the feasible direction: 
-\begin{definition}[linearized feasible directions]
+The tangent cone defines the feasible direction, we can prove for the differentiable function, it can be used as test function for optimality.
+
+\begin{theorem}[1st order NOC for differentiable function with tangent cone]
+	For $f \in C^1(M, N)$, if $x$ is a minimizer of $f$, then it holds
+	\begin{equation}
+		\langle \nabla F(x), d \rangle \ge 0 \quad \forall d \in T_M(x).
+	\end{equation}
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+The tangent cone is not easy to calculate, observe the the manifold defined by the (in)equality: 
+\[
+M: = \{ x \in \Rn: G_i(x) = 0 \quad 1 \le i \le p ;\quad G_i(x)\le 0 \quad \forall p < i \le m\} 
+\]
+There is one easier way to charaterized the feasible direction, where we just linearize the constraints and compute the cone:  
+
+\begin{definition}[linearized constraints and linearized cone]
+	Given $M$ as above, we define the \textbf{linearized constraints} as: 
+	\begin{equation}
+		M_L:= \{ y \in \Rn : G(x) + J_G(x) (y - x) \ci 0 \}
+	\end{equation}
+	For $\mathcal{K}$ is the positive real space we can just replace $\ci$ by $\le$. Furthermore we define the linearized cone:
+	\begin{equation}
+		L_M(x):= \{ \lambda (y - x) : \lambda \ge 0, y \in M_L \},
+	\end{equation}
+\end{definition}
+\begin{remark}
+	The tangent space of the linearized constraints contains the linearized cone:
+	\begin{equation*}
+		L_M(x) \subset T_{M_L}(x)
+	\end{equation*}
+\end{remark}
+More importantly, for the (in)equality constraints, we can express the linearized cone simply be the linearization:
+\begin{equation}
+	L_M(x):= \{ p \in \Rn | \nabla G_j(x)^Tp = 0 \quad \forall j ; \quad \nabla H_i(x)^T p \le 0 \quad \forall i \in A(x) \} 
+\end{equation}
+
+
+The question needs to be asked is the relation between the linearized cone and the tangent cone. One can show for the 
+general NLP setting, the tangent cone is always contained in the linearized cone. However the opposite diretion does not hold. \par   
+We need to specify the \textbf{conditions}, such that we can have
+\[
+L_M(x) = T_M(x)
+.\]
+
+\begin{definition}[the Robinson condition]
 \end{definition}
 
-However, this only holds if the linearized structure really capture the geometric structure around the feasible set: 
+\begin{definition}[MFCQ]
+\end{definition}
 
 
 \section{Equality Constrained Optimization}
-\subsection{the constraints qualification}
+We observe the optimization problem
+\begin{equation}
+	\begin{aligned}
+		& \min_x F(x)\\
+		&\text{s.t.}\\
+		& G(x) = 0
+	\end{aligned}\tag{PEQ}\label{eq:PEQ}
+\end{equation}
 
 
 \subsection{the optimality condition}
@@ -303,13 +380,13 @@ However, this only holds if the linearized structure really capture the geometri
 
 \begin{definition}[Regular Point]
 	Given $X \subset \mathbb{R}^n$ open and $f \in C^1 (X, \mathbb{R}^m)$. A point $x \in X$ is a \textit{regular point} if 
-	\begin{equation}
+	\begin{equation*}
 		D f(x)  \text{ surjective}
-	\end{equation}
+	\end{equation*}
 	and $y = f(x)$ is a \textit{regular value} is 
-	\begin{equation}
+	\begin{equation*}
 		f^{-1}(y) \text{ consists of regular point}
-	\end{equation}
+	\end{equation*}
 \end{definition}
 
 \begin{theorem}[the regular value theorem]
@@ -333,19 +410,19 @@ However, this only holds if the linearized structure really capture the geometri
 
 \begin{definition}[Tangent space in $\mathbb{R}^n$]
 	Given $X \subset \mathbb{R}^n$ open, the tangent space $T_pX = \{p\} \times \mathbb{R}^n$ is the linear space equipped with the induced Hilbert structure:
-	\begin{equation}
+	\begin{equation*}
 	\begin{aligned}
 		& (p, v) + \lambda (p, w) = (p, v + \lambda w)\\
 		& \langle(p, v), (p, w) \rangle = \langle v, w \rangle_p
 	\end{aligned}
-	\end{equation} 
+	\end{equation*} 
 \end{definition}
 
 \begin{definition}[Tangential in $\mathbb{R}^n$]
 	Given $Y \subset \mathbb{R}^l$ open, we define the map
-	\begin{equation}
+	\begin{equation*}
 		T_p f: T_pX \rightarrow T_{f(p)} Y, \quad (p, v) \mapsto (f(p), \partial f(p) \cdot v). 
-	\end{equation}
+	\end{equation*}
 	as the \textbf{tangential} of $f$ at $p$. 
 \end{definition}
 
@@ -359,11 +436,10 @@ However, this only holds if the linearized structure really capture the geometri
 $\dim (T_p M) = n - l$. 	
 \end{remark}
 \begin{proof}
-    
 \end{proof}
 
 \begin{proposition}
-	Given $X \subset \mathbb{R}^n$ open and $c$ a regular value, $T_p M^\perp$ admits the basis
+	Given $X \subset \mathbb{R}^n$ open and $c$ a regular value of $f$ and $M = \{ x \in \Rn: x = f^{-1}(c)\}$,  $T_p M^\perp$ admits the basis
 	\begin{equation}
 		\mathcal{B} = \{ \nabla f^1(p) \dots \nabla f^l(p) \}. 
 	\end{equation}
@@ -379,9 +455,30 @@ $\dim (T_p M) = n - l$.
 \begin{remark}
 By the theorem we have
 \begin{equation}
-	\nabla F = \sum_{i = 1}^k \lambda_i \nabla h^i.
+	\nabla F(p) = \sum_{i = 1}^k \lambda_i \nabla h^i(p).
 \end{equation}	
 \end{remark}
+
+\begin{theorem}[NOC for equality constrained optimization]
+For \eqref{eq:PEQ}, if the LICQ is satisfied and $x$ is a minimizer of the problem, then there exists $\lambda \in \R^m$ such that for the Lagrange function $L$:
+\begin{enumerate}
+	\item $ L_x = 0 $,
+	\item $ L_\lambda = 0 $,
+	\item $ \langle p , L_{xx} p \rangle \ge 0 \quad \forall p \in T(x) $, where $T(x*)$ is the tangent cone of the active constraints. 
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+\begin{theorem}[SOC of the equality constrained problems]
+	Given the problem setting and the objective and constraints are $C^2$ and LICQ, if there exists $\lambda \in \R^m$, such that
+	\begin{enumerate}
+		\item $L_x ( x, \lambda) = 0 $
+		\item $\langle d, L_{xx}(x, \lambda) d \rangle \gneq 0 \quad \forall d \in T_M(x) \backslash 0,$
+	\end{enumerate}
+	then $x$ is a minimizer of the problem. 
+	
+\end{theorem}
 
 
 \subsection{the algorithms}
@@ -411,10 +508,15 @@ By the theorem we have
 
 
 \paragraph{the line-search SQP}
+\textbf{Questions}:
+\begin{enumerate}
+	\item What is the Maratos effect?
+\end{enumerate}
 
 \begin{equation}
-	\Psi_r(x) = F(x) + \sum_{i = 1}^l r_i G_i(x)
+	\Psi_r(x) = F(x) + \sum_{i = 1}^l r_i \|G_i(x)\|
 \end{equation}
+Depending on the problem, different parameter $r$ and different norm $\| \|$ can be chosen. 
 
 \begin{algorithm}
 	\begin{algorithmic}
@@ -435,20 +537,13 @@ By the theorem we have
 
 
 \newpage
-\section{Inequality Constrained Optimization}
-The problem under consideration is 
+\section{General(inequality) Constrained Optimization}
+The Lagrange function is defined as 
 \begin{equation}
-	\left\{
-	\begin{aligned}
-	&\min_{x \in \mathbb{R}^n} f(x)\\
-	&\texttt{s.t.}\\
-	&c_i(x) = 0 \quad i \in \mathcal{E},\\
-	&c_i(x) = 0 \quad i \in \mathcal{I}.
-\end{aligned}
-\right.
+	L(x, \lambda, \mu):= f(x) + \langle \lambda, G(x) \rangle + \langle \mu, H(s) 
+	rangle. 
 \end{equation}
 
-The objective function $f$, $c_i$, $i \in \mathcal{E} \cup \mathcal{I}$ are assumed to be smooth. 
 \begin{definition}[active set]
 Given a feasible point $x$, the active set $\mathcal{A}(x)$ is defined as 
 \begin{align*}
@@ -456,6 +551,48 @@ Given a feasible point $x$, the active set $\mathcal{A}(x)$ is defined as
 \end{align*}
 where $\mathcal{E}$ is the set of equality constraints and $\mathcal{I}$ the inequality constraints. 
 \end{definition}
+In the following we assume $\dim \mathcal{E} = m, \dim \mathcal{A}(x) = s, \dim \mathcal{I} = l$
+
+\subsection{The optimality condition}
+\begin{theorem}[NOC condition (KKT) under LICQ]
+	Given $x$ a feasible point that satisfies LICQ, if $x$ is a minimizer of the function $f$, then there exists $\lambda \R^m, \mu \in \R^l$, such that: 
+	\begin{enumerate}
+		\item $L_x(x, \lambda, \mu) = 0$,
+		\item $L_\lambda(x, \lambda, \mu) = 0$,
+		\item $\langle \mu, H(x) \rangle = 0, \mu \ge 0$ (complementary condition),
+	\end{enumerate}
+	which are called NOC of the 1st order. Furthermore: 
+	\begin{equation}
+		\langle L_{xx} (x, \lambda, \mu), d \rangle \ge 0 \quad \forall d \in T(x),
+	\end{equation}
+	where 
+	$T(x)$ is the tangent cone of the constraint.  
+\end{theorem}
+\begin{proof}
+\end{proof}
+\begin{remark}
+The condition 
+\[
+\langle p, L_{xx} ( x, \lambda, \mu) p \rangle > 0 \quad \forall p \in T(x)\backslash 0
+ \]
+is not sufficient due to the \textbf{weakly active set}. 
+\end{remark}
+
+\begin{theorem}[SOC of the inequality constrained problem under LICQ]
+	Given the same condition as above, if it holds
+	\begin{equation}
+		\langle p, L_{xx}(x, \lambda, \mu) p) \rangle > 0 \quad \forall p \in T^+(x),
+	\end{equation}
+	where 
+	\[
+	T^+(x, \mu):= \{ p \in \Rn: \nabla G(x)^p = 0, \nabla H_i(x)^T p = 0 \quad \forall i \in A(x) \text{ with } \mu_i > 0  \}.
+	\]
+	Then the x is an optimizer for the (ICP) problem.
+\end{theorem}
+
+\subsection{Active-set method}
+
+
 
 
 
@@ -858,6 +995,8 @@ Now we link the Robinson normal mapping condition to the proximal mapping. Obser
 
 
 
+\section{The semi-smooth Newton method}
+
 
 
 \chapter{Nonsmooth Optimization}
@@ -892,21 +1031,9 @@ We now look into the sufficient and necessary conditions of minimal points $\hat
 	\end{enumerate}
 \end{theorem}
 
-\begin{definition}[Star-shaped area]
-\end{definition}
-
-
-
-
-
-\begin{definition}[Lipschitz continuity]
-\end{definition}
-
 \begin{remark}
 Convexity implies locally Lipschitz-continuity. 	
 \end{remark}
-
-
 
 \begin{theorem}
 	Given a convex $f: D \longrightarrow \mathbb{R}^n$, $D$ is open and convex.Then we have:
@@ -928,7 +1055,7 @@ Convexity implies locally Lipschitz-continuity.
 \end{proof}
 
 \begin{theorem}
-\textbf{Given a convex function, a point is a minimum point iff 0 is included in the subdifferential:} For a convex function defined on a non-empty, open and convex set, the following arguments are equivalent:
+Given a convex function, a point is a minimum point iff 0 is included in the subdifferential: For a convex function defined on a non-empty, open and convex set, the following arguments are equivalent:
 	\begin{enumerate}
 		\item The point $\hat{x}$ is local, and therefore global minimal point on the set $D$.
 		\item $0 \in \partial f(\hat{x}))$

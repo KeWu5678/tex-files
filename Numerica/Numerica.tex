@@ -1279,52 +1279,6 @@ The symplectic Euler, adjoint symplectic Euler, St\"omer-Verlet all preserve the
 Given the $2 \times 2$ system
 
 
-\chapter{Numerical DAE}
-\section{Linear DAE with constant coefficients}
-The linear DAE with constant coefficients admits the form 
-\begin{equation}
-	A x' + B x = q(t)
-\end{equation}
-with $A, B \in \mathbb{R}^{m \times m}$, $q \in C(I, \mathbb{R}^d)$.
-\begin{definition}[regular matrix pair]
-	Suppose $A, B \in \mathbb{R}^{m \times m}$,  the matrix pair $\{A, B\}$ is regular if for $\lambda \in \mathbb{R}$:
-	\begin{align*}
-		\det (\lambda A + B) \not\equiv 0
-	\end{align*}
-	and $\{A, B\}$ is singular if $\det(\lambda A + B) \equiv 0$. 
-\end{definition}
-
-\begin{definition}[Kronecker normal form]
-\end{definition}
-
-\begin{definition}
-	A DAE with constant coefficients admits the Kronecker-index $\kappa$, if the matrix pair $\{A, B\}$ admits the Kronecker index $\kappa$. 	
-\end{definition}
-
-\begin{definition}[the consistent initial condition]
-	
-\end{definition}
-
-\begin{lemma}
-	If $\{A, B\}$ are regular, then there exits $U, V$ transformation matrix such that
-	\begin{align*}
-		UAV = \begin{bmatrix}
-			I & 0 \\
-			0 & N 
-		\end{bmatrix}
-		, 
-		\quad
-		UBV = \begin{bmatrix}
-			W & 0 \\
-			0 & I 
-		\end{bmatrix},
-	\end{align*}
-	where $N$ a nilpotent matrix and $W$ arbitrary.
-\end{lemma}
-\begin{proof}
-	
-\end{proof}
-
 
 \chapter{FEM for Elliptic Problems}
 \section*{Exam Questions}
