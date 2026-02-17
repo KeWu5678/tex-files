@@ -224,13 +224,20 @@ As introduced in the abstract, the $l^1$ penalty fail to detect the redundancy o
   
  \end{remark}
 
-\begin{lemma}[the second order estimate]
+\begin{proposition}[the second order estimate]
 	Given $\phi$ that satisfies the Assumption \ref{pen1}, if $\phi$ satisfies further Assumption \ref{pen2}, then it holds
 	\begin{enumerate}
 		\item for all $ z \in [0, \hat{z}_1]: \phi(z) \ge z - \frac{\gamma_1}{2} z^2$, 
 		\item for all $z \in [0, \hat{z}_2]: \phi(z) \le z - \frac{\gamma_2}{2}z^2$.
 	\end{enumerate} 
-\end{lemma}
+\end{proposition}
+
+By the proposition above we know any penalty satisfies Assumption \ref{pen1} and \ref{pen2} admits such upper and lower bound. 
+The function
+\begin{equation}
+	\phi_{\log, \gamma}(z) = \frac{1}{\gamma} \log ( 1 + \gamma z)
+\end{equation}
+for $\gamma > 0$ and its convex combination with the $l1$ norm will be the main function of choice for our numerical analysis. 
 
 \section{theoretical review and notations}
 Throughout the paper we denote $\Omega$ a compact subspace of $\mathbb{R}^{d + 1}$, $C(\Omega)$ the space of continuous functions and $M(\Omega)$ the space of Radon measure on $\Omega$. Without further specification, we denote $\langle \cdot, \cdot\rangle$ the dual bracket $\langle \cdot, \cdot \rangle_{M(\Omega), C(\Omega)}$. 

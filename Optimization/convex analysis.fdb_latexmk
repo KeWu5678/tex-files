@@ -1,6 +1,6 @@
 # Fdb version 4
-["pdflatex"] 1770921243.20822 "/Users/ruizhechao/Desktop/TeX/Optimization/convex analysis.tex" "convex analysis.pdf" "convex analysis" 1770921244.02798 0
-  "/Users/ruizhechao/Desktop/TeX/Optimization/convex analysis.tex" 1770921243.09392 65073 e0bc11450d1818f765c2e7e46d28b53a ""
+["pdflatex"] 1771179056.72347 "/Users/ruizhechao/Desktop/TeX/Optimization/convex analysis.tex" "convex analysis.pdf" "convex analysis" 1771179057.79695 0
+  "/Users/ruizhechao/Desktop/TeX/Optimization/convex analysis.tex" 1771179056.60804 67471 f0c81ec7e4a83bc931c38a0b3724e301 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc" 1136849721 2900 1537cc8184ad1792082cd229ecc269f4 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -215,8 +215,8 @@
   "/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1769729467 5467155 19efa205003f9ecad95fbbaa6ff24da1 ""
   "/usr/local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1769729416 3345728 596ec178b7e7c8621d5caa85ca9aeea9 ""
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
-  "convex analysis.aux" 1770921243.92897 7477 0499945fdb75c3f79aba405624c0bcf5 "pdflatex"
-  "convex analysis.tex" 1770921243.09392 65073 e0bc11450d1818f765c2e7e46d28b53a ""
+  "convex analysis.aux" 1771179057.66078 7630 7cafb4a4371652360ee06a45d91199fd "pdflatex"
+  "convex analysis.tex" 1771179056.60804 67471 f0c81ec7e4a83bc931c38a0b3724e301 ""
   (generated)
   "convex analysis.aux"
   "convex analysis.log"

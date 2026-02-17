@@ -159,6 +159,30 @@ bindingoffset=0mm, top=10mm,bottom=5mm}
 
 \begin{document}
 \chapter{Nonlinear Optimization}
+\section{Concepts}
+The convergence rate measures how fast the next iterate approaching the limit compared to the last iterate. 
+\begin{definition}
+	Given a sequence $(x_k)_k$, and for $k$ large enough,\\
+	1. The sequence converges to $x_*$ if
+	\[ \lim_k \|x_k - x_*\| \rightarrow 0 ,\]
+	2. The sequence converges \textbf{linearly} if
+	\[ \| \xkone - x_* \| \le C \| x_k - x_*\| \quad C \in [0,1 ) ,\]
+	3. The sequence converges \textbf{superlinearly} if 
+	\[ \lim_k \| \xkone - x_*\| / \|x_k - x_* \| \rightarrow 0, \]
+	4. The sequence converges \textbf{in order $p > 1$}, if 
+	\[ \|\xkone - x_*\| \le c \| x_k - x^*\| \quad c \ge 0, \]
+\end{definition}
+
+\begin{definition}[the relative \& absolute stopping criteria]
+	
+\end{definition}
+
+\begin{definition}[scaling invariant algorithm]
+	A algorithm is scaling invariant if given the objective function $F$ and iterate $x_k$, the rescaled objective 
+	function $A \cdot F$ admits the same iterate $x_k$. 
+\end{definition}
+
+
 \section{Linear Optimization}
 Observe the Linear Program \textbf{LP)}: Given $x \in \mathbb{R}^n, A \in \mathbb{R}^{n \times n}, b \in \mathbb{R}^n$, 
 \begin{align*}
@@ -168,6 +192,36 @@ Observe the Linear Program \textbf{LP)}: Given $x \in \mathbb{R}^n, A \in \mathb
 
 \section{Unconstrained line search}
 In the central of smooth optimization is the Newton method. 
+
+\begin{definition}[decent direction]
+	Given a differentiable function $F: D \rightarrow \R$ from in the real space, a vector $d$ is called a decent direction at $x \in D$ if 
+	\[\langle \nabla F (x), d \rangle \lneq 0\]
+\end{definition}
+
+For differentiable functions, the descent direction is robust against scaling, one can show: 
+
+\begin{theorem}
+	Given $F$ differentiable at $x$ and $d$ is a descent direction at $x$, then there exists $\bar{\alpha}$, such that
+	\[\langle \nabla F(x), \alpha d \rangle  \lneq 0 \quad \forall \alpha  \in (0, \bar{\alpha}] \]
+\end{theorem}
+
+A "good" descent direction should stay close to the "optimal" descent diretion: the gradient descent:
+\begin{definition}[the angle condition]
+	Given a function $F$, a descent direction $d$ if there exists $c \gneq 0$ such that:
+	\[
+	\langle \nabla F(x), d \rangle / \|\nabla F(x)\| \|d\| \le -c
+	\]
+\end{definition}
+
+The question now arises: How do we choose the step size? There are conditions that a "good" step size should satisfy: 
+1. It should achieve enough linearized descent. 
+2.  
+
+\begin{definition}[the efficient step size]
+	Given a function $F$ and a descent direction $d$ at $x$, 
+	a step size $\alpha$ is efficient if there exists $ \theta > 0$ such that
+	\[ F(x + \alpha d) \le F(x) -  \theta (\langle \nabla F(x),  \alpha d \rangle)^2 / \|d\|^2  \]
+\end{definition}
 
 \subsection{1st order method}
 
@@ -744,7 +798,7 @@ This is a powerful existence result. However, it should be noted that the Gateau
 	(On a open and convex set in $\mathbb{R}^n$ )The convex function admits every directional derivative everywhere and the directional derivative is \textbf{sublinear. }
 \end{corollary}
 
-Notice that the subgradient, it is not only defined in a neighborhood of $x$ but globally. The following theorem states, for the convex function, the relationship between the Gateau derivative and the sub-gradient exists. 
+Notice that the subgradient, it is not only defined in a neighborhood of $x$ but globally. The following theorem states, for the convex function, the relationship between the Gateau derivative and the subgradient exists. 
 
 \begin{theorem}
 The subderivative of a convex function are the vectors with dual norm smaller than that of all directional derivative, i.e., given a convex function on a open and convex subset of $\mathbb{R}^n$, $\forall x \in D$ we have:
@@ -991,386 +1045,7 @@ hence
 "$\Leftarrow$": analog.
 \end{proof}
 
-Now we link the Robinson normal mapping condition to the proximal mapping. Observe the minimization problem:
-
-
-
-\section{The semi-smooth Newton method}
-
-
-
-\chapter{Nonsmooth Optimization}
-\section{Convex optimization}
-\subsection{Directional Derivative}
-
-
-\begin{remark}
-	The function $f$ does not to be continuous.
-\end{remark}
-We need to establish a Existenzaussage about the directional derivative.
-
-
-This is a very important auxiliary function because in the convex function the distance between any two points is upper bounded by this function.\par The existence of directional derivative, the local Lipschitz continuity of convex function, the convexity of sub-differential, the equivalence of sub-differential and gradient for differentiable functions, and the equivalence of Clark derivative and directional derivative have all used this operator. 
-
-
-
-
-
-The sublinear function defined a half norm on the open set $D \subset \mathbb{R}^n$. Can we find a directional derivative, which for some $s, t \in \mathbb{R}^n$ admits strict sub-linearity?
-We now look into the sufficient and necessary conditions of minimal points $\hat{x}$. 
-
-
-\begin{theorem}[NOB]
-	Given a function: $f :D \longrightarrow \mathbb{R}$, where $D$ is open. For the minimal point $\hat{x} \in D$, we have:
-	\begin{enumerate}
-		\item the necessary conditions: $f$ admits directional derivative in every direction and it holds
-		\begin{equation}
-			f'(\hat{x}, x - \hat{x}) \geq 0,\quad \forall x \in \mathbb{R}^n	.
-		\end{equation}
-		\item The sufficient condition: $f$ is convex and satisfies the condition above.
-	\end{enumerate}
-\end{theorem}
-
-\begin{remark}
-Convexity implies locally Lipschitz-continuity. 	
-\end{remark}
-
-\begin{theorem}
-	Given a convex $f: D \longrightarrow \mathbb{R}^n$, $D$ is open and convex.Then we have:
-	\begin{enumerate}
-		\item $\forall x \in D$, the subdifferential $\partial f(x)$ is non-empty, convex, and compact.
-		\item If $f$ is Lipschitz continuous, we have: $\partial f(x) \subset U_L(x)$, and \begin{equation}
-			f'(x,s) = \max_{g \in \partial f(x)}g^\top s, \forall s \in \mathbb{R}^n
-		\end{equation}
-	\end{enumerate} 
-\end{theorem}
-
-\begin{proof}
-	The difficult part is to prove that the subdifferential is not empty for the convex function and equation (6) using the separation theorem.
-	\begin{enumerate}
-		\item $\partial f(x)$ is closed and convex:\\
-		By the definition of sub-differential we know that $M_y := \{g | f(y) - f(x) \geq g^\top(y - x) \}$ is convex for all $y$. Because the intersection of convex sets is also convex, we know the $\partial f(x)$ is convex.
-		\item  the equation is shown by separation theorem. 
-	\end{enumerate}
-\end{proof}
-
-\begin{theorem}
-Given a convex function, a point is a minimum point iff 0 is included in the subdifferential: For a convex function defined on a non-empty, open and convex set, the following arguments are equivalent:
-	\begin{enumerate}
-		\item The point $\hat{x}$ is local, and therefore global minimal point on the set $D$.
-		\item $0 \in \partial f(\hat{x}))$
-	\end{enumerate}
-\end{theorem}
-
-Here we have a generalisation of the necessary conditions of optimal points in the case of smooth function to the case of non-smooth(convex) functions.
-
-\begin{lemma}
-	The union of convex and compact sets is compact and we have:
-	\begin{equation*}
-		C = \{ \sum_{i = 1}^m \alpha_i x_i \mid x_i \in C_i, \alpha_i \geq 0, \sum_{i = 1}^m \alpha_i = 1\}
-	\end{equation*}
-\end{lemma}
-
-\begin{theorem}
-Given a family of \textcolor{red}{convex} continuous function $f_i: \mathbb{R}^n \longrightarrow \mathbb{R}$. We define the convex function:
-\begin{equation}
-	f(x) := \max_{1\leq i \leq m} f_i(x).
-\end{equation}
-$\forall x \in \mathbb{R}^n$, define $I(x)$ the set of indices, of which the function is active in the point $x$. Than we have :
-\begin{equation*}
-	f'(x, d) = \max_{i \in I(x)} f_i'(x) \quad \forall d \in \mathbb{R}^n
-\end{equation*}
-And the subdifferential is the convex hull of the subdifferential active functions. i.e.
-\begin{equation*}
-	\partial f(x) = \conv \{ i \in \cup_{i \in I(x)} \partial f_i(x)\}
-\end{equation*}
-\end{theorem}
-
-\begin{proof}
-The existence of the directional derivative is guaranteed by the convexity of the function. By definition we get the form of (7)\\
-To show $\partial f(x) = \conv_{i \in I} \{ \partial f_i(x) \}$\\
-"$\subset$", \\
-by definition we know:
-\begin{align*}
-	&g\top s \leq f_i'(x, s) \leq \partial f(x), \forall s\\
-	\Rightarrow & \cup \partial f_i \subset \partial f\\
-	\overset{(2)}{\Rightarrow} & \conv\{\cup_{i \in I} \partial f_i \} \subset \partial f
-\end{align*}
-(2) because the sub-differential is a convex subset of $\mathbb{R}^n$.\\
-"$\supset$"\\
-\end{proof}
-
-\begin{corollary}
-If the function $f_i:\mathbb{R}^n \longrightarrow \mathbb{R}, 1 \leq i \leq m$ are affine. i.e.
-\begin{equation*}
-	f_i = a_i^T x + b_i
-\end{equation*}
-Define:
-\begin{equation*}
-	f = \max_{1 \leq i \leq m} f_i(x)
-\end{equation*}
-Then $\forall x, d \in \mathbb{R}^n$
-\begin{equation*}
-	f'(x, d) = a_i^\top d, \quad \partial f(x) = conv\{a_i | i \in I(x)\}
-\end{equation*}
-\end{corollary}
-
-
-
-\subsection{Derivative by Clark}
-\begin{definition}[Clark derivative]
-	Given a function $f:D \longrightarrow \mathbb{R}^n, D \subset \mathbb{R}^n$ open. For $\hat{x} \in D, s \in \mathbb{R}$. The Clark derivative exists if:
-	\begin{equation*}
-		f^\circ(\hat{x}, s) := \limsup_{t \rightarrow 0_+, x \rightarrow \hat{x}} \frac{f(x + ts) - f(x)}{t} \in \mathbb{R}
-	\end{equation*}
-\end{definition}
-
-\begin{theorem}[Existence of Clark derivative]
-\textbf{Locally Lipschitz continuous function is Clark differentiable in the point}. And we have:
-\begin{equation*}
-	f^\circ(x, s) \leq L \| s \| \quad \forall s \in \mathbb{R}^n
-\end{equation*}
-\end{theorem}
-
-Form convexity follows the local Lipschitz differentiability. Therefore all the convex function is Clark differentiable.
-
-\begin{lemma}
-	Given a function $f: D \longrightarrow \mathbb{R}, D \subset \mathbb{R}^n$, locally Lipschitz continuous in the point $\hat{x}$ with Lipschitz constant $L$. Than the clark derivative $f^\circ(\hat{x}, s) $ is:
-	\begin{itemize}
-		\item sublinear: $f^\circ(x, u + v) \leq f^\circ(x, u) + f^\circ(x, v)$
-		\item reflexiv: $f^\circ(x, -u) = -f^\circ(x, u)$
-	\end{itemize}
-\end{lemma}
-
-\begin{theorem}
-	Given a convex function: $f: D \longrightarrow \mathbb{R}$ (therefore locally Lipschitz continuous, the local Lipschitz continuity is important!). Directional derivative and Clark derivative are equivalent. 
-\end{theorem}
-
-\begin{proof}
-	Aufgab 3, Set 2.
-\end{proof}
-
-
-\begin{definition}[Clarke Subdifferential]
-	$f: D \longrightarrow \mathbb{R}, D \subset \mathbb{R}^n$ open, and is local Lipschitz continuous.The Clark derivative is well defined and the Clark sub-differential could be defined as:
-	\begin{equation*}
-		\partial^C f(x) := \{ y \in \mathbb{R}^n \mid f^\circ(x,s) \geq \langle y,s \rangle , \forall s \in \mathbb{R}^n \}
-	\end{equation*}
-\end{definition}
-\begin{example}[Half pipe example]
-	in the point 0 not continuous differentiable. If we want $\partial f(\hat{x}) = \{\nabla f(\hat{x}) \}$, the smoothness of $f$ would be required. We see that even for differentiable function the gradient is not necessarily equivalent to Clark sub-derivative.(Unlike sub-derivative)\\
-	In general Banach space obvious more complicated. 
-\end{example}
-
-\begin{theorem}
-	\textbf{Locally Lipschitz continuous function admit in every point the Clark sub-derivative, and the sub-derivative} and:
-	\begin{enumerate}
-		\item $\partial^C f \subset U_L(0)$ is non-empty, convex, and compact.
-		\item $f^\circ(x, s) = \max\{y^\top s | y \in \partial^C f(x) \}$ for all $s \in \mathbb{R}^n$
-	\end{enumerate}
-\end{theorem}
-
-\begin{theorem}[NBO: necessary condition for the optimal point]
-	
-\end{theorem}
-
-\subsection{Bouligand Differentiability(Limiting Jacobian)}
-
-\begin{theorem}[Theorem of Rademacher]
-\textbf{Local Lipschitz continuous functions are a.e. differentiable.}
-\end{theorem}
-
-\begin{definition}[Bouligand derivative and Bouligand differentiable function]
-Let $f: D \longrightarrow \mathbb{R}^m, D \subset \mathbb{R}^n$ open, local Lipschitz continuous in $D$. $D_f$ the dense subset in the sense of Rademacher. The Bouligand subdifferential(Limiting Jacobian) is defined as:
-	\begin{equation*}
-		\partial^B f(x) := \{ G \in \mathbb{R}^{m \times n} \mid \exists (x_k) \subset D_f: x_k \rightarrow x \text{ and } \nabla f(x_k) \rightarrow G \}
-	\end{equation*} 
-	A function is \textbf{B-differentiable} if it's directional differentiable and can be approximated in 1st order by the Bouligand derivative. 
-\end{definition}
-\begin{remark}
-The directional differentiability doesn't ensure the 1st order approximation by the gradient. There are functions that admit vanishing directional derivative but not even continuous. [p65, Scholtes]	
-\end{remark}
-
-
-\begin{theorem}
-	Let $f$ defined as above. The Clark derivative in any point in $D$ is the convex hull of the Bouligand derivative.:
-	\begin{equation*}
-		\partial^C f(x) = conv\{ \partial^B f(x) \}
-	\end{equation*}
-\end{theorem}
-
-\begin{example}
-\end{example}
-
-\subsection{Optimization condition for the abs-normal functions}
-We encounter constantly nonsmooth function, let $f$ be a multivariate function defined on a open set. The functions:
-	\begin{itemize}
-	\item $PC^r$-function
-	\item Piecewise Smooth function
-	\item Piecewise Linear function
-\end{itemize} 
-are all nonsmooth. 
-
-
-\begin{example}
-	niemals glatt verfahren auf nicht linear problem zu verwenden. 
-\end{example}
-
-\begin{definition}[Abs-normal function]
-	For the piecewise smooth function we define the abs-normal form. Given $d \in \mathbb{N}$, piecewise smooth function$ f: \mathbb{R}^n \longrightarrow \mathbb{R}, y = f(x)$ we define 
-	\begin{align*}
-			z &= F(x, |z|) (\text{implizit defined})\\
-			y &= \varphi(x, |z|)
-	\end{align*}
-	where $\varphi, F \in C_{abs}^c(\mathbb{R}^n, \mathbb{R}+)$.
-\end{definition}
-
-\begin{example}
-\end{example}
-
-\begin{theorem}[necessary conditions of optimization for the $C_{abs}^d$ Functions]
-	Given $f \in C_{abs}^d(\mathbb{R}^n), d \geq 1$. If $x_*$ is a minimal point, $z(x_*) = 0$, $rank(Z) := rank(z(z_*, x_*)) = s$. Then there must exist a vector of Lagrange multiplier with $\lambda_* \in \mathbb{R}^s$, such that:
-	\begin{itemize}
-		\item $a^\top (x_*, 0) + \lambda_*^\top Z(x_*, 0) = 0$  
-		\item $F(x_*, 0) = 0$
-		\item $b^\top (x_*, 0) + \lambda_* \frac{\partial F}{\partial |z|} = 0$
-	\end{itemize}
-\end{theorem}
-
-\subsubsection*{The evaluation procedure}
-
-\section{Subgradient Methods}
-\subsection{introduction}
-gradient ist immer eine abstiegrichtung. Aber sub-gradient nicht. 
-
-\begin{definition}[descent, steepest descent]
-	Given $f: D \longrightarrow \mathbb{R}, D \subset \mathbb{R}^n$ directional differentiable. We define
-	\begin{itemize}
-		\item The direction $s \in \mathbb{R}^n$ is called descent for $f$ in $x$, if 
-			\begin{equation*}
-				f'(x,s) < 0
-			\end{equation*}
-		\item The descent is called the steepest descent if
-			\begin{equation*}
-				f'(x, \frac{s}{\|s\|}) = \min_{\| d \| = 1}f'(x, d)
-			\end{equation*}
-	\end{itemize} 
-\end{definition}
-
-\begin{remark}.
-	\begin{enumerate}
-		\item $s = 0$ is allowed
-		\item Is $f$ Lipschitz continuous in $x$, it can be proved that the directional derivative is also (Lipschitz) continuous. By the theorem of Weierstrass the existence of the minimum is garanteed. 
-		\item Is $f$ differentiable in $x$, the steepest descent is $s = - \alpha \nabla f(x), \alpha > 0$.
-		\item By the theorem of Rademacher, for the Lipschitz-continuous function, the points not differentiable is a null set.
-	\end{enumerate}
-\end{remark}
-
-\begin{definition}[sub-gradient, subdifferential]
-	Given $f: D \longrightarrow \mathbb{R}$ convex on a convex, open subset of $\mathbb{R}^n$. A vector is called sub-gradient of $f$ in the point $\hat{x}$, if
-	\begin{equation}
-		f(x) - f(\hat{x}) \geq g^\top(x-\hat{x}), \forall x \in D
-	\end{equation}
-	
-	The set $\partial f(\hat{x}) \subset \mathbb{R}^n$ with 
-	\begin{equation*}
-		\partial f(\hat{x}) := \{g \in \mathbb{R}^n \mid g \text{ subgradient}\}
-	\end{equation*}
-	is called the subdifferential of $f$ in point $\hat{x}$.
-\end{definition}
-
-\subsection{subgradient method}
-\begin{algorithm}
-    \caption{subgradient algorithm}
-    $f: \mathbb{R}^n \longrightarrow \mathbb{R}$ directional differentiable for all $x \in \mathbb{R}^n$ and $x^0 \in \mathbb{R}^n$ is given. For $k = 0, 1, 2, \dots$
-    \begin{algorithmic}
-        \State $\mathrm{opt\_sub} (f, \epsilon , x_0)$
-        \State $s_0 \in \partial f(x_0)$
-            \While{$(s_k \le \epsilon)$}
-                \State Calculate \textbf{one} sub-derivative $s^k \in \partial f(x^k)$
-                \State Determine a step width $\alpha_k > 0$
-                \State Set $d^k = -\frac{s^k}{\|s\|},\quad x^{k+1} = x^k + \alpha_k d^k, \quad k = k + 1$
-            \EndWhile
-    \end{algorithmic}
-\end{algorithm}
-
-\begin{remark}\quad
-	\begin{enumerate}
-		\item We would expect the one sub-gradient $g \in \partial f(x)$ can be calculated in every step $\Rightarrow$ Oracle.
-		\item The sub-gradient method is not a descent method.
-	\end{enumerate}
-\end{remark}
-
-
-\begin{lemma}
-	$f : \mathbb{R}^n \longrightarrow \mathbb{R}$ a convex function. $\tilde{x}$ an arbitrary minimal point of $f$ and $x^k$ the k-th iteration of the sub-gradient method and not the minimal point. Then there exists $\tilde{\alpha} > 0$ , s.t.for $x^{k + 1} = x^{k} + \alpha_k d^k$ we have:
-		\begin{equation*}
-			\| x^{k + 1} - \tilde{x} \|  < \| x^k - \tilde{x} \| \quad \forall \alpha_k \in (0, \tilde{\alpha})
-		\end{equation*}
-\end{lemma}
-
-\begin{proof}
-	By the sub-gradient method we get:
-	\begin{equation*}
-		\| x^{k+1} - \tilde{x} \| = \| x^k - \tilde{x} \|^2 + 2 \alpha_k \langle d_k, x^k - \tilde{x} \rangle + \alpha_k^2
-	\end{equation*}
-\end{proof}
-
-\begin{lemma}
-	$f : \mathbb{R}^n \longrightarrow \mathbb{R}$ convex function, $\tilde{x}, z \in \mathbb{R}^n$ with $f(z) > f(\tilde{x})$ and $s \in \partial f(z), s \neq 0$. Define $H_z = \{ x \in \mathbb{R}^n | \langle s, x - z \rangle = 0\}$. Then the optimisation problem
-		\begin{equation*}
-			\min_{x \in H_z} \frac{1}{2} \| x - \tilde{x} \|^2
-		\end{equation*}
-		has an unique deterministic solution:
-		\begin{equation*}
-			x^* = \tilde{x} + \lambda s, \text{  with } \lambda = \frac{\langle s,  z - \tilde{x} \rangle}{\| s\|^2}
-		\end{equation*}
-		
-		And we have $\lambda > 0, \|x^* - \tilde{x} \| = \lambda \|s\|$, and $f(x^*) \geq f(z)$
-\end{lemma}
-
-\begin{proof}
-	The objective function is convex and differentiable. And we have an equality constraint.
-	\begin{enumerate}
-		\item We apply the Lagrange multiplier:
-			\begin{align*}
-				\nabla f(x^*) - \lambda s = 0\\
-				\langle s, x^* - z \rangle = 0
-			\end{align*}
-			solve for the $\lambda$.
-		\item Since $f(z) > f(\tilde{x})$ we have:
-			\begin{equation*}
-				0 \geq f(\tilde{x}) - f(z) \leq \langle s, x - z \rangle = - \lambda \|s\|^2
-			\end{equation*}
-			So we have that $\lambda > 0$.
-		\item By the definition of the sub-gradient we have:
-			\begin{equation*}
-				f(x^*) - f(z) \geq \langle s, x^* - z \rangle = 0
-			\end{equation*}
-	\end{enumerate}
-\end{proof}
-
-\begin{remark}\quad
-	\begin{enumerate}
-		\item We mainly apply the Lagrange and the definition of the sub-gradient.
-		\item Notice that the sub-gradient method is not a descent method.
-	\end{enumerate}
-\end{remark}
-
-
-\begin{theorem}
-	$f : \mathbb{R}^n \longrightarrow \mathbb{R}$ the objective function, which is \textbf{convex} with $\inf_{x \in \mathbb{R}^n} f(x) := f^* > - \infty$. If the step width $\{\alpha_k \}_{k \in \mathbb{N}}$ satisfies:
-	\begin{equation*}
-		\sum \alpha_k = \infty, \quad \lim \alpha_k = 0
-	\end{equation*}
-	then the sub-gradient method will not stop in finite steps but converges to the minimal point:
-	\begin{equation*}
-		\lim f_k \longrightarrow f^*
-	\end{equation*}
-\end{theorem}
-
-
-\subsection{proximal algorithm}
+\section{Proximal algorithm}
 \begin{definition}[the proximal operator]
 	Given $f:\mathbb{R}^n \rightarrow \mathbb{R}$ a proper closed convex function, the proximal operator is defined as
 	\begin{align*}
@@ -1516,21 +1191,395 @@ Assuming $f$ is twice differentiable, for $\lambda > 0$ sufficiently small, it h
 	\prox_{\lambda f}(x) = x - \lambda \nabla f (x) + o(\lambda). 
 \end{align*}
 \end{corollary}
+
+Now we link the Robinson normal mapping condition to the proximal mapping. Observe the minimization problem:
+
+
+
+\section{The semi-smooth Newton method}
+
+
+
+\section{Convex optimization}
+\subsection{Directional Derivative}
+
+
+\begin{remark}
+	The function $f$ does not to be continuous.
+\end{remark}
+We need to establish a Existenzaussage about the directional derivative.
+
+
+This is a very important auxiliary function because in the convex function the distance between any two points is upper bounded by this function.\par The existence of directional derivative, the local Lipschitz continuity of convex function, the convexity of sub-differential, the equivalence of sub-differential and gradient for differentiable functions, and the equivalence of Clark derivative and directional derivative have all used this operator. 
+
+
+
+
+
+The sublinear function defined a half norm on the open set $D \subset \mathbb{R}^n$. Can we find a directional derivative, which for some $s, t \in \mathbb{R}^n$ admits strict sub-linearity?
+We now look into the sufficient and necessary conditions of minimal points $\hat{x}$. 
+
+
+\begin{theorem}[NOB]
+	Given a function: $f :D \longrightarrow \mathbb{R}$, where $D$ is open. For the minimal point $\hat{x} \in D$, we have:
+	\begin{enumerate}
+		\item the necessary conditions: $f$ admits directional derivative in every direction and it holds
+		\begin{equation}
+			f'(\hat{x}, x - \hat{x}) \geq 0,\quad \forall x \in \mathbb{R}^n	.
+		\end{equation}
+		\item The sufficient condition: $f$ is convex and satisfies the condition above.
+	\end{enumerate}
+\end{theorem}
+
+\begin{remark}
+Convexity implies locally Lipschitz-continuity. 	
+\end{remark}
+
+\begin{theorem}
+	Given a convex $f: D \longrightarrow \mathbb{R}^n$, $D$ is open and convex.Then we have:
+	\begin{enumerate}
+		\item $\forall x \in D$, the subdifferential $\partial f(x)$ is non-empty, convex, and compact.
+		\item If $f$ is Lipschitz continuous, we have: $\partial f(x) \subset U_L(x)$, and \begin{equation}
+			f'(x,s) = \max_{g \in \partial f(x)}g^\top s, \forall s \in \mathbb{R}^n
+		\end{equation}
+	\end{enumerate} 
+\end{theorem}
+
 \begin{proof}
-	
+	The difficult part is to prove that the subdifferential is not empty for the convex function and equation (6) using the separation theorem.
+	\begin{enumerate}
+		\item $\partial f(x)$ is closed and convex:\\
+		By the definition of sub-differential we know that $M_y := \{g | f(y) - f(x) \geq g^\top(y - x) \}$ is convex for all $y$. Because the intersection of convex sets is also convex, we know the $\partial f(x)$ is convex.
+		\item  the equation is shown by separation theorem. 
+	\end{enumerate}
+\end{proof}
+
+\begin{theorem}
+Given a convex function, a point is a minimum point iff 0 is included in the subdifferential: For a convex function defined on a non-empty, open and convex set, the following arguments are equivalent:
+	\begin{enumerate}
+		\item The point $\hat{x}$ is local, and therefore global minimal point on the set $D$.
+		\item $0 \in \partial f(\hat{x}))$
+	\end{enumerate}
+\end{theorem}
+
+Here we have a generalisation of the necessary conditions of optimal points in the case of smooth function to the case of non-smooth(convex) functions.
+
+\begin{lemma}
+	The union of convex and compact sets is compact and we have:
+	\begin{equation*}
+		C = \{ \sum_{i = 1}^m \alpha_i x_i \mid x_i \in C_i, \alpha_i \geq 0, \sum_{i = 1}^m \alpha_i = 1\}
+	\end{equation*}
+\end{lemma}
+
+\begin{theorem}
+Given a family of \textcolor{red}{convex} continuous function $f_i: \mathbb{R}^n \longrightarrow \mathbb{R}$. We define the convex function:
+\begin{equation}
+	f(x) := \max_{1\leq i \leq m} f_i(x).
+\end{equation}
+$\forall x \in \mathbb{R}^n$, define $I(x)$ the set of indices, of which the function is active in the point $x$. Than we have :
+\begin{equation*}
+	f'(x, d) = \max_{i \in I(x)} f_i'(x) \quad \forall d \in \mathbb{R}^n
+\end{equation*}
+And the subdifferential is the convex hull of the subdifferential active functions. i.e.
+\begin{equation*}
+	\partial f(x) = \conv \{ i \in \cup_{i \in I(x)} \partial f_i(x)\}
+\end{equation*}
+\end{theorem}
+
+\begin{proof}
+The existence of the directional derivative is guaranteed by the convexity of the function. By definition we get the form of (7)\\
+To show $\partial f(x) = \conv_{i \in I} \{ \partial f_i(x) \}$\\
+"$\subset$", \\
+by definition we know:
+\begin{align*}
+	&g\top s \leq f_i'(x, s) \leq \partial f(x), \forall s\\
+	\Rightarrow & \cup \partial f_i \subset \partial f\\
+	\overset{(2)}{\Rightarrow} & \conv\{\cup_{i \in I} \partial f_i \} \subset \partial f
+\end{align*}
+(2) because the sub-differential is a convex subset of $\mathbb{R}^n$.\\
+"$\supset$"\\
+\end{proof}
+
+\begin{corollary}
+If the function $f_i:\mathbb{R}^n \longrightarrow \mathbb{R}, 1 \leq i \leq m$ are affine. i.e.
+\begin{equation*}
+	f_i = a_i^T x + b_i
+\end{equation*}
+Define:
+\begin{equation*}
+	f = \max_{1 \leq i \leq m} f_i(x)
+\end{equation*}
+Then $\forall x, d \in \mathbb{R}^n$
+\begin{equation*}
+	f'(x, d) = a_i^\top d, \quad \partial f(x) = conv\{a_i | i \in I(x)\}
+\end{equation*}
+\end{corollary}
+
+
+\section{Generalized Differentials}
+
+\subsection{Derivative by Clark}
+\begin{definition}[Clark derivative]
+	Given a function $f:D \longrightarrow \mathbb{R}^n, D \subset \mathbb{R}^n$ open. For $\hat{x} \in D, s \in \mathbb{R}$. The Clark derivative exists if:
+	\begin{equation*}
+		f^\circ(\hat{x}, s) := \limsup_{t \rightarrow 0_+, x \rightarrow \hat{x}} \frac{f(x + ts) - f(x)}{t} \in \mathbb{R}
+	\end{equation*}
+\end{definition}
+
+\begin{theorem}[Existence of Clark derivative]
+Locally Lipschitz continuous function is Clark differentiable in the point. And we have:
+\begin{equation*}
+	f^\circ(x, s) \leq L \| s \| \quad \forall s \in \mathbb{R}^n
+\end{equation*}
+\end{theorem}
+
+Form convexity follows the local Lipschitz differentiability. Therefore all the convex function is Clark differentiable.
+
+\begin{lemma}
+	Given a function $f: D \longrightarrow \mathbb{R}, D \subset \mathbb{R}^n$, locally Lipschitz continuous in the point $\hat{x}$ with Lipschitz constant $L$. Than the clark derivative $f^\circ(\hat{x}, s) $ is:
+	\begin{itemize}
+		\item sublinear: $f^\circ(x, u + v) \leq f^\circ(x, u) + f^\circ(x, v)$
+		\item reflexiv: $f^\circ(x, -u) = -f^\circ(x, u)$
+	\end{itemize}
+\end{lemma}
+
+\begin{theorem}
+	Given a convex function: $f: D \longrightarrow \mathbb{R}$ (therefore locally Lipschitz continuous, the local Lipschitz continuity is important!). Directional derivative and Clark derivative are equivalent. 
+\end{theorem}
+
+\begin{proof}
+	Aufgab 3, Set 2.
 \end{proof}
 
 
+\begin{definition}[Clarke Subdifferential]
+	$f: D \longrightarrow \mathbb{R}, D \subset \mathbb{R}^n$ open, and is local Lipschitz continuous.The Clark derivative is well defined and the Clark sub-differential could be defined as:
+	\begin{equation*}
+		\partial^C f(x) := \{ y \in \mathbb{R}^n \mid f^\circ(x,s) \geq \langle y,s \rangle , \forall s \in \mathbb{R}^n \}
+	\end{equation*}
+\end{definition}
+\begin{example}[Half pipe example]
+	in the point 0 not continuous differentiable. If we want $\partial f(\hat{x}) = \{\nabla f(\hat{x}) \}$, the smoothness of $f$ would be required. We see that even for differentiable function the gradient is not necessarily equivalent to Clark sub-derivative.(Unlike sub-derivative)\\
+	In general Banach space obvious more complicated. 
+\end{example}
+
+\begin{theorem}
+	Locally Lipschitz continuous function admit in every point the Clark subderivative, and the subderivative:
+	\begin{enumerate}
+		\item $\partial^C f \subset U_L(0)$ is non-empty, convex, and compact.
+		\item $f^\circ(x, s) = \max\{y^\top s | y \in \partial^C f(x) \}$ for all $s \in \mathbb{R}^n$
+	\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[NBO: necessary condition for the optimal point]
+	
+\end{theorem}
+
+
+
+\subsection{Bouligand Differentiability(Limiting Jacobian)}
+
+\begin{theorem}[Theorem of Rademacher]
+Local Lipschitz continuous functions are a.e. differentiable.
+\end{theorem}
+
+\begin{definition}[Bouligand derivative and Bouligand differentiable function]
+Let $f: D \longrightarrow \mathbb{R}^m, D \subset \mathbb{R}^n$ open, local Lipschitz continuous in $D$. $D_f$ the dense subset in the sense of Rademacher. The Bouligand subdifferential(Limiting Jacobian) is defined as:
+	\begin{equation*}
+		\partial^B f(x) := \{ G \in \mathbb{R}^{m \times n} \mid \exists (x_k) \subset D_f: x_k \rightarrow x \text{ and } \nabla f(x_k) \rightarrow G \}
+	\end{equation*} 
+	A function is \textbf{B-differentiable} if it's directional differentiable and can be approximated in 1st order by the Bouligand derivative. 
+\end{definition}
+\begin{remark}
+The directional differentiability doesn't ensure the 1st order approximation by the gradient. There are functions that admit vanishing directional derivative but not even continuous. [p65, Scholtes]	
+\end{remark}
+
+
+\begin{theorem}
+	Let $f$ defined as above. The Clark derivative in any point in $D$ is the convex hull of the Bouligand derivative.:
+	\begin{equation*}
+		\partial^C f(x) = \conv\{ \partial^B f(x) \}
+	\end{equation*}
+\end{theorem}
+
+\begin{example}
+\end{example}
+
+\subsection{Optimization condition for the abs-normal functions}
+We encounter constantly nonsmooth function, let $f$ be a multivariate function defined on a open set. The functions:
+	\begin{itemize}
+	\item $PC^r$-function
+	\item Piecewise Smooth function
+	\item Piecewise Linear function
+\end{itemize} 
+are all nonsmooth. 
+
+
+\begin{example}
+	niemals glatt verfahren auf nicht linear problem zu verwenden. 
+\end{example}
+
+\begin{definition}[Abs-normal function]
+	For the piecewise smooth function we define the abs-normal form. Given $d \in \mathbb{N}$, piecewise smooth function$ f: \mathbb{R}^n \longrightarrow \mathbb{R}, y = f(x)$ we define 
+	\begin{align*}
+			z &= F(x, |z|) (\text{implizit defined})\\
+			y &= \varphi(x, |z|)
+	\end{align*}
+	where $\varphi, F \in C_{abs}^c(\mathbb{R}^n, \mathbb{R}+)$.
+\end{definition}
+
+\begin{example}
+\end{example}
+
+\begin{theorem}[necessary conditions of optimization for the $C_{abs}^d$ Functions]
+	Given $f \in C_{abs}^d(\mathbb{R}^n), d \geq 1$. If $x_*$ is a minimal point, $z(x_*) = 0$, $rank(Z) := rank(z(z_*, x_*)) = s$. Then there must exist a vector of Lagrange multiplier with $\lambda_* \in \mathbb{R}^s$, such that:
+	\begin{itemize}
+		\item $a^\top (x_*, 0) + \lambda_*^\top Z(x_*, 0) = 0$  
+		\item $F(x_*, 0) = 0$
+		\item $b^\top (x_*, 0) + \lambda_* \frac{\partial F}{\partial |z|} = 0$
+	\end{itemize}
+\end{theorem}
+
+
+\section{Subgradient Methods}
+\subsection{introduction}
+Gradient is always a decent direction, but the subgradient is not. 
+
+\begin{definition}[descent, steepest descent]
+	Given $f: D \longrightarrow \mathbb{R}, D \subset \mathbb{R}^n$ directional differentiable. We define
+	\begin{itemize}
+		\item The direction $s \in \mathbb{R}^n$ is called descent for $f$ in $x$, if 
+			\begin{equation*}
+				f'(x,s) < 0
+			\end{equation*}
+		\item The descent is called the steepest descent if
+			\begin{equation*}
+				f'(x, \frac{s}{\|s\|}) = \min_{\| d \| = 1}f'(x, d)
+			\end{equation*}
+	\end{itemize} 
+\end{definition}
+
+\begin{remark}.
+	\begin{enumerate}
+		\item $s = 0$ is allowed
+		\item Is $f$ Lipschitz continuous in $x$, it can be proved that the directional derivative is also (Lipschitz) continuous. By the theorem of Weierstrass the existence of the minimum is garanteed. 
+		\item Is $f$ differentiable in $x$, the steepest descent is $s = - \alpha \nabla f(x), \alpha > 0$.
+		\item By the theorem of Rademacher, for the Lipschitz-continuous function, the points not differentiable is a null set.
+	\end{enumerate}
+\end{remark}
+
+\begin{definition}[subgradient and subdifferential]
+	Given $f: D \longrightarrow \mathbb{R}$ convex on a convex, open subset of $\mathbb{R}^n$. A vector is called subgradient of $f$ in the point $\hat{x}$, if
+	\begin{equation}
+		f(x) - f(\hat{x}) \geq g^\top(x-\hat{x}), \forall x \in D
+	\end{equation}
+	
+	The set $\partial f(\hat{x}) \subset \mathbb{R}^n$ with 
+	\begin{equation*}
+		\partial f(\hat{x}) := \{g \in \mathbb{R}^n \mid g \text{ subgradient}\}
+	\end{equation*}
+	is called the subdifferential of $f$ in point $\hat{x}$.
+\end{definition}
+
+\subsection{subgradient method}
+\begin{algorithm}
+    \caption{subgradient algorithm}
+    $f: \mathbb{R}^n \longrightarrow \mathbb{R}$ directional differentiable for all $x \in \mathbb{R}^n$ and $x^0 \in \mathbb{R}^n$ is given. For $k = 0, 1, 2, \dots$
+    \begin{algorithmic}
+        \State $\mathrm{opt\_sub} (f, \epsilon , x_0)$
+        \State $s_0 \in \partial f(x_0)$
+            \While{$(s_k \le \epsilon)$}
+                \State Calculate \textbf{one} sub-derivative $s^k \in \partial f(x^k)$
+                \State Determine a step width $\alpha_k > 0$
+                \State Set $d^k = -\frac{s^k}{\|s\|},\quad x^{k+1} = x^k + \alpha_k d^k, \quad k = k + 1$
+            \EndWhile
+    \end{algorithmic}
+\end{algorithm}
+
+\begin{remark}\quad
+	\begin{enumerate}
+		\item We would expect the one subgradient $g \in \partial f(x)$ can be calculated in every step $\Rightarrow$ Oracle.
+		\item The subgradient method is not a descent method.
+	\end{enumerate}
+\end{remark}
+
+
+\begin{lemma}
+	$f : \mathbb{R}^n \longrightarrow \mathbb{R}$ a convex function. $\tilde{x}$ an arbitrary minimal point of $f$ and $x^k$ the k-th iteration of the subgradient method and not the minimal point. Then there exists $\tilde{\alpha} > 0$ , s.t.for $x^{k + 1} = x^{k} + \alpha_k d^k$ we have:
+		\begin{equation*}
+			\| x^{k + 1} - \tilde{x} \|  < \| x^k - \tilde{x} \| \quad \forall \alpha_k \in (0, \tilde{\alpha})
+		\end{equation*}
+\end{lemma}
+
+\begin{proof}
+	By the subgradient method we get:
+	\begin{equation*}
+		\| x^{k+1} - \tilde{x} \| = \| x^k - \tilde{x} \|^2 + 2 \alpha_k \langle d_k, x^k - \tilde{x} \rangle + \alpha_k^2
+	\end{equation*}
+\end{proof}
+
+\begin{lemma}
+	$f : \mathbb{R}^n \longrightarrow \mathbb{R}$ convex function, $\tilde{x}, z \in \mathbb{R}^n$ with $f(z) > f(\tilde{x})$ and $s \in \partial f(z), s \neq 0$. Define $H_z = \{ x \in \mathbb{R}^n | \langle s, x - z \rangle = 0\}$. 
+	Then the optimization problem
+		\begin{equation*}
+			\min_{x \in H_z} \frac{1}{2} \| x - \tilde{x} \|^2
+		\end{equation*}
+		has an unique deterministic solution:
+		\begin{equation*}
+			x^* = \tilde{x} + \lambda s, \text{  with } \lambda = \frac{\langle s,  z - \tilde{x} \rangle}{\| s\|^2}
+		\end{equation*}
+		
+		And we have $\lambda > 0, \|x^* - \tilde{x} \| = \lambda \|s\|$, and $f(x^*) \geq f(z)$
+\end{lemma}
+
+\begin{proof}
+	The objective function is convex and differentiable. And we have an equality constraint.
+	\begin{enumerate}
+		\item We apply the Lagrange multiplier:
+			\begin{align*}
+				\nabla f(x^*) - \lambda s = 0\\
+				\langle s, x^* - z \rangle = 0
+			\end{align*}
+			solve for the $\lambda$.
+		\item Since $f(z) > f(\tilde{x})$ we have:
+			\begin{equation*}
+				0 \geq f(\tilde{x}) - f(z) \leq \langle s, x - z \rangle = - \lambda \|s\|^2
+			\end{equation*}
+			So we have that $\lambda > 0$.
+		\item By the definition of the subgradient we have:
+			\begin{equation*}
+				f(x^*) - f(z) \geq \langle s, x^* - z \rangle = 0
+			\end{equation*}
+	\end{enumerate}
+\end{proof}
+
+\begin{remark}\quad
+	\begin{enumerate}
+		\item We mainly apply the Lagrange and the definition of the subgradient.
+		\item Notice that the subgradient method is not a descent method.
+	\end{enumerate}
+\end{remark}
+
+
+\begin{theorem}
+	$f : \mathbb{R}^n \longrightarrow \mathbb{R}$ the objective function, which is \textbf{convex} with $\inf_{x \in \mathbb{R}^n} f(x) := f^* > - \infty$. If the step width $\{\alpha_k \}_{k \in \mathbb{N}}$ satisfies:
+	\begin{equation*}
+		\sum \alpha_k = \infty, \quad \lim \alpha_k = 0
+	\end{equation*}
+	then the subgradient method will not stop in finite steps but converges to the minimal point:
+	\begin{equation*}
+		\lim f_k \longrightarrow f^*
+	\end{equation*}
+\end{theorem}
 
 
 
 
 
-\subsection{cutting-plane methods}
-
+\section{cutting-plane methods}
 The cutting-plane method is motivated by the subdifferential. The subdifferential at each point of a function defines a linear hyperspace and a minorant of the original function. we show that the minimax of a family of functions could be transformed to a linear optimisation problem. Theorem 3.13 shows that this method indeed converges to the minimum of the function. Then 3.14 provides a valid termination criteria by stating that if by k-th iteration the approximated value is in the $\epsilon$-ball of the real value, then the approximation is within the $\epsilon$-ball of the minimum of the objective function.
 
-By the definition of sub-gradient we know that $f(x)$ is lower bounded by the function:
+By the definition of subgradient we know that $f(x)$ is lower bounded by the function:
 \begin{equation} 
 	f^{se}_k = \max_{1 \leq j \leq k} l_j(x) = \max_{1 \leq j \leq k} \{f(x_j) + s_j^\top (x - x_j)\}
 \end{equation} 
@@ -1560,7 +1609,7 @@ In the case $D$ is convex we can transform it to a linear optimisation problem a
 \begin{algorithmthm}
 	Given $f : \mathbb{R}^n \longrightarrow \mathbb{R}$ for all $x \in \mathbb{R}^n$ directional differentiable and $x_0 \in \mathbb{R}^n$ given. For $k = 1, 2, \dots, $
 	\begin{enumerate}
-		\item calculate a sub-gradient for each point $g^k \in \partial f(x^k)$
+		\item calculate a subgradient for each point $g^k \in \partial f(x^k)$
 		\item Terminate when conditions satisfied
 		\item Calculate $x^{k + 1}$ by solving the problem (8)
 	\end{enumerate}
@@ -1594,6 +1643,12 @@ In the case $D$ is convex we can transform it to a linear optimisation problem a
 By the above theorem we have termination criteria. Moreover, we observe that the Schnittebenenverfaheren is a descendant method. \par 
 However, the problem (8) is not guaranteed to be solvable. Consider $D = \mathbb{R}$ and $s_0 \neq 0$. Then $l_0$ is not lower bounded. This problem could be dealt with by penalty term.  
 
+\section{The semismooth Newton methods}
+
+
+
+
+directional differentiablity and B-differentiablity are equivalent for locally Lipshitz continuous function in finite-dimensional space
 
 \section{The Bundle-Methods}
 \subsection{Bundle-method motivated by Schnittebeneverfahren}
