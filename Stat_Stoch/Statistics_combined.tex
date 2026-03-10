@@ -1,0 +1,4227 @@
+\documentclass[a4paper,12pt, oneside, fleqn]{book}
+
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{mathptmx}
+\usepackage[colorlinks = true, linkcolor = blue]{hyperref}
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n} %mathcal
+
+
+%algorithm
+\usepackage{algpseudocode}
+
+\usepackage{amsmath,amssymb,amsthm,textcomp}
+\usepackage{multicol}
+\usepackage{tikz}
+\usepackage[normalem]{ulem}
+\usepackage{bbm} % using for the characteristic function
+\usepackage{ulem}
+\usepackage{cancel}
+\usepackage{esint} %integral mean
+
+\usepackage{geometry}
+\geometry{left=15mm,right=15mm,%
+bindingoffset=0mm, top=20mm,bottom=20mm}
+
+\makeatletter
+\def\th@plain{%
+  \thm@notefont{}% same as heading font
+  \itshape % body font
+}
+\def\th@definition{%
+  \thm@notefont{}% same as heading font
+  \normalfont % body font
+}
+\makeatother
+
+
+
+\renewcommand{\thechapter}{\Roman{chapter}}
+\renewcommand*\thesection{\arabic{section}}
+
+
+%\newtheorem{theorem}{Theorem}
+\newtheorem{theorem}{Theorem}[section]
+\renewcommand{\thetheorem}{\arabic{section}.\arabic{theorem}}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{method}[theorem]{Method}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\newtheorem{exercise}{Exercise}[subsection]
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\renewcommand{\thedefinition}{\arabic{section}.\arabic{definition}}
+\newtheorem*{example}{Example}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem{review}{Review}
+
+
+\linespread{1.3}
+\newcommand{\linia}{\rule{\linewidth}{0.5pt}}
+
+
+% my own titles
+\makeatletter
+\renewcommand{\maketitle}{
+\begin{center}
+\vspace{2ex}
+{\huge \textsc{\@title}}
+\vspace{1ex}
+\\
+\linia\\
+\@author \hfill \@date
+\vspace{4ex}
+\end{center}
+}
+\makeatother
+%%%
+
+%symbol
+\AtBeginDocument{
+  \let\ran\relax
+  \DeclareMathOperator{\dom}{dom}
+}\AtBeginDocument{
+  \let\ran\relax
+  \DeclareMathOperator{\ran}{ran}
+}
+\DeclareMathOperator{\var}{Var}
+\DeclareMathOperator{\cov}{Cov}
+\AtBeginDocument{
+  \let\div\relax
+  \DeclareMathOperator{\div}{div}
+}
+\DeclareMathOperator*{\esssup}{ess\, sup}
+\DeclareMathOperator*{\spa}{span}
+\DeclareMathOperator*{\dist}{dist}
+\DeclareMathOperator*{\supp}{supp}
+\DeclareMathOperator*{\rank}{rank}
+\DeclareMathOperator*{\tr}{tr}
+\DeclareMathOperator*{\sign}{sign}
+
+\begin{document}
+\title{Mathematical Statistics}
+\author{Ruizhe Chao}
+\date{01/01/2014}
+\maketitle
+
+\section{Introduction}
+\begin{definition}[statistic model]
+	The statistical model is a triple
+	\begin{align*}
+		\bigg(\chi, \mathcal{F}, (\mathbb{P}_\theta)_{\theta \in \Theta} \bigg),
+	\end{align*}
+	where $\chi$ is the sample space, $\mathcal{F}$ is the induced $\sigma$-algebra(how to define it?) and $P_\theta$ the distribution defined on the probability space. 
+\end{definition}
+
+\begin{definition}[mathematical sampling] 
+\end{definition}
+
+\begin{definition}[estimator]
+	Let $(\chi, \mathcal{F}, (\mathbb{P}_\theta)_{\theta \in \Theta})$ be a statistical model and $\rho: \Theta \rightarrow \mathbb{R}^d$ a (induced) parameter, then the mesurable function
+	\begin{align*}
+		\hat{\rho}: \chi \rightarrow \mathbb{R}^d
+	\end{align*}
+	is an estimator. Moreover, if $\mathbb{E} \hat{\rho} = \rho(\theta)$, then $\hat{\rho}$ is unbiased. 
+\end{definition}
+
+\begin{example}
+	
+\end{example}
+
+
+\begin{definition}[ consistent estimator]
+	Let $X_1, \dots, X_n$ be a finite set of i.i.d. samples. The estimator $\hat{\rho}$ is consistent if 
+	\begin{align*}
+		\forall \theta \in \Theta: \hat{\rho} \overset{\mathbb{P}_\theta}{\longrightarrow} \rho(\theta).
+	\end{align*}
+	If under the distribution $\mathbb{P}_\theta$ it holds
+	\begin{align*}
+		r_n^{-1} (\hat{\rho}(X_1, \dots, X_n) - \rho(\theta)) \overset{d}{\longrightarrow} N(\mu_\theta, \sigma_\theta), 
+	\end{align*}
+	then $\hat{\rho}_n:= \hat{\rho}(X_1, \dots, X_n)$ is asymptotically normal. 
+\end{definition}
+
+
+
+
+\section{Testing theory}
+We do not want to recover the distribution but only gain qualitative informations
+\subsection{Statistical test}
+\begin{definition}[statistical test]
+Given a parameter set $\Theta = \Theta_0 \cup \Theta_1$ and $\theta$ the true underlying parameter. We define
+\begin{itemize}
+	\item $H_0$: $\theta \in \Theta_0$, 
+	\item $H_1$: $\theta \in \Theta_1$.
+\end{itemize} 
+A non-randomised test is a measurable function
+\begin{align*}
+	&\varphi: (\chi, \mathcal{F}) \rightarrow \bigg(\{0, 1\}, \mathcal{P}(\{0, 1\}) \bigg)\\
+	&\texttt{ with the rejection region:}\\
+	&\{\varphi = 1\} = \{ x \in \chi: \varphi(x) = 1\}
+\end{align*}
+A randomised test is a measurable function
+\begin{align*}
+	&\varphi:(\chi, \mathcal{F}) \rightarrow \bigg([0, 1], \mathcal{B}([0, 1]\bigg)
+\end{align*}
+In the case of the randomised test we have possible error:
+\begin{enumerate}
+	\item \textbf{Type 1 error}($\alpha$-error): rejected $H_0$ when it's true,
+	\item \textbf{Type 2 error}($\beta$-error): accepted $H_0$ when it's false. 
+\end{enumerate}
+\end{definition}
+
+\begin{definition}[goodness-of-fit function]
+	Let $\varphi$ be the test statistic, the goodness function of the estimator is defined as 
+	\begin{align*}
+		\beta_\varphi: \Theta &\rightarrow \mathbb{R}\\
+		\theta &\mapsto \mathbb{E}_\theta \varphi
+	\end{align*}
+	A test admits the \textbf{significant level} of $\alpha \in [0,1]$, if $ \forall \theta \in \Theta_0:  \beta_\varphi(\theta) \le \alpha$ . \\
+	A test with significant level of $\alpha$ is \textbf{unbiased}, if $\forall \theta \in \Theta_1: \beta_\varphi(\theta) \ge \alpha$.  
+\end{definition}
+\begin{remark}
+In the case of non-randomised test. It holds
+\begin{align*}
+	\beta_\varphi(\theta) = \mathbb{P}_\theta (\varphi = 1). 
+\end{align*}	
+The type 1 error is therefore bounded by the significant level $\alpha$.
+The $\alpha$-error is in general more serious we hence normally choose $\alpha$ small. \par 
+Analogously we observe the type 2 error is bounded by $1-\alpha$(pretty big). In general we can't minimise the type 1 error and type 2 error at the same time. 
+\end{remark}
+
+\begin{definition}
+Given a statistical test with connected parameter set $\Theta$, we define the one-sided test:
+\begin{align*}
+	H_0: \theta \le \theta_0 \texttt{ against } H_1: \theta < \theta_0,
+\end{align*}
+and the two-sided test:
+\begin{align*}
+	H_0: \theta = \theta_0 \texttt{ against }  H_1: \theta \neq \theta_0.
+\end{align*}
+\end{definition}
+
+\begin{example}
+
+
+We formulate the hypothesis
+\begin{align*}
+	H_0: p \le 0.2 \texttt{ against } H_1: p > 0.2
+\end{align*}
+given a sample $x \in \chi$, we define the test statistic:
+\begin{align*}
+	\varphi(x) = \mathbbm{1}_{x > c}(x). 
+\end{align*}	
+The goodness function is 
+\begin{align*}
+	\beta_\theta(\varphi) = \mathbb{E}_\theta \varphi = \mathbb{P}_\theta(\varphi = 1) = \mathbb{P}(x >5) \le 0.05.
+\end{align*}
+The significance level is set to be 0.05 and $\theta = 0.2$, solve for $c$: by monotonicity of the accumulated distribution function it holds
+\begin{align*}
+	 \hat{c} = \arg\min_{c = 0, \dots, 13} \mathbb{P}_\theta (x >  c) \le 0.05 
+\end{align*}
+By the binomial distribution it holds $c = 5$. The $H_0$ is rejected.
+\end{example}
+
+\begin{method}[construction of tests]
+Define the test statistic associated with the random variable $T: (\chi, \mathcal{F}) \rightarrow (\mathbb{R}, \mathcal{B}(\mathbb{R})) $
+\begin{align*}
+	\varphi_\alpha (x) := \mathbbm{1}_{T(x) \in \Gamma_\alpha}(x). 
+\end{align*}
+with $\Gamma_\alpha \subset \mathcal{B}(\mathbb{R})$ the \underline{critical region} is defined as $\Gamma_\alpha:= [c_\alpha, \infty)$ with 
+\begin{align*}
+	c_\alpha:= \inf_{c \in \mathbb{R}} \sup_{\theta \in \Theta_0} \mathbb{P}_\theta( x > c) \le \alpha. 
+\end{align*}
+\end{method}
+
+\begin{definition}[p-value]
+Given a test problem, if the test function is \textbf{ordered} in the sense that if a greater significance level $\hat{\alpha}$ is chosen, the null is still rejected. Then the p-value is the lowest significance level, at which the null is rejected.
+\begin{align*}
+	p_\varphi(x):= \inf_{\alpha: T(x) \in \Gamma_\alpha} \sup_{\theta \in \Theta_0} \mathbb{P}_\theta(T(x) \in \Gamma_\alpha)).
+\end{align*}
+\end{definition}
+\begin{remark}
+\quad
+\begin{enumerate}
+    \item The statistical setup (including the significance level) must be determined before the p-value. We can't first draw the sample then determine the significance level, because $\alpha$ is not random. 
+    \item The p-value could be calculated independent of the significance level.
+\end{enumerate}
+\end{remark}
+
+\begin{method}[Likelihood Ratio Test]\label{Test}
+For general test problem (not simple) test, given the significant level $\alpha$, define the likelihood ratio: 
+\begin{equation}
+    \varphi_\alpha(x) = 
+    \left\{\begin{aligned}
+        0,  \quad   \frac{\sup_{\theta \in \Theta_1}L(\theta, x)}{\sup_{\theta \in \Theta_0} L(\theta, x)} < c_{\alpha}\\
+        1,  \quad \frac{\sup_{\theta \in \Theta_1}L(\theta, x)}{\sup_{\theta \in \Theta_0} L(\theta, x)} > c_{\alpha}\\
+        \gamma_{\alpha}, \quad \frac{\sup_{\theta \in \Theta_1}L(\theta, x)}{\sup_{\theta \in \Theta_0} L(\theta, x)} = c_{\alpha} 
+    \end{aligned}\right.
+\end{equation}
+since $c_\alpha$ can't be attained in general for the predetermined significance level $\alpha$(especially for discrete distribution), we introduce $\gamma_\alpha$. 
+\end{method}
+\begin{remark}
+Note:
+\begin{enumerate}
+    \item The test does not depends on the dominating measure.
+    \item \textbf{On $c_\alpha$:} given the significant level $\alpha$, the critical value is determined by the method of test construction:
+    \begin{align*}
+    	c_\alpha:= \inf_{c \in \mathbb{R}} \sup_{\theta \in \Theta_0} \mathbb{P}_\theta ( x > c) \le \alpha. 
+    \end{align*} 
+    \item \textbf{On  $\gamma_\alpha$:} Given the significant level $\alpha$
+    \begin{equation*}
+        \alpha \overset{!}{=} \mathbb{E}_{\theta_{0}}[\varphi] = \mathbb{P}_{\theta_{0}}[\varphi > c_{\alpha}] + \gamma_\alpha \mathbb{P}_{\theta_{0}}[\varphi = c_\alpha]
+    \end{equation*}
+    \begin{equation*}
+        \gamma_\alpha = \frac{\alpha - \mathbb{P}[\varphi > \alpha]}{\mathbb{P}[\varphi(x) = c_{\alpha}]}
+    \end{equation*}
+    \item \textbf{Normal Approximation:} If the likelihood quotient has the arithmetical mean. Try normal approximation by central limit theory
+\end{enumerate}
+\end{remark}
+
+
+\begin{theorem}[Neyman-Pearson lemma]
+For \textbf{simple test}, given a fixed level, there exists an explicit formula of an UMP test.
+\end{theorem}
+\begin{proof}
+	change of measure formula:
+	\begin{equation*}
+		\mathbb{E}_1 \xi = \mathbb{E}_0 (\xi \mathbb{Z}), \quad \mathbb{Z}: \text{randon-nikodym density}
+	\end{equation*}
+\end{proof}
+
+
+\begin{method}[Pearson Chi-Square Test]
+The multinomial distribution:
+\begin{equation}
+	Z(N, \theta) = \frac{N!}{\prod N_j !} \prod \theta_j^{N_j}
+\end{equation}
+The MLE(using Lagrange multiplier):
+\begin{equation*}
+	\tilde{\theta_j} = \frac{N_j}{N}
+\end{equation*}
+The LR test statistic:
+\begin{align*}
+	T &= \sup_{\theta \in \Theta} \log \frac{Z(N, \theta)}{Z(N, \theta_0)}\\
+	&= N \sum \tilde{\theta}_j \log \frac{\tilde{\theta_j}}{\theta_{0, j}}\\
+	&\approx \frac{1}{2} N \sum \frac{(\frac{N_j}{N} - \theta_{0, j})^2}{\theta_{0, j}}
+\end{align*}
+$2T = Q$ is called the Pearson's chi-square test
+\end{method}
+
+
+
+
+
+\begin{theorem}[Neyman-Pearson of the one-sided test problem]
+Given one-sided test:
+\begin{equation*}
+    H_{0}: \theta \leq \theta_{0}
+\end{equation*}
+\begin{equation*}
+        H_{1}: \theta > \theta_{0}
+\end{equation*}
+If the likelihood function:
+\begin{equation*}
+    \frac{L(x, \theta')}{L(x, \theta'')} = h(T(x), \theta', \theta'')
+\end{equation*}
+monotone increasing likelihood function for all $\theta$ and $t$. Then the Neyman-Pearson test for the for a simple test with $\theta_1 > \theta_0$ is also the UMP test for the one-sided problem.
+\end{theorem}
+
+
+
+\begin{remark}
+Note:
+\begin{enumerate}
+    \item under certain \underline{regularity condition} (what?) admits the LR good properties.
+    \item Compare the confidence interval and the constant in the likelihood function.
+\end{enumerate}
+\end{remark}
+
+\begin{example}[t-test]
+when calculating the critical value of LR, all we care about is randomness(to make the test have the level of $\alpha$). Certain constant operation could be thrown out.
+\end{example}
+
+
+\quad\\
+Summary to standard test problems:
+\begin{itemize}
+    \item For simple test, based on Neyman-Pearson's Lemma we know that UMP exists.
+    \item For the one-sided test, we choose any $\theta_1$ > $\theta_0$ and see that the Neyman Peason test is still UMP test.
+    \item For the two-sided test, we use the likelihood ratio test. Note that in this case the test is not necessarily UMP. But under certain regularity conditions it provides good results.(?)
+\end{itemize}
+
+
+\subsection{Confidence Interval}
+\begin{definition}[confidence interval]
+Given a statistical test with the induced parameter $\rho: \Theta \rightarrow \mathbb{R}$. Given $\alpha$ the confidence level,  the significance interval is defined as a set-valued function:
+\begin{align*}
+	C:\chi \rightarrow \mathcal{P}(\mathbb{R}),
+\end{align*}
+such that
+\begin{align*}
+	\forall \theta \in \Theta: \mathbb{P}_\theta(\rho(\theta) \in C) \ge 1 - \alpha. 
+\end{align*}
+\end{definition}
+\begin{remark}
+The induced parameter is not random, the confidence interval is. 	
+\end{remark}
+
+
+
+
+
+
+
+\subsection{general linear test problem}
+\begin{remark}
+    Given $X_{1} \dots X_{n}, Y_{1}, Y_{n}$ i.i.d. $\sim \mathcal{N}(0, 1)$. We have:
+    \begin{equation}
+        T_n := \frac{X_1}{\sum_{i = 1}^{n} Y_i^2}, \quad
+        F_{n, p}: = \frac{\sum_{i = 1}^p X_i^2}{\sum_{i = 1}^n Y_i^2}, \quad
+        \chi^2(n) = \sum_{i = 1}^{n}X_i^2
+    \end{equation}
+\end{remark}
+
+\begin{theorem}[T-test]
+In the standard linear model with unknown variance. The Simple test for the hypothesis:
+\begin{equation*}
+    H_0: \rho = <\nu, \beta_0>, \quad against \quad H_1: \rho = <\nu, \beta_1>
+\end{equation*}
+is given by the function:
+\begin{equation}
+    \psi_\alpha = \mathbbm{1}(T_{n - p}(Y) > q_{T, (1 - \alpha)/2})
+\end{equation}
+with 
+\begin{equation}
+    T_{n - p}(Y) := \frac{\hat{\rho} - \rho_0}{\hat{\sigma} \sqrt{\nu^T (X^T X)^{-1} \nu}}
+\end{equation}
+\end{theorem}
+
+\begin{definition}[linear test problem]
+In a regular linear model and a contrast matrix $ \mathbf{K} \in \mathbf{R}^{r * p}$ with full rank $r \leq p$. The two-sided test for $c = \mathbf{K} \beta$ is called a linear test problem.
+\end{definition}
+
+\begin{theorem}
+Observe a linear test problem with the contrast matrix $K \in \mathbb{R}^{r * p}$ and $c \in \mathbb{R}^{p}$, the error is normally distributed. Define the residual sum of square
+\begin{equation}
+    RSS := ||Y - X\hat{\beta}||^2
+\end{equation}
+\begin{equation}
+    RSS_{H0} := ||Y - X \hat{\beta}_{H0}||^2
+\end{equation}
+and the Fischer statistic:
+\begin{equation}
+    F:= \frac{\frac{1}{r}(RSS_{H0} - RSS)}{\frac{1}{n - p}RSS}
+\end{equation}
+Than we have:
+\begin{enumerate}
+    \item every likelihood quotient test has the test function: F(y)
+    \item We have:
+    \begin{equation}
+        \| RSS_0 - RSS \|^2 / \sigma^2 = \| (K(X^T X)^{-1}K^T)^{-1/2} (K \hat{\beta} -c) \|^2/\sigma^2 \sim \chi^2
+    \end{equation}
+    \item Under the null hypothesis we have that the Fischer statistic admits the F distribution:
+    \begin{equation}
+        F \sim F(r, n - p)
+    \end{equation}
+    Especially for has the F-test with with $(1 - \alpha)$ quantile the significance level of $\alpha$ 
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\begin{enumerate}
+    \item plug the pdf of y into the likelihood function, using log-likelihood function we get the result;
+    \item Ingredients:
+    \begin{itemize}
+        \item $K$ is a linear mapping, the kernel space of $K$ is the orthogonal complement of  $K^*$.
+        \item a new scalar product could be defined by:
+        \begin{equation}
+            <. , .>_x := <X., X.>
+        \end{equation}
+        \item we know from Gauss-Markov that the LSE is a linear transformation of the random variable $y$, so $\hat{\beta}$ is normally distributed. Besides is the LSE $\hat{\beta}$ a unbiased estimator.
+    \end{itemize}
+\end{enumerate}
+\end{proof}
+
+
+
+
+
+\subsection{Application: Analysis of Variance}
+\begin{definition}[ANOVA(the model of the (one-factorial analysis)]
+\begin{itemize}
+    \item Factor
+    \item Gesamtstichprobeumfang
+    \item ausbalancierte Design
+\end{itemize}
+\end{definition}
+
+\begin{lemma}[LSE of the ANOVA-Model]
+The LSE in the ANOVA model is the Gesamtmittel( $\overline{Y..}$.)
+\end{lemma}
+
+\begin{lemma}
+In ANOVA model observe:
+\begin{itemize}
+    \item Gesamtmittel: $\overline{Y}.. = \frac{1}{n} \sum_{i = 1} ^ {p} \sum_{j = i}^{n_{i}} Y_{ij} $
+     \item SSB(sum of squares between groups): 
+    \item SSW(sum of squares within groups):
+    \item SST(total sum of squares): 
+\end{itemize}
+\end{lemma}
+
+\begin{remark}
+vgl. Bias-Variance-Zerlegung
+\end{remark}
+
+\begin{theorem}[F-test in the ANOVA model]
+In the ANOVA-Modell, the likelihood ratio for the test:
+\begin{equation*}
+    H_0: \mu_1 = \dots \mu_p; \quad H_1: \exists i \neq j: \mu_i \neq \mu_j
+\end{equation*}
+is :
+\begin{equation}
+    F = \frac{\frac{1}{p -1}SSB}{\frac{1}{n - p}SSW}
+\end{equation}
+\end{theorem}
+
+\begin{corollary}
+In a 2-factor ANOVA test, the Liklihood Ratio test is a $T_{n - 2, 1-\alpha/2}$ test with:
+\begin{equation}
+    T = \frac{\overline{Y_{1.}} - \overline{Y_{2.}}}{\sqrt{\frac{1}{  n_1} + \frac{1}{n_2}}\hat{\sigma}}
+\end{equation}
+\end{corollary}
+
+
+
+\section{Method Of Moments}
+\textbf{The Setup}: We assume the i.i.d. model $\mathbb{Y} = (Y_1, \dots, Y_n)$\\
+\textbf{probability assumptions}:
+\begin{enumerate}
+	\item $\mathbb{P} \in (\mathbb{P}_\theta, \theta \in \Theta \subset \mathbb{R})$
+	\item $l(y, \theta) = \log \mathbb{P}(y, \theta)$, 
+	\item $L(\mathbb{Y}, \theta) = L(\theta) = \sum_{i = 1}^n l(y_i, \theta)$
+\end{enumerate} 
+
+
+\begin{theorem}[bias-variance decomposition]
+	Assume the estimator $\theta^* \in L^2(\mathbb{P}_\theta)$ with the true parameter $\theta \in \Theta$, then the quadratic risk $R(\theta^*, \theta):= \mathbb{E}[(\theta^* - \theta)^2]$ satisfies:
+	\begin{align*}
+		R(\theta^*, \theta) := \mathbb{E}_\theta[(\theta^* - \theta)^2] =  (\mathbb{E}\theta^* - \theta)^2 + \var(\theta^*)
+	\end{align*}
+\end{theorem}
+\begin{definition}[the empirical measure]
+\begin{equation*}
+	P_n(B) = \frac{1}{n} \sum_{Y_i \in B}\mathbbm{1}(Y_i)
+\end{equation*}
+\begin{equation*}
+	F_n(y) = \frac{1}{n} \sum_{Y_i \leq y} \mathbbm{1}(Y_i)
+\end{equation*}
+	
+\end{definition}
+
+
+\begin{theorem}[the theorem of Glivenko-Cantalli]
+	Empirical cdf converges \textbf{uniformly }to the ture cdf:
+	\begin{equation*}
+		\|F_n - F\|_\infty \rightarrow0
+	\end{equation*}
+\end{theorem}
+
+\begin{proof}
+\textbf{Step 1: $F_n \overset{a.s.}{\rightarrow} F$}\\
+Proved by law of large numbers
+\begin{equation*}
+	F_n(x) \overset{a.s.}{\longrightarrow} F(x), \quad F_n(x-) \overset{a.s.}{\longrightarrow} F(x-), 
+\end{equation*}
+by the strong law of large number. (Since $(\mathbbm{1}_{(x_i \in (- \infty, x))})_{i \in \mathbb{N}}$ is i.i.d and belongs to $L^2$). We separate the cdf along the y-axis. Define:
+\begin{equation*}
+	x_j := \min \{x : F(x) \leq \frac{j}{N}\}, 
+\end{equation*}
+and
+\begin{equation*}
+	R_n := \max_{j = 1, \dots, N}\{ |F_n(x_j) - F(x_j)| + |F_n(x_j-) - F(x_j-)| \}
+\end{equation*}
+(Since the cdf is only right-continuous we must include the left-limits point)
+
+$\forall x \in (x_{j - 1}, x_j)$ we have:
+\begin{equation*}
+	F_n(x) \overset{(1)}{\leq} F_n(x_{j}-) \overset{(2)}{\leq} F(x_j-) + R_n \overset{(3)}{\leq} F(x) + R_n + \frac{1}{N} 
+\end{equation*}
+Where (1) follows by the monotony of $F_n$ and (2) and (3) follow by the definition of $R_n$ and analog we have:
+\begin{equation*}
+	F_n(x) \geq F_n (x_{j -1}) \geq F(x_{j - 1}) - R_n \geq F(x) - R_n - \frac{1}{N}
+\end{equation*}
+The characteristic of the uniform convergence is that it does not depends on the selection of $x$. 
+Together we have:
+\begin{equation*}
+	\limsup_N \sup_{x \in \Omega}(|F_n - F|) \leq R_n + \frac{1}{N}
+\end{equation*}
+Since $R_n \longrightarrow 0$ by the results above the equation goes to zero as $N \longrightarrow \infty$.
+\end{proof}
+
+\begin{remark}
+Functional analysis view of point and Riemann integral. 	
+\end{remark}
+
+
+\begin{theorem}[Random variable]
+Let $S_0 := \mathbb{E} g(Y_1), \quad \sigma_g^2:= Var[ g(Y_1) ] < \infty $. The arithmetical mean:
+\begin{equation*}
+	S_n = \frac{1}{n} \sum Y_i
+\end{equation*}
+satisfies
+\begin{enumerate}
+	\item $\mathbb{E} S_n = S_0$
+	\item $\var[S_n] = \frac{1}{n} \sigma_g^2$
+	\item $S_n \longrightarrow S_0, a.s.$
+	\item $\sqrt{n} (S_n - S_0) \overset{\omega}{\longrightarrow} \mathcal{N}(0, \sigma^2_g)$
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[Continuous mapping theorem]
+Let the setting be the same as above. and $h \in C^2(\mathbb{R}, \mathbb{R})$. And $h'(S_0) \neq 0$, We have
+\begin{enumerate}
+	\item $h(S_n) \overset{P}{\longrightarrow} h(S_0)$
+	\item $\sqrt{n}(h(S_n) - h(S_0)) \overset{P}{\longrightarrow} \mathcal{N}(0, h'(S_0) \sigma_g^2)$
+\end{enumerate}
+\end{theorem}
+.\\
+\textbf{Substitution Principle: Methods of Moments}\\
+\begin{method}[method of moments]\quad
+\begin{enumerate}
+	\item We defined the first moment as the induced parameter to be estimated: $m(\theta) = \mathbb{E}_{\theta}[g(Y_1)]$. $m$ describe the potential nonlinear relation between the parameter and moment and is determined by the statistical assmptions. 
+	\item Determine $m^{-1}(Y)$ with $Y = \mathbb{E}_\theta [g(x)]$. It holds $m^{-1}(Y)  = \theta$. 
+	\item We now substitute the empirical measure for the real measure by the theorem of Glivinko-Cantalli and get the estimator $\tilde{\theta} = m^{-1}(\frac{1}{n} \sum g(Y_i))$
+\end{enumerate}
+\end{method} 
+\begin{remark}
+$m^{-1}$ my be difficult to solve: consider the case where we estimate the variance under normal distribution, $m^{-1}$ has the argument of first and second moment, $\theta$ and $m$ do not have to be linear.	
+\end{remark}
+
+
+\begin{example}[Uniform Distribution]
+Let $ P \sim U[0, \theta]$, The parameter to estimate is $\theta$. Know 
+\begin{equation*}
+	\begin{aligned}
+		\mathbb{E}_\theta [Y] &= \frac{1}{2} \theta, m(\theta) = \frac{1}{2}\theta\\
+		m^{-1}(\mathbb{E}Y) &\sim m^{-1}(\frac{1}{n}\sum Y_i)\\
+		\hat{\theta} &= 2 \times \frac{1}{n} \sum Y_i
+	\end{aligned}
+\end{equation*}
+Is this a unbiased estimator?Yes. p-moment could also be used. Given all the moment estimator are unbiased. The Question remains: Which are the better estimator?
+\end{example}
+
+
+
+
+
+\begin{theorem}
+	$\Theta \subset \mathbb{R}$, there exists a function $g: \mathbb{R} \longrightarrow \mathbb{R}$, s.t.
+	\begin{equation*}
+		\int g(y) p(y,\theta) d\mu(y) = \theta
+	\end{equation*}
+	\begin{equation*}
+		\int [g(y) - \theta]^2 p(y,\theta) d\mu(y) = \sigma^2(\theta) < \infty
+	\end{equation*}
+	Then the moment estimator $\tilde{\theta}_n = \frac{1}{n} \sum g(Y_i)$ satisfies:
+	\begin{enumerate}
+		\item $\tilde{\theta}_n$ is unbiased.
+		\item The normalised quadratic risk $ \mathbb{E}_\theta (\tilde{\theta}^n - \theta)^2 = \frac{1}{n} \sigma^2(\theta)$
+		\item $\tilde{\theta}_n$ is asymptotic root-n normal.
+		\begin{equation*}
+			\sqrt{n} (\tilde{\theta}_n - \theta) \overset{\omega}{\longrightarrow} \mathcal{N}(0, \sigma^2(\theta))
+		\end{equation*}
+	\end{enumerate}
+\end{theorem}
+
+\begin{theorem}
+	If instead $\mathbb{E} g(y) = m(\theta)$ with a monotonic and twice differentiable, and $(m^{-1})'(m(\theta)) \neq 0$. Then we have:
+	\begin{enumerate}
+		\item $\tilde{\theta}_n := m^{-1}(\frac{1}{n} \sum Y_i )$ is consistent.
+		\item $\tilde{\theta}_n$ is root-n normal and: $\sqrt{n} (\tilde{\theta}_n - \theta) \overset{\omega}{\sim} \mathcal{N}(0, \sigma^2_g (m^{-1})(m(\theta))$
+	\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+	Exercise 1.2
+\end{proof}
+
+\begin{remark}
+Condition: The moment function is invertible and the inverse function is twice differentiable.	
+\end{remark}
+
+
+\begin{definition}[Confidence set]
+mengenwertig function  \( C : \mathcal{X} \longrightarrow \mathcal{P}(\Theta) \), which gives a (minimal) set, such that\textbf{ for every} $\theta$ in the parameter set, the probability of the given $x$ occurring $\geq$ 1 - $\alpha$:
+\begin{equation}
+    \mathbb{P}_{\theta}[\theta \in C(x)] = \mathbb{P} [x \in \chi, \theta \in C_\alpha] \geq 1 - \alpha \quad \forall \theta \in \Theta
+\end{equation}
+\end{definition}
+
+\begin{remark}
+Be aware $\theta$ does not admit any distribution so it's wrong to say that $\theta$ lies in $C(x)$ with the probability $1 - \alpha$. Here the $C(x)$ is the random variable.
+\begin{enumerate}
+    \item It is wrong to say, that $\theta$ is in $C_{\alpha}$ with the probability $1 - \alpha$.
+    \item Usually we construct the confidence set by an estimator. We use the likelihood of the estimator to establish the confidence the parameter.
+\end{enumerate}
+\end{remark}
+
+
+
+\subsection{Cramer-Rao Inequality}
+\begin{lemma}
+The Kullback-Leibler divergence is positive-definite, and addtive:
+	\begin{equation*}
+		KL(\tilde{\theta}, \theta) \geq 0, \quad		KL(\tilde{\theta}, \theta) = 0 \Leftrightarrow \mathbb{P}_{\tilde{\theta}} = \mathbb{P}_{\theta}
+	\end{equation*}
+\end{lemma}
+
+\begin{lemma}[Additivity]
+	Consider the product $\mathbb{P}_\theta = \mathbb{P}_\theta^{1} \otimes \mathbb{P}_\theta^{2}$. $\mathbb{P}_{\hat{\theta}} = \mathbb{P}_{\hat{\theta}}^1 \otimes \mathbb{P}_{\hat{\theta}}^2$  Then 
+	\begin{equation}
+		KL(P_\theta, P_{\hat{\theta}}) = KL(P_\theta^{(1)} , P_{\hat{\theta}}^{(1)}) + KL(P_\theta^{(2)} , P_{\hat{\theta}}^{(2)})
+	\end{equation}
+	We see the the KL divergence grow linear with n.
+\end{lemma}
+
+\begin{corollary}
+	As a corollary we have, let $\mathbb{P}_\theta = P_\theta^{\otimes n}$, we have:
+	\begin{equation}
+		KL(P_\theta, P_{\hat{\theta}}) = nKL(\theta, \hat{\theta})
+	\end{equation}
+\end{corollary}
+
+We now see the Kullback-Leibler divergence provides a tool to measure the distance between two probability measures. It has the desired properties such as positive definite and additivity. However it is not symmetric. Notice the two parameter to be compared do not have to be in the same dimension. We are able to compare the normal distribution (with 2 parameter) to the Bernoulli distribution(with 1 parameter)
+
+\begin{definition}[Fisher Information]
+\begin{equation*}
+	F(\theta) = \int [\frac{\partial}{\partial \theta} l(y, \theta)]^2 p(y, \theta) d\mu(y) = \mathbb{E}_\theta [l'(\theta, y)^2] \geq 0
+\end{equation*}
+Is called the Fischer Information.
+\end{definition}
+
+\begin{remark}
+	The Fischer information is an eccentric property of the parametric probability models. 
+\end{remark}
+
+\begin{definition}[Regular parametric family(Univariate)]
+The family $(\mathbb{P}_\theta, \theta \in \Theta \subset \mathbb{R})$ is regular if:
+\begin{enumerate}
+	\item $\mathbb{P}_{\theta}$ all have the same null set.
+	\item \textbf{DUIS}: $\forall f(y) \in L^2(\mathbb{P_\theta})$:
+	\begin{equation} \label{RM}
+		\frac{\partial}{\partial \theta} \int f(y) p(y, \theta) d\mu(y) = \int \frac{\partial}{\partial \theta} f(y) p(y, \theta) d\mu(y) 
+	\end{equation}
+	\item Finite Fischer Information: $l(y, \theta): = \log L(y,\theta)$ is differentiable w.r.t. $\theta$. And:
+	\begin{equation*}
+		\int [\frac{\partial}{\partial \theta} l(y, \theta)]^2 p(y, \theta) d\mu(y) < \infty
+	\end{equation*}	
+\end{enumerate}
+\end{definition}
+
+\begin{lemma}[properties of regular parametric family]
+	If $(\mathcal{P}_\theta)$ is a regular parametric family. We have:
+	\begin{enumerate}
+		\item $\mathbb{E}_\theta l'(\theta, y) \equiv 0$
+		\item $F(\theta) = Var_\theta[l'(y,\theta)]$
+		\item $F(\theta) = -\mathbb{E}l^{''}(y, \theta)$
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	by definition we know:
+	\begin{equation} \label{equ: 11}
+		L(\theta, y) = \exp (l(\theta, y)) = \mathbb{P}_\theta(y)
+	\end{equation}
+	We know:
+	\begin{equation*}
+		\int L(\theta, y) d\mu(y) = 1
+	\end{equation*}
+	By the definition of regular parametric family we interchange the limit:
+	\begin{equation*}
+		\int \frac{d}{d\theta} L(\theta, y) d\mu(y) = \int l'(\theta, y) L(\theta, y)d\mu = \frac{d}{d\theta} \int L(\theta, y) d\mu(y) = 0
+	\end{equation*}
+	The second equation is true since $\mathbb{E}l'(\theta, y) = 0$.\\
+	The third equation can be shown by differentiating twice the equation \ref{equ: 11}.
+\end{proof}
+
+\begin{lemma}[Additivity of Fischer-Information]
+Let $\mathbb{Y} = (Y_1, \dots, Y_n)$ be an i.i.d. sequence. $\mathbb{P}_{\tilde{\theta}} = \mathbb{P}_\theta^{\otimes n}$ be the product measure.	 Then we have:
+\begin{equation}
+	F(\tilde{\theta}) = nF(\theta)
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+	
+\end{proof}
+
+\begin{theorem}[Cramer-Rao inequality]
+	Given the i.i.d setup and the regular parametric family, the \textcolor{red} {unbiased estimator} $\tilde{\theta}\in L^2(\mathbb{R}^n) $ for the parameter $\theta \in \mathbb{R}^n $, we have
+	\begin{equation*}
+		Var_\theta[\tilde{\theta}_n] =  \mathbb{E} |\tilde{\theta}_n - \theta|^2 \geq \frac{1}{n F(\theta)}
+	\end{equation*}
+\end{theorem}
+\begin{proof}
+We have
+\begin{align*}
+	Cov_\theta(\tilde{\theta}, l') &= \int_X (\tilde{\theta} - \theta)(l'(\theta, y) - 0)L(\theta, y) dy \\
+	&= \int_X (\tilde{\theta} - \theta)(\frac{L'}{L})L(\theta, y)dy\\
+	&= \int_X (\tilde{\theta} - \theta) L'(\theta, y) dy\\
+	&= \int_X \tilde{\theta} L'(\theta, y) dy\\
+	&= 1
+\end{align*}
+Apply Cauchy-Schwarz:
+\begin{align*}
+	&Var_\theta (\tilde{\theta}) Var_\theta(l') > Cov_\theta(\tilde{\theta}, l')^2 = 1\\
+	\Rightarrow &Var_\theta \geq \frac{1}{F(\theta)} = \frac{1}{nF(\theta)}
+\end{align*}
+\end{proof}
+
+\begin{corollary}
+If the estimator is\textbf{ not} unbiased. i.e.
+\begin{equation*}
+	\mathbb{E}\hat{\theta} = \tau(\theta)
+\end{equation*}
+	Then the quadratic risk is lower bounded by:
+	\begin{equation*}
+		\mathbb{E}_\theta |\hat{\theta} - \theta |^2 \geq |\tau(\theta) - \theta|^2 + \frac{\tau'(\theta)^2}{n F(\theta)}
+	\end{equation*}
+\end{corollary}
+
+
+\begin{proof}
+	Apply the same argument of interchanging limit by the definition of regular parametric family:
+	\begin{align*}
+		\tau(\theta) &= \int \hat{\theta}p(\theta, y) d\mu\\
+		\Rightarrow \tau'(\theta) &=\int \frac{d}{d\theta} \hat{\theta} p(\theta, y) d\mu\\
+		&= \int \hat{\theta}l'(\theta)p(\theta, y) d\mu\\
+		&= \mathbb{E} \hat{\theta}l'(\theta)
+	\end{align*}
+	Therefore we have the equation:
+	\begin{equation}
+		\mathbb{E}(\hat{\theta} - \tau(\theta))l'(\theta,y) = \tau'(\theta)
+	\end{equation}
+	By Cauchy-Schwarz inequality we have:
+	\begin{equation*}
+		\mathbb{E}(\hat{\theta} - \tau(\theta))l'(\theta, y) \leq \sqrt{\mathbb{E}(\hat{\theta} - \tau(\theta))^2} \times \sqrt{\mathbb{E}(l'(\theta, y)^2}
+	\end{equation*}
+	Therefore
+	\begin{equation*}
+		Var_\theta [\hat{\theta}] \geq \frac{\tau'(\theta)^2}{F(\theta)}
+	\end{equation*}
+\end{proof}
+
+
+\subsection{R-Efficiency and Cramer-Rao Inequality in the multivariate cases}
+We saw that in the regular parametric family the variance of an unbiased estimator is lower bounded by $\frac{1}{nF(\theta)}$. That motivated the following defintion.
+\begin{definition}
+	$\tilde{\theta}$ is R-efficient if it is unbiased and 
+	\begin{equation}
+		\mathbb{E}[\tilde{\theta} - \theta]^2 = \frac{1}{nF(\theta)}
+ 	\end{equation}
+\end{definition}
+
+The next theorem shows that all the R-efficient estimator could be recovered by the method of moments.
+
+\begin{theorem}
+	If there exists $\tilde{\theta}$ is R-efficient, then 
+	\begin{equation}
+		\tilde{\theta} = \frac{1}{n}\sum U(Y_i)
+	\end{equation}
+	where $U(.)$ is a vector function to $\mathbb{R}$ and satisfies:
+	\begin{equation*}
+		\int U(y) p(\theta, y) d\mu \equiv \theta
+	\end{equation*}
+	and the $\log$ density coulbe be represented as:
+	\begin{equation*}
+		l(\theta, y) = C(\theta)^\top U(y) - B(\theta) + l(y)
+	\end{equation*}
+\end{theorem}
+
+\begin{proof}
+	$\tilde{\theta}$ can be R-efficient, only if 
+	\begin{equation*}
+		\tilde{\theta} - \theta - h \equiv 0
+	\end{equation*}
+	where
+	\begin{equation*}
+		h = \frac{L'(\mathbb{Y}, \theta)}{nF(\theta)}
+	\end{equation*} 
+	so we have:
+	\begin{equation*}
+		L'(Y,\theta) = (\hat{\theta} - \theta) n F(\theta)
+	\end{equation*}
+	$\forall \theta^\circ, \theta_\circ$, By the fundamental theorem of integral and differential.
+	\begin{align*}
+		L(Y,\theta^\circ) - L(Y, \theta_\circ) &= \int_{\theta_\circ}^{\theta^\circ}n F(\theta)(\hat{\theta} - \theta)d\theta \\
+		&= \int L'(Y,\theta)d\theta
+	\end{align*}
+\end{proof}
+
+
+\begin{definition}[Regular family(Multivariate)]
+The family is called regular if :
+\begin{enumerate}
+	\item $\mathbb{P}_{\theta}$ all have the same null set.
+	\item interchange of limit under integral: $\forall s(y) \in L^2(\mathbb{P_\theta})$:
+	\begin{equation*}
+		\frac{\partial}{\partial \theta} \int s(y) p(y, \theta) d\mu(y) = \int \frac{\partial}{\partial \theta} s(y) p(y, \theta) d\mu(y) 
+	\end{equation*}
+	\item Finite Fischer information: The $\log$ density is differentiable w.r.t. $\theta$ and $\nabla l(y, \theta) \in L^2(P_\theta)$
+	\begin{equation*}
+		\int \|\nabla l\| ^2 p(y, \theta) d\mu(y) < \infty
+	\end{equation*}
+	The Fisher information matrix is defined as:
+	\begin{equation*}
+		F(\theta) = (\int \nabla l \nabla l^\top) dP_\theta(y)
+	\end{equation*}
+	is a $p \times p$ symmetric positive semi-definite matrix.
+\end{enumerate}	
+\end{definition}
+
+
+\begin{theorem}[Cramer-Rao in multivariate case]
+	If $\tilde{\theta}$ is a unbiased estimator of $\theta$. For an i.i.d sample from a regular parametric family:
+	\begin{equation*}
+		Var_\theta[\tilde{\theta}] \geq \{ n I(\theta)\}^{-1} 
+	\end{equation*}
+	\begin{equation*}
+		\mathbb{E} \| \tilde{\theta} - \theta \|^2 = tr\{ Var_\theta[\tilde{\theta}]\} \geq \{n I(\theta)\}^{-1} 
+	\end{equation*}
+	Moreover if the estimator $\tilde{\theta}$ is not unbiased and $\mathbb{E}\tilde{\theta} =\tau(\theta)$, then:
+	\begin{equation*}
+		Var_\theta[\tilde{\theta}] \geq \nabla \tau^\top (nI(\theta))^{-1} \nabla \tau
+	\end{equation*}
+	and 
+	\begin{equation*}
+		\mathbb{E} |\tilde{\theta} - \theta|^2 \geq
+	\end{equation*}
+\end{theorem}
+
+\begin{definition}[R-efficiency]
+	$\tilde{\theta}$ is R-efficient if
+	\begin{equation*}
+		\mathbb{E}\tilde{\theta} \equiv \theta, Var[\tilde{\theta}] = I(\theta)^{-1}
+	\end{equation*} 
+
+\end{definition}
+The definition only well-defined when the distribution admits certain formation.
+
+
+
+
+
+
+\newpage
+
+
+
+\section{Linear Regression Estimation}
+\subsection{The Maximum-Likelihood Estimator}
+\begin{definition}[dominated statistical model]
+\begin{equation}
+	L(\theta, x):= \frac{d\mathbb{P}_\theta}{d\mu}(x), \quad \theta \in \Theta, x \in \chi. 
+\end{equation}	
+\end{definition}
+
+\begin{definition}[maximum likelihood estimator(MLE)]
+\begin{equation}
+	\hat{\theta}  := \arg\max_{\theta \in \Theta} L(\theta, x) \texttt{ for a.a } x \in \chi. 
+\end{equation}
+\end{definition}
+
+\begin{remark}
+note:
+\begin{enumerate}
+    \item The MLE is independent of the dominating measure.
+    \item The applicability of the MLE should be further examined.
+    \item Let PA be correct, $\mathbb{P} = \mathbb{P}_{\theta^*}$, for $\theta^* \in \Theta$. We let $\psi(\theta) = -\log L(\theta)$ be the contrast and we can show that:
+		\begin{equation*}
+			\theta^* = \arg \min_\theta \mathbb{E}_{\theta^*} \psi(y, \theta) 
+		\end{equation*}
+\end{enumerate}
+\end{remark}
+
+\begin{definition}[Contrast function]
+	The function $\psi(y, \theta)$ is a contrast function if
+	\begin{equation*}
+		\forall \hat{\theta} \in \Theta: 
+		\hat{\theta} = \arg\min_{\theta} \int \psi(y, \theta) d\mathbb{P}_{\hat{\theta}}(y)
+	\end{equation*} 
+	In particular, for if true measure $\theta^* \in \Theta$, it holds 
+	\begin{equation*}
+		\theta^* = \arg\min_\theta \int \psi(y, \theta) d\mathbb{P}_{\theta^*}(y)
+	\end{equation*}
+
+\end{definition}
+Observe here that we do not have the unbiasedness anymore. Instead we have minimal distance and projection. The meaning of the distance therefore becomes important. \textcolor{red}{Notice for the expectation. We are always under the true measure.} \par 
+
+\subsubsection*{Special Case: Least square estimation}
+let $\psi(y, \theta) = \| g(y) - \theta \|^2$ where $g(y)$ satisfies:
+\begin{equation*}
+	\int g(y) d\mathcal{P}_\theta(y) \equiv \theta
+\end{equation*}
+Observe
+\begin{equation*}
+	\mathbb{E}_\theta \psi(\theta', y) = \| \theta - \theta' \|^2 + \mathbb{E}\|g(y) - \theta\|^2 + \cdots
+\end{equation*}
+This is a well defined contrast.
+
+
+\subsection{The Standard Linear Model}
+\begin{definition}[the linear model]
+Given the observation $Y \in \mathbb{R}^n$, feature vector $\beta \in \mathbb{R}^p$, and the design matrix $X \in \mathbb{R}^{n \times p}$  with  :
+\begin{align*}
+	Y = X \beta + \epsilon 
+\end{align*}
+\begin{enumerate}
+	\item $X$ is full rank $p$, $p < n$
+	\item the random noise $\epsilon \in \mathbb{R}^n$ satisfies  $\mathbb{E}\epsilon = 0$, $ \cov(\epsilon_i, \epsilon_j) = \Sigma_{i, j}$, $\Sigma > 0$
+\end{enumerate}
+If $\Sigma = \sigma^2 I_n$, the linear model is called the ordinary linear model
+\end{definition}
+\begin{remark}\quad
+\begin{enumerate}
+	\item We can use $\Sigma^{-\frac{1}{2} }$ to standardise the normal distribution. For $Y = \theta \Psi + \epsilon$,with $\epsilon \sim N(0, \Sigma)$. Instead $Y$ we observe $\Sigma^{-\frac{1}{2}} Y$, observe:
+	\begin{align*}
+		\var(\Sigma^{-\frac{1}{2}}Y) = \Sigma^{-\frac{1}{2}}\var(\epsilon)(\Sigma^{-\frac{1}{2}})^T = E_n
+	\end{align*}
+    \item the sampling(observation) is in the image space of the linear mapping of the design matrix.
+\end{enumerate}
+\end{remark}
+
+\begin{method}[the LSE estimation]
+	The LSE estimator $\hat{\beta}$ is defined as
+	\begin{align*}
+		\hat{\beta}:= \arg\inf_{\beta \in \mathbb{R}^p}|\Sigma^{-\frac{1}{2}}(Y - X\beta)|^2
+	\end{align*}
+\end{method}
+
+
+\begin{theorem}[Gauss-Markov]
+given ordinary linear models, it holds
+\begin{enumerate}
+    \item LSE is the BLUE(best unbiased linear estimator) with the  form:
+    \begin{equation}
+        \hat{\beta} := (X^TX)^{-1}X^TY
+    \end{equation}
+    \item For the induced parameter $\gamma: = <\beta, v>$ for some $v$, $\langle \hat{\beta}, \nu \rangle$ is the BLUE for the parameter. Best is in the sense that it has the minimum variance.
+    \item The sampling variance
+    \begin{equation}
+    \hat{\sigma} = \frac{|R|^2}{n - p} = \frac{|(E - \Pi)Y|^2}{n - p} =  \frac{\|Y - X\hat{\beta}\|^2}{n - p} 
+    \end{equation}
+    is a unbiased estimator of $\sigma$
+\end{enumerate}
+\end{theorem}
+Not that $X$ may not be invertible but $X^T X$ is invertible given the condition of full rank.
+
+\begin{proof}.
+\begin{enumerate}
+    \item We can show that under the condition of full rank of X, $(X^T X)$ is invertible. We then show that $<Y - X\hat{\beta}, X> = 0$
+    \item Orthogonal projection in Hilbert space.
+    
+\end{enumerate}
+\end{proof}
+
+\begin{remark}\quad
+\begin{enumerate}
+    \item compare $\hat{\beta}$ with the that in the regular linear model. We see that the term $\Sigma$ cancels out.
+    \item LSE is independent of the distribution of $\epsilon$
+    \item \textbf{the relationship between LSE and MLE:} Under the assumption of normally distributed error MLE is actually LSE;
+    \item \textbf{MLE of the $\sigma^2$}, Simple calculation shows that: \begin{equation*}
+        \hat{\sigma} = \frac{1}{n} ||Y - \beta X||^2
+    \end{equation*}
+\end{enumerate}
+\end{remark}
+
+In the light of Bayes, we can assume the parameter admits a-priori distribution and calculate the a-posteriori distribution of the parameter given an observation. 
+\begin{theorem}
+Assuming homogeneous Gaussian error $\sigma^2 E_n$ with $\sigma$ known, if the feature parameter $\beta \in \mathbb{R}^p$ admits the a-priori distribution
+\begin{align*}
+	\beta \sim \mathcal{N}(m, M), \quad m \in \mathbb{R}^p, M\in \mathbb{R}^{p \times p}_{SPD},
+\end{align*} 
+then the a-posteriori distribution $\beta$(given the realisation of $y \in Y$) is:
+\begin{align*}
+    &\beta|_Y = \mathcal{N}(\mu_{y}, \Sigma_{y})\\
+    &\texttt{with}\\
+    &\Sigma_{y} = (\sigma^{-2} X^T X + M^{-1})^{-1}\\
+    &\mu_{y} = \Sigma_{y} (\sigma^{-2}X^T y + M^{-1} m)
+\end{align*}
+\end{theorem}
+\begin{remark}\quad
+\begin{enumerate}
+    \item run the calculation once more.
+    \item Known the Bayes optimal estimator is the a-posterori mean value we could calculate the explicit formula of $\beta_{Bayes}$.
+    \item From above we can also get an argmin expression.
+\end{enumerate}
+\end{remark}
+
+
+\subsubsection{Implementation with feature functions}
+Assume the true function is defined in a separable Banach space:  
+\begin{equation*}
+	 f =  f(x, \theta) := \sum_{j = 1}^\infty \theta_j \psi_j(x)
+\end{equation*}
+for a given basis of $(\psi_j)_j$. The model
+\begin{equation*}
+	f \approx Y_i = \sum_{j = 1}^p \theta_j \psi_j(X_i) + \epsilon_i
+\end{equation*}
+
+\begin{remark}
+	How many features we should use ($p$). In reality $\mathbb{E} Y_i = f(X_i)$. For the model we have $f(x) = f(x, \theta) = \sum_1^p \theta_j \psi_j(x)$. 
+	An exact representation of $f(x) = f(x, \theta) = \sum_1^p \theta_j \psi_j(x)$ requires $p = \infty$ and a good basis.For $p < \infty$, we can expect 
+	\begin{equation*}
+		 \forall \theta: \quad \min_\theta \| f - \sum_1^p \theta_j \psi_j(x) \| \gneqq 0 
+	\end{equation*}
+	But the error of the approximation appoaches to 0 as $p \rightarrow \infty$. The problem of selecting p is mainly in the field of non-parametric statistics.
+\end{remark}
+
+\begin{method}[Featured LSE]
+	For $\Psi:= (\psi_1, \dots, \psi_p)^T$, define
+\begin{align*}
+	\tilde{\theta}_{LSE} = \tilde{\theta}_p &= \arg \min_{\theta \in \mathbb{R}^p} \sum^n_{i = 1} | Y_i - f(X_i)|^2\\
+	&= \arg \min_{\theta \in \mathbb{R}^p} \sum^n |Y_i - \psi(X_i)^\top \theta |\\
+	&= \arg \min_{\theta \in \mathbb{R}^p} \| \mathbb{Y} - \psi(X)^\top \theta\|^2
+\end{align*}
+\end{method}
+
+
+\subsubsection{quasi-maximum likelihood approach}
+In the model We assumed: 1)error to be Gaussian, 2)mean of $\mathbb{Y}$ is linear in $\theta$, 3)the noise is homogeneous, but in reality: 
+\begin{enumerate}
+	\item $\mathbb{E}\mathbb{Y} \neq \psi^\top \theta$
+	\item Error is not Gaussian or homogenous.
+	\item $Y_i$ is i.i.d. but the true measure is not in the parameter family
+	\item $Y_i$ is independent but not identical distributed
+	\item $Y_i$ are dependant. 
+\end{enumerate}
+In those case we call the quasi ML approach instead of ML approach, which means for $\hat{\theta}:= \arg \max_{\theta \in \Theta} L(\theta) $
+\begin{equation*}
+	\log \frac{d\mathbb{P}}{d\mu}(Y) \neq L(\hat{\theta}, Y) 
+\end{equation*}
+
+
+
+
+
+
+
+\subsubsection*{Piecewise Constant approximation}
+Suppose that $\mathcal{X}$, the design space is split into pieces $A_1, \cdots, A_k$. $\mathcal{X}$ is a disjoint union(partition) of $A_i s$. By the definition of continuity we know that $f$ is continuous is equivalent to that $f(x)$ is nearly constant on each interval $A_k$, provided the intervals are small enough.
+\begin{equation*}
+	f(x) \approx f(x, \theta) = \sum_{k = 1}^{K} \theta_k \mathbbm{1}(x \in A_k)
+\end{equation*}
+Where the $\theta$ is parameter and the character functions are expansion family. Question now is how to recover $\theta = (\theta_1, \cdots, \theta_p)^\top$.
+\begin{equation*}
+	\tilde{\theta}_{MC} = \arg \min_\theta \sum_{i = 1}^n \psi(Y_i - f(X_i, \theta))
+\end{equation*}
+
+\begin{theorem}
+	$\tilde{\theta}_{MC} = (\tilde{\theta}_j)$, where
+	\begin{equation*}
+		\tilde{\theta}_j = \arg \min_{\theta_j} \sum_{i: X_i \in A_j} \psi(Y_i - \theta_j)
+	\end{equation*}
+	If $\psi(y) = y^2$, then
+	\begin{equation*}
+		\tilde{\theta}_{LSE} = (\tilde{\theta})_j = \frac{1}{N_j} \sum_{X_i \in A_j} Y_i
+	\end{equation*} 
+\end{theorem}
+
+\subsubsection*{Piecewise Polynomial approximation}
+\begin{equation*}
+	f(x) \approx P_m (x, \theta_k), \quad x \in A_k
+\end{equation*}
+\begin{equation*}
+	P_m(x, \theta_m) = \theta_{k,0} + \theta_{k,1}x + \theta_{k,m} x^m
+\end{equation*}
+\begin{equation*}
+	f(x, \theta) = \sum P_m(x, \theta_k) \mathbbm{1}(x \in A_k)
+\end{equation*}
+We have $(m+1)k$ parameters, we then can write the minimal contrast:
+\begin{equation*}
+	\tilde{\theta}_k = \arg \min_\theta \sum_{i: X_i \in A_k} \psi(Y_i - P_m(Xi, \theta))
+\end{equation*}
+At each $k$ we do independently the job. The benefits of the piecewise polynomials is that we can solve a simple problem at each piece. The disadvantage is, however, $f(\theta, x)$ is only piecewise smooth. A solution suggested by the engineers motivated the spline methods
+
+$\varphi_j (x) = x^j$ is rarely used since the feature vectors are strongly correlated. What are often used are orthogonal polynomials. Instead we define the new scalar product:
+\begin{align*}
+	\langle f, g \rangle := \int f g d\mu 
+\end{align*}
+where $\mu$ is in subject of change. 
+
+\begin{theorem}
+	Given $\mu$ there exists and unique orthogonal polynomial basis $\psi_j$ with $\langle \psi_j \psi_m \rangle = \delta_{i, j}$ and $\psi_j$ is of degree $j$.
+\end{theorem}
+\begin{proof}
+	 By induction.
+\end{proof}
+Select $n$ point, the weighted average would approximate the integral:
+\begin{align*}
+	\langle \varphi_j, \varphi_k \rangle_n:= \frac{1}{n}\sum_{i = 1}^n \varphi_j(x_i) \varphi_k(x_i)\rangle \approx \langle \varphi_j , \varphi_k \rangle
+\end{align*}
+
+
+
+
+\subsubsection*{Fourier approximation}
+\begin{lemma}
+	In an unit interval define $x_i := \frac{i - 1}{n}, i = 1, \dots, n$. Define the scalar product:
+	\begin{align*}
+		\langle \varphi_j, \varphi_k \rangle_n := \frac{1}{n} \sum_{i = 1}^n \varphi_j(x_i) \varphi_k(x_i)
+	\end{align*}
+	Then we have:
+	\begin{align*}
+		\forall n \in \mathbb{N}: \langle \varphi_j, \varphi_k \rangle_n = \delta_{j,k}
+	\end{align*}
+\end{lemma}
+
+\subsubsection*{Haar basis}
+\begin{align*}
+	\Psi &= \mathbbm{1}_{[0, 1]}(x) \\
+	\psi &= \mathbbm{1}_{[0, \frac{1}{2}]}(x) - \mathbbm{1}_{(\frac{1}{2}, 1]}(x)
+\end{align*}
+
+\subsubsection*{Piecewise linear approximation}
+Partition of the design space is the partition of the data, therefore we can approximate the function piecewise
+When $f$ is nearly linear on each interval we could use piecewise linear approximation:
+\begin{equation}
+	f(x, \theta) \approx \sum_{k = 1}^K (a_k + b_k x) \mathbbm{1}(x \in A_k)
+\end{equation}
+Then we have $p = 2K$ and $\theta_j = (a_j, b_j)$
+why the loss has a $\delta$(see lecture note).
+
+\begin{theorem}
+	\begin{equation*}
+		(\tilde{a}_k, \tilde{b}_k) = \arg \min_{a_k, b_k} \sum_{X_i \in A_k} \psi(Y_i - a_k - b_kX_i)
+	\end{equation*}
+\end{theorem}
+To build an orthogonal, select $x_k$ and let $\sum_{x_i \in A_k}(x_i - x_k)^2 = 0$
+
+\subsubsection*{spline approximation}	
+The motivation behind the spline method is that we would like force the smooth transaction from one to another piece. Let $f(x)$ be an univariate function.
+\begin{definition}
+	$f(x)$ is a polynomial spline of degree $q$ at knots $t_0 < t_1 \cdots < t_k$. if $f(x)$ is a polynomial of degree $m$ at each interval $(t_{k-1}, t_k]$. And 
+	\begin{equation*}
+		f^{(m)} (t_k - ) = f^{(m)} (t_k + ) \quad \forall m < q, \quad \forall k = 1, \dots, K - 1
+	\end{equation*}
+	$f(x), f'(x), \cdots, f^{(q-1)}(x)$ are continuous and $f^{(q)}$ is piecewise constant.
+\end{definition}
+
+\begin{lemma}
+	Given $q$ and $t_0 < t_1 \cdots < t_k$ each spline $f(x)$ can be representated as 
+	\begin{equation}
+		f(x) = \sum_{j = 0}^{k - 1} a_j \psi_j(x) + \sum_{m = 0}^{q - 1} \alpha_m x^m
+	\end{equation}
+	where $\psi_j(x) = (x - t_j)^q $, therefore our parameter is $\theta = (a_0, \cdots, a_{K- 1}, \alpha_0, \alpha_{q-1})$
+\end{lemma}
+
+For estimation we can see that there exists a problem. The basis $\{psi_j\}_j = (1, x, \dots, x^{q - 1}, \psi_0(x), \dots, \psi_{k-1}(x)$ is useful for theory but not for practice, because the basis are strongly correlated. A remedy for this is called B-splines. The idea is $\psi_j(x)$ has a support only on $q$ neighbour pieces. Nice numeric for B-splines.\\
+smoothing spline\\
+Roughness penalty and bounded variation(variation calculas. Solution of the variation problem is a spline.
+
+\subsubsection{Method of substitution and M-estimation}
+Now we do \textbf{not} have i.i.d., therefore we can not use the empirical distribution to recover real distribution. The method we are going to use is the \textbf{method of contrast}.\par 
+
+Given $Y_i's$ not i.i.d., $f(x) = f(x, \theta^*)$, $\epsilon_i = Y_i - f(X_i, \theta^*)$. We study the empirical distribution of the error's. 
+\begin{definition}
+	A function $\psi(y)$ is called a contrast(influence) if 
+	\begin{equation*}
+		\mathbb{E} \psi(\epsilon_i + Z) \geq \mathbb{E} \psi(\epsilon_i) \quad \forall i = 1, \cdots, n \quad \forall z
+	\end{equation*}
+\end{definition}
+observe that 
+	\begin{equation*}
+		\theta^* = \arg \min_\theta \mathbb{E} \sum_{i = 1}^{n} \psi(Y_i - f(X_i, \theta))
+	\end{equation*}
+Define
+\begin{equation*}
+		\tilde{\theta} = \tilde{\theta}_{MC} = \arg \min_\theta \sum \psi(Y_i - f(X_i, \theta))
+\end{equation*}
+as the \textbf{Minimum contrast estimator}. We are looking at $\theta$ s.t. the empirical distribution of the residual $\tilde{\epsilon}_i = Y_i - f(X_i)$ mimics as well as possible the true distribution of the residual.
+
+
+\begin{example}[Mean regression]
+$\psi(y) = y^2$. \\We check if it is a true contrast. Observe
+\begin{equation*}
+	\mathbb{E} \psi(\epsilon_i + z) = \mathbb \epsilon_i^2 + z^2 \geq \mathbb{E} \psi(\epsilon_i)
+\end{equation*}
+satisfies the definition of the contrast.
+\begin{equation*}
+	\Rightarrow \tilde{\theta} = \tilde{\theta}_{LSE} \text{ The least sqaure estimator}
+\end{equation*}
+\end{example}
+
+
+\begin{example}[LAD estimation]
+ Assume median regression for $Y_i = f(x_i) + \epsilon_i$:
+ \begin{equation*}
+ 	med(\epsilon_i) = 0 \Leftrightarrow f(x_i) = med(Y_i)
+ \end{equation*}
+	Consider $\psi(y) = |y|$, Then
+	\begin{equation*}
+		\mathbb{E}\psi(\epsilon_i + z) = \mathbb{E} |\epsilon_i + z| \geq \mathbb{E} |\epsilon| \quad \forall z \neq 0 \Leftrightarrow med(\epsilon) = 0
+	\end{equation*}
+	We can then derive the minimum contrast estimator:
+	\begin{equation*}
+		\Rightarrow \tilde{\theta} = \tilde{\theta}_{LAD} \text{ the least deviation estimation}
+	\end{equation*}
+	Widely used for robustness. It is less sensitive to data contamination.
+\end{example}
+
+\begin{example}[Maximum likelihood estimator]
+	Regression model $Y_i = f(X_i, \theta^*) + \epsilon_i$ where $\epsilon_i$ are iid from the density $\rho(.)$. Define
+	\begin{equation*}
+		\psi(y)= -\log \rho(y)
+	\end{equation*}
+	\begin{align*}
+		\mathbb{E} \log \rho(\epsilon_i + z) &\leq \mathbb{E} \log \rho(\epsilon_i) \\
+		\Leftrightarrow \mathbb{E} \log \frac{\rho(\epsilon_i)}{\rho(\epsilon_i + z)} &\geq 0 \\
+		KL( L(\epsilon), L(\epsilon + z)) &\geq 0
+	\end{align*}
+	Which is satisfied by the property of Kullback-Leibler divergence.
+	\begin{equation*}
+		\tilde{\theta} = \tilde{\theta}_{MLE} \text{ is the maximum likelihood estimator.}
+	\end{equation*}
+	 
+\end{example}
+
+\begin{remark}.
+\begin{enumerate}
+	\item If $\epsilon \sim \mathcal{N}(0, \sigma^2)$ , we have $\log \rho(y) = - \frac{1}{2\sigma^2} + C$. Then $\tilde{\theta}_{MLE} = \tilde{\theta}_{LSE}$.
+	\item If $\epsilon \sim Laplace(0, b)$, we have $\log \rho(y) = -|y| + C$. Then $\tilde{\theta}_{MLE} = \tilde{\theta}_{LAD}$.
+\end{enumerate}
+\end{remark}
+ 
+
+
+
+\subsection{Regularization of linear models}
+Numerical issue: Calculating $(\psi \psi^T)^{-1}$ is hard and unstable. Especially $(\psi \psi^T)$ is not well-posed. Meaning that $\lambda_{min} (\psi \psi^T) \geq \rho > 0$. In particular, it breaks down if $\psi \psi^T$ is degenerated $\Leftrightarrow$ $\psi_j$ is not linearly independent. The engineering solution:
+\begin{align*}
+	\tilde{\theta}_R &= (\psi \psi^T + R)^{-1} \psi \mathbb{Y} \quad R: ridge\\
+	\tilde{f}_R &= \psi^T \tilde{\theta}_R 
+\end{align*}
+Tikhonov regularization:
+\begin{align*}
+	R &= I_p\\
+	\tilde{\theta}_R &= (\psi \psi^T + I_p)^{-1} \psi \mathbb{Y}
+\end{align*}
+penalty actually add information to the model.
+
+
+\begin{method}[Ridge regression]
+Penalised log-likelihood:
+\begin{equation*}
+	L_G = L(\theta) - \frac{\|G\theta\|^2}{2} 
+\end{equation*}
+Penalised MLE $\tilde{\theta}_G$:
+\begin{equation*}
+	\tilde{\theta}_G = \arg \max_\theta L_G(\theta)
+\end{equation*}	
+For the linear model with homogeneous error $L(\theta) = -\frac{1}{2\sigma^2} \| \mathbb{Y} - \psi^T \theta\|^2 + R$ :
+\begin{align*}
+	&\tilde{\theta}_G = \arg \min_\theta(\frac{1}{2\sigma^2} \| \mathbb{Y} - \psi^T \theta\|^2 + \frac{\|G\theta\|^2}{2} )\\
+	&-\nabla^2 L_G(\theta) = \frac{1}{\sigma^2} \psi \psi^T + G^2\\
+	&D_G = D^2 + G^2, \quad D^2 := \frac{1}{\sigma^2} \psi \psi^T
+\end{align*}
+\end{method}
+
+
+
+\begin{theorem}
+	The penalised estimator has the form:
+	\begin{equation*}
+		\tilde{\theta}_G = (\psi \psi^T + \sigma^2 G^2)^{-1} \psi \mathbb{Y}
+	\end{equation*}
+	The excess has the form:
+	\begin{equation*}
+		L_G(\tilde{\theta}) - L_G(\theta) = \frac{1}{2} \|D_G(\tilde{\theta} - \theta) \|^2
+	\end{equation*}
+\end{theorem}
+
+
+\subsubsection*{Properties of pMLE: Bias and Variance}
+Observe $\Pi_G := \psi^T (\psi \psi^T + \sigma^2 G^2)^{-1} \psi$. \\
+Notice $\Pi_G$ is not a projector but a subprojector:
+\begin{equation*}
+	\Pi_G \leq \Pi_G
+\end{equation*}
+
+\begin{theorem}
+	Let $Var(\epsilon) = \Sigma$, then:
+	
+\end{theorem}
+
+Observation:
+The variance term decrease as $G^2$ increase, In the opposite, the bias term increase with $G^2$.\par
+$\Rightarrow$ Bias-Variance trade off.\par 
+We select $G^2$ such that the order of variance is the same as the order of bias.
+
+
+
+\subsection{Inference Under Normal Distribution}
+Now we want to construct the confident interval of the feature parameter under the assumption of homogeneously(with the same covariance matrix $E_n \sigma^2$) normally distributed error.
+
+\begin{theorem}[F-test]
+In a standard linear model with homogeneous Gaussian error of unknown variance $E_n \sigma^2$. For the test problem:
+\begin{align*}
+    & H_0: \beta = \beta_0;\\
+    & \texttt{against}\\
+    & H_1: \beta \neq \beta_0
+\end{align*}
+The two-sided F-test (Also Fisher-Test) is: 
+\begin{align*}
+    &\varphi_\alpha = \mathbbm{1}(F(Y) > q_{F(p, n - p), 1-\alpha})\\
+    &\texttt{with}\\
+    & F_{p, n - p} = \frac{\frac{1}{p} \|X( \beta_0 - \hat{\beta} )\|^2}{\hat{\sigma}^2}
+\end{align*}
+\end{theorem}
+
+\begin{theorem}[t-test]
+\end{theorem}
+
+\begin{theorem}
+	Given the semi-parametric model  and homogeneous Gauss error we have:
+	\begin{equation*}
+		2(\tilde{L}(\tilde{\theta}) - \tilde{L}(\theta^*)) \sim \chi^2_p
+	\end{equation*}
+\end{theorem}
+
+
+\subsubsection*{Empirical methods}
+preestiamte $\eta$ is available as $\hat{\eta}$, if $\eta^* \approx \hat{\eta}$
+\begin{equation*}
+	\hat{\theta} = (\Psi \Psi^T)^{-1} \Psi(\mathbb{Y} - \Phi \hat{\eta})
+\end{equation*}
+if orthogonal:
+\begin{equation*}
+	\hat{\theta} = (\Psi \Psi^T)^{-1} \Psi\mathbb{Y}
+\end{equation*}
+In general $\hat{\eta} = A\mathbb{Y}$:
+\begin{equation*}
+	\hat{\theta} = (\Psi\Psi^T)^{-1} \Psi(\mathbb{Y} - \Phi A \mathbb{Y}) = S\mathbb{Y}
+\end{equation*}
+\subsubsection*{Two-Step procedure}
+
+
+\subsubsection*{Alternating Method}
+\begin{theorem}
+	let $\| \Pi_\eta \Pi_\theta\| = \lambda < 1$, then:
+	\begin{equation*}
+		\hat{\theta}_k \longrightarrow \theta^* 
+	\end{equation*}
+	with the geometric rate:
+	\begin{equation*}
+		\|\hat{\theta}_k - \theta^*\| \leq Ce^{\lambda k}
+	\end{equation*}
+\end{theorem}
+
+
+\subsection{Analysis Of Variance}
+\begin{definition}[one-way analysis of variance(ANOVA1)]
+\end{definition}
+
+\begin{definition}[variance decomposition]
+	Given ANOVA1, define the group mean and overall mean 
+	\begin{align*}
+		\bar{Y}_{i, \bullet}:= \sum_{j = 1}^{n_i} Y_{ij}, \quad \bar{Y}_{\bullet\bullet}:= \sum_{i = 1}^p \sum_{j = 1}^{n_i} Y_{ij}.
+	\end{align*}
+	and the variability within the group(SSW) and the variability between the group(SSB):
+	\begin{align*}
+		SSW:=  \sum_{i = 1}^p \sum_{j = 1}^{n_i}(Y_{ij} - \bar{Y}_{i\bullet})^2, \quad SSB:= \sum_{i = 1}^p n_i ( \bar{Y}_{i\bullet} - \bar{Y}_{\bullet\bullet})^2. 
+	\end{align*}
+	It holds that the total variability(SST) can be decomposed  as:
+	\begin{align*}
+		SST = SSW + SSB.
+	\end{align*}
+\end{definition}
+
+\begin{theorem}
+	Assuming \textbf{ANOVA1}, it holds
+	\begin{enumerate}
+		\item $(\bar{Y}_{1\bullet}, \dots, \bar{Y}_{p\bullet})$ is the LSE of $(\mu_1, \dots, \mu_p)$
+		\item $SSW \sim \chi(n - p)$, $SSB \sim \chi ( p -1)$. 
+		\item SSW and SSB are independent and  $F :=  \frac{n - p}{p -1} \frac{SSB}{SST} \sim F(p - 1, n - p)$. 
+	\end{enumerate}
+\end{theorem}
+
+
+
+\subsubsection{Inference for linear models}
+\begin{definition}[Quadratic likelihood]
+	$L(\theta)$ is quadratic if
+	\begin{equation*}
+		 L(\theta) = \langle D, D\theta \rangle. \quad \text{$D^2$ is symmetric $p \times p$ deterministic metrix}
+	\end{equation*}
+It implies
+\begin{flalign}
+		\nabla L(\theta) - \nabla L(\theta^\circ) &= -D^2 (\theta - \theta^\circ)\\
+	L(\theta) - L(\theta^\circ) &= (\theta - \theta^\circ) \nabla L(\theta^\theta) - \frac{1}{2}(\theta - \theta^\circ)^T D^2 (\theta - \tilde{\theta})
+\end{flalign}
+$\nabla = \sigma^{-2} \Psi \mathbb{Y} = \nabla L_G(0)$
+\end{definition}
+Consider the best parametric fit under MLE and the MLE estiamtor: \ref{est:BPF}. We have:
+\begin{theorem}
+	Let $L(\theta)$ be quadratic, then 
+	\begin{enumerate}
+		\item $\forall \theta^\circ$ 
+			\begin{equation*}
+				\tilde{\theta} = \theta^\circ + D^{-2} \nabla L(\theta^\circ)
+			\end{equation*}
+		yielding at $\theta^\circ = 0: \tilde{\theta} =  D^{-2} \nabla L(0)$
+		\item $\mathbb{E} \tilde{\theta} = \theta^*$
+		\item Let $S = \nabla L(\theta^*) \in \mathbb{R}^p$, then
+			\begin{align*}
+				\mathbb{E} S &= 0 \\
+				\var(\tilde{\theta}) &= D^{-2} \var(S) D^{-2}
+			\end{align*}
+		\item $\forall \theta:
+				2(L(\tilde{\theta}) - L(\theta)) = (\tilde{\theta} - \theta)^T D^2 (\tilde{\theta} - \theta) = \| D(\tilde{\theta} - \theta)\| ^2$
+	\end{enumerate}
+\end{theorem}
+
+
+
+Model: Given the  linear model \ref{model: linear} and gauss error \ref{model: gausserror}
+\begin{theorem}
+Given the model specified, we have:
+	\begin{enumerate}
+		\item $L(\theta)$ is quadratic with :
+			\begin{equation*}
+				D^2 = \psi \Sigma^{-1} \psi^T
+			\end{equation*}
+		\item The excess has the form:
+			\begin{equation*}
+				L(\tilde{\theta}) - L(\theta) = \frac{1}{2} \| D (L(\tilde{\theta}) - L(\theta)) \|^2 
+			\end{equation*}
+		\item if \ref{model: homogausserror}
+			\begin{equation} 
+				L(\tilde{\theta}) - L(\theta^*) = \frac{1}{2} \| \xi \|^2 \sim \frac{1}{2} \chi^2
+			\end{equation}
+	\end{enumerate}
+	The distribution of $L(\tilde{\theta}) - L(\theta)$ only depends on $p$(Free from $n, \psi, \Sigma$).
+\end{theorem}
+
+
+\begin{corollary}[Likelihood based confidence set]
+	\begin{equation*}
+		\epsilon(\zeta)= \{ \theta : L(\tilde{\theta}) - L(\theta)^* \leq \zeta \}
+	\end{equation*}
+	\begin{equation*}
+		\mathbb{P} (\theta^* \notin \epsilon(\zeta_\alpha) ) = \alpha
+	\end{equation*}
+	In fact, $\epsilon(\zeta)$ is an elliptic set around $\tilde{\theta}$ with the axis due to $D^2$.
+	\begin{equation*}
+		\epsilon(\zeta) = \{\theta: \| D (\tilde(\theta) - \theta) \|^2 \leq 2 \zeta \}
+	\end{equation*}
+	where the $\zeta$ is the $\alpha$-quantile of the $\chi^2$ distribution.
+\end{corollary}
+
+
+\begin{proof}.
+	\begin{enumerate}
+		\item the form of the negative Hessian is trivial
+		\item See the theorem above
+		\item We know from the last theorem:
+			\begin{equation*}
+				L(\tilde{\theta}) - L(\theta^*) = \frac{1}{2} \| D^{-1} S \|^{2}, \quad S = \nabla L(\tilde{\theta})
+			\end{equation*}
+			then we have $\xi = D^{-1} S$, which is centralised normal since S is centralised normal:
+			\begin{align*}
+				\nabla L(\theta) &= \psi \Sigma^{-1} \langle \mathbb{Y} - \psi \theta \rangle \\
+				\nabla L(\theta^*) &= \psi \Sigma^{-1} \epsilon 
+			\end{align*}
+			Calculate the variance of $\xi$:
+			\begin{equation*}
+				\var(\xi) = I_p
+			\end{equation*}
+	\end{enumerate}
+\end{proof}
+
+\begin{theorem}[Corresponding Theory]
+\begin{enumerate}
+    \item Given a confidence set, we can construct a test with significant level $\alpha$ for every $\theta$ in the parameter space (seeing admitting the parameter as the null hypothesis).
+    \item Given a family of test with level of $\alpha$ for every parameter, we are able to construct the confidence set of the level $1 - \alpha$. 
+\end{enumerate}
+\end{theorem}
+
+
+\begin{theorem}[LR test for general $\Sigma$]
+	Suppose LPA is true. then we have the test statistic:
+	\begin{equation*}
+		T = \frac{1}{2} (\tilde{\theta} - \theta_0)^T D (\tilde{\theta} - \theta_0) \sim \frac{1}{2} \chi_p^2
+	\end{equation*}
+\end{theorem}
+\begin{remark}
+The test is pivotal, depends only on dim$\Theta = p$	
+\end{remark}
+
+
+\begin{theorem}[LR test for the i.i.d errors under misspecified LPA]
+	Assume the general linear model and homogeneous noise. we have the test statistic:
+	\begin{equation*}
+		T = \frac{1}{2\sigma^2} \|\varphi(\tilde{\theta} - \theta_0)\|^2
+	\end{equation*}
+	
+	\begin{equation*}
+		\|Y - f_0\|^2 = \|\tilde{f} - f_0 \|^2 + \|\tilde{\epsilon}\|^2
+	\end{equation*}
+	and 
+	\begin{align*}
+		\|f^* - f_0 \|^2 &\sim \chi_{n - p}^2\\
+		\|\tilde{\epsilon}\|^2 &\sim \chi_p^2
+	\end{align*}
+	Denote:
+	\begin{align*}
+		RSS_0 &= \|Y - f_0\|^2\\
+		RSS &= \|\tilde{\epsilon}\|^2
+	\end{align*}
+	We have:\begin{equation*}
+		T = \frac{RSS_0 - RSS}{2\sigma^2}
+	\end{equation*}
+\end{theorem}
+
+\begin{remark}
+given the known variance $\sigma^2$. The test statistic $T$ only depends on:
+\begin{equation*}
+	\Delta = \frac{1}{\sigma^2} \|\Pi(f^* - f^0)\|^2
+\end{equation*}	
+and $dim \Theta = p$.
+\end{remark}
+
+
+
+
+
+\newpage
+
+
+\section{Generalised Linear Model}
+\begin{lemma}
+	Given the conditions above(regularity is not required), We have:
+	\begin{equation*}
+	\mathbb{E}_{\theta*} L(\theta) - \mathbb{E}_{\theta*} L(\theta^*) = -n KL(P_{\theta*}, P_{\theta}) \leq 0		
+	\end{equation*}
+
+\end{lemma}
+
+\begin{corollary}[Best parametric fit]
+	\begin{equation}\label{est:BPF}
+		\theta^* = \arg \max_{\theta} \mathbb{E} L(\theta) = \arg \min_{\theta \in \Theta} KL(P, P_\theta)
+	\end{equation}
+	compared MLE
+	\begin{equation} \label{est: MLE}
+		\tilde{\theta} = \arg \max_\theta L(\theta)
+	\end{equation}
+\end{corollary}
+
+
+Why is it an useful approach? If PA is not correct, for example the true measure is not in the parameter family. One define the best parametric fit(projection) of our parametric family. By Lemma above
+\begin{equation*}
+	\theta^* = \arg \min_{\theta \in \Theta} KL(P, P_\theta)
+\end{equation*}
+
+The main objects in the maximum likelihood approach.
+\begin{align*}
+	L(\theta) &= \log \frac{dP_\theta}{d\mu}(\mathbb{Y}) = \sum_1^n l(y_i, \theta)\\
+	\tilde{\theta} &= \arg \max_\theta L(\theta)\\
+	\theta^* &= \arg \max_\theta \mathbb{E}L(\theta)\\
+	L(\tilde{\theta}) &= \max_\theta L(\theta)\\
+	\varepsilon(\zeta) &= \{ \theta \in \Theta: L(\tilde{\theta}) - L(\theta) \leq \zeta \}
+\end{align*}
+
+
+\begin{itemize}
+	\item The question arise as the maximum may not be uniquely defined or exists at all.
+	\item  $L(\theta)$ sometimes is as important as $\theta$.
+	\item $\varepsilon(\zeta)$ is called the likelihood based confidence sets. This is a random set, but we hope that the true measure is covered by the set.
+\end{itemize}
+
+
+
+\begin{lemma}
+\begin{equation*}
+	\mathbb{P} [\theta^* \notin \varepsilon(\zeta)] = \mathbb{P} [ L(\tilde{\theta}) - L(\theta^*) > \zeta]
+\end{equation*}
+\end{lemma}
+
+We define $L(\tilde{\theta}) - L(\theta^*)$ as excess. The usual task in PA is to find $\zeta$ s.t.
+\begin{equation*}
+	\mathbb{P} [ L(\tilde{\theta}) - L(\theta^*) > \zeta] \leq \alpha
+\end{equation*}
+
+
+
+\begin{example}[Gaussian shift]
+$Y_i \sim \mathcal{N}(\theta, \sigma^2)$, $\sigma^2$ is known. $Y_i = \theta + \epsilon_i$, $\epsilon_i \sim \mathcal{N}(0, \sigma^2)$
+\begin{equation*}
+	\tilde{\theta}_{MLE} = \frac{1}{n}\sum Y_i
+\end{equation*}
+
+\end{example}
+
+\begin{lemma}
+	for any $\theta$, 
+	\begin{equation}
+		L(\tilde{\theta}) - L(\theta) = \frac{n}{2 \sigma^2}(\tilde{\theta} - \theta)^2
+	\end{equation}
+	Based on that we can calculate the likelihood based confidence set:
+	\begin{equation*}
+		\varepsilon(\zeta) = \left[\tilde{\theta} - \sqrt{\frac{\zeta \sigma^2}{n}}, \tilde{\theta} + \sqrt{\frac{\zeta \sigma^2}{n}} \right ]
+	\end{equation*}
+\end{lemma}
+
+\begin{proof}
+	For the quadratic function Taylor could provide an exact approximation. Moreover, at the optimal point the first order linear term vanishes. From equation (15) we get the expression of the confidence set:
+	\begin{align*}
+		\varepsilon(\zeta) &= \{ \theta \in \Theta \mid L(\tilde{\theta}) - L(\theta) \leq \zeta \} \\
+		&= \{ \theta \in \Theta \mid \frac{n}{2 \sigma^2}(\tilde{\theta} - \theta)^2 \leq \zeta \}\\
+		(Taylor) &=  \{ \theta \in \Theta \mid \frac{n}{\sigma^2}(\tilde{\theta} - \theta)^2 \leq \zeta \}\\
+		&= \left[\tilde{\theta} - \sqrt{\frac{\zeta \sigma^2}{n}}, \tilde{\theta} + \sqrt{\frac{\zeta \sigma^2}{n}} \right ]
+	\end{align*}
+\end{proof}
+
+\begin{remark}
+All based on the geometric properties of $L(\theta)$. But here we haven't been able to establish the relationship between $\eta$ and $\alpha$. The next lemma will show how we do it.
+\end{remark}
+
+\begin{lemma}
+	Let PA be true, $P = P_{\theta^*}$ $(Y_i = \theta^* + \epsilon_i, \quad \epsilon_i \sim \mathcal{N}(0, \sigma^2))$. Then
+	\begin{enumerate}
+		\item $\tilde{\theta} = \frac{1}{n} \sum Y_i \sim \mathcal{N}(\theta^*, \frac{\sigma^2}{n})$
+		\item $2L(\tilde{\theta}, \theta^*) \sim \chi^2$
+		\item Define $\xi := \frac{\sqrt{n}}{\sigma}(\tilde{\theta} - \theta)$ Let $\zeta_\alpha$ be s.t. $P(\xi^2 > 2 \zeta_\alpha) = \alpha$, then
+		\begin{equation*}
+			P(\theta \notin \varepsilon(\zeta_\alpha)) = \alpha
+		\end{equation*}
+		\begin{equation*}
+			\varepsilon(\zeta_\alpha) = \left[\tilde{\theta} - \sqrt{\frac{\zeta_\alpha \sigma^2}{n}}, \tilde{\theta} + \sqrt{\frac{\zeta_\alpha \sigma^2}{n}} \right ]
+		\end{equation*}
+	\end{enumerate}
+\end{lemma}
+
+\begin{example}[Bernoulli]
+	$Y_i \in \{0, 1\}, \quad P_\theta[Y_i = 1] = \theta $
+	\begin{itemize}
+		\item $p(y, \theta) = \theta^y (1-\theta)^{1-y}$
+		\item $l(y, \theta) = y \log \theta + (1 - y) \log(1 - \theta)$
+		\item $L(\theta) = \sum l(\theta) = \log \frac{\theta}{1 - \theta} \sum Y_i + n\log (1 - \theta)$
+	\end{itemize}
+\end{example}
+
+\begin{lemma}
+Given the Bernoulli distribution. Let $\tilde{\theta}$ be the arithmetical mean of the observation, then we have:
+\begin{enumerate}
+	\item $\tilde{\theta} = \frac{1}{n} \sum Y_i = \frac{S}{n}$ is the MLE
+	\item $L(\tilde{\theta}) - L(\theta) = nKL(P_{\tilde{\theta}}, P_\theta)$
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	\begin{align*}
+			\frac{d}{d\theta} L(y, \theta) &\overset{!}{=} 0\\
+			s(\frac{1}{\theta} + \frac{1}{1 - \theta}) - \frac{1 - \theta}{n} &\overset{!}{=} 0\\
+			\theta &= \frac{s}{n}
+	\end{align*}
+\end{proof}
+
+
+\begin{corollary}
+\begin{equation*}
+		\varepsilon(\zeta) = \{KL(\tilde{\theta}, \theta) \leq \frac{\zeta}{n} \}
+\end{equation*}
+We see that the confidence set is a ball in the KL-divergence with radium $\frac{\zeta}{n}$. 
+The question remains as how to choose $\zeta$. We will be seeing this next lecture. 
+\end{corollary}
+
+\begin{example}[Exponential model]
+	$Y_i \geq 0, P_\theta(Y_i > t) = \exp{\frac{-t}{\theta}}$
+\end{example}
+
+
+Similar results for Poisson, multinomial, and many other to discuss in thursday. Now we look at a example where the maximum likelihood estimator is not the arithmetical mean.
+
+\begin{example}[Uniform]
+	We can not take the log-likelihood but we work with the probability directly.\\
+	Uniform distribution is therefore not regular. 
+\end{example}
+
+\begin{example}[Shift of Laplacian]
+	$Y_i \sim P_\theta \rightleftarrows Y_i = \theta + \epsilon$\\
+	$\epsilon \sim Laplace$
+	
+	Least absolute deviation
+\end{example}
+
+\begin{lemma}
+	$\tilde{\theta} = med (Fn)$ \\
+	Formally, $\tilde{\theta}$ is the smallest $\theta$ which the r.v under $\theta$ has the probability larger than 0.5.
+\end{lemma}
+
+
+\begin{definition}[Mean square error]
+\(\hat{\theta} \) is an estimator. The MSE of \( \hat{\theta} \) given \( \theta \) is defined as:
+\( R(\hat{\theta}, \theta) := \mathbf{E}_{\theta}[(\hat{\theta} - \theta)^2] \)\par
+If we regard $\theta$ as the parameter, then the MSE is a measurable function on the space is \( (\mathcal{X}, \mathcal{F}, \mu) \). 
+\end{definition}
+
+
+
+\textbf{Setup:} $\mathbb{Y}$ i.i.d. from $P$\\
+\textbf{probability assumptions}:
+\begin{enumerate}
+	\item $\mathcal{P} \in (P_\theta, \theta \in \Theta \subset \mathbb{R})$
+	\item $P_\theta \ll \mu_0$, \quad $p(y, \theta) = \frac{dP_\theta}{d\mu_0}$, \quad $l(y, \theta) = \log \mathcal{P}(y, \theta)$, \quad $L(\mathbb{Y}, \theta) = L(\theta) = \sum_{i = 1}^n l(y_i, \theta)$
+	\item MLE $\tilde{\theta}$: $\tilde{\theta}_{MLE} = arg \max_{\theta \in \Theta} L(\theta) = \sum_{i = i}^n l(Y_i, \theta)$
+\end{enumerate} 
+
+
+The purpose of this section is to find another way to estimate a parameter by generalising the assumption of linear model. The Gauss-Markov method assumed standard linear model(where the parameter is linear w.r.t the observation and the error is centralised normal distributed). Under the assumption of centralised normally distributed error the MLE and LSE are equivalent and we have the BLUE. When dropping the assumption of standard linear model we introduce the notion: UMVUE(R-efficient).\par 
+After introducing the notion, we should further investigate, under what condition we can get such estimator. Recall in Gauss-Markov we have the condition of regular linear model, which is in fact very restricting. The question stands out, how the model for the UMVUE should look like.\par 
+
+
+\begin{definition}
+	$P_\Theta = (\mathbb{P}_\theta, \theta \in \Theta)$ is an univariate exponential family. if 
+	\begin{equation*}
+		p(y,\theta) := \frac{dP_\theta}{d\mu} = p(y) \exp (y C(\theta) - B(\theta))
+	\end{equation*}
+	Where $C, B$ are some nondecreasing function. and $p(y)$ is non-negative function on y. Informally, in an exponential family the log-likelihood function is linear in y. Let $\mathcal{P}$ be an EF, EF is EF \textbf{natural parametrisation(natural exponential family)} if $\mathbb{E} Y_i \equiv \theta$
+\end{definition}
+
+
+\begin{remark}
+	Note:
+	\begin{itemize}
+		\item The representation is not unique
+		\item For identifiability we assume $c'(\theta) >0$. See in the Fisher Information, $Var_\theta[l'(\theta)] = \frac{1}{C'(\theta)}$
+	\end{itemize}
+\end{remark}
+
+\begin{example}[Bernoulli]
+where y: averaged sum.
+\begin{equation*}
+	p = \theta^y (1-\theta)^{1 -y} =\exp\left( y \log \frac{\theta}{1 - \theta} + \log (1 - \theta)\right)
+\end{equation*}
+Then we have:
+\begin{equation*}
+	\theta = \frac{1}{1 + \exp(-y)}
+\end{equation*}
+\end{example}
+
+\begin{example}[Exponential distribution]
+	todo	
+	$P_\theta( Y > y) = e^{\frac{-y}{\theta}}$
+	$l(y, \theta) = -\frac{y}{\theta} - $ to do
+\end{example}
+
+\subsubsection*{Some properties of EFn}
+Some properties of EFn
+Assume that $C(\theta)$ and $B(\theta)$ are smooth. (two times diff). Also $\mathcal{P}$ is regular.
+
+\begin{lemma}
+	Given a EFn, we have:
+	\begin{equation} \label{ODE}
+		B'(\theta) = \theta C'(\theta)
+	\end{equation}
+	This is differential equation relating $B(\theta)$ and $C(\theta)$
+\end{lemma}
+
+\begin{proof}
+	We know:
+	$\int p(y, \theta) d\mu(y) \equiv 1$ \\
+	by (\ref{RM})
+	\begin{equation*}
+			\frac{d}{d\theta} \int p(y, \theta) dy = \int \frac{d}{d\theta} p(y, \theta) dy
+	\end{equation*}
+	Then we have:
+	\begin{align*}
+		\int (y C'(\theta) - B'(\theta)) \exp [yC(\theta) - B(\theta)] dy &= 0 \\
+		C'(\theta) \int y p(y, \theta)dy &= B'(\theta) \int p(y, \theta) dy\\
+		C'(\theta) \theta &= B'(\theta)
+	\end{align*}
+\end{proof}
+
+\begin{lemma} \label{theorem: Properties of EFn}
+	let $P_\Theta$ be an EFn, then:
+	\begin{enumerate}
+		\item $KL(\theta, \theta') = \mathbb{E}_\theta \log \frac{p(y, \theta)}{p(y, \theta')} = \theta[C(\theta) - C(\tilde{\theta})] - [B(\theta) - B(\tilde{\theta})] $
+		\item $F(\theta) = \mathbb{E}_\theta[ l'(\theta)^2] = C'(\theta)$
+		\item $Var_\theta[Y_1] = \mathbb{E}[(Y - \theta)^2] = \frac{1}{C'(\theta)}$
+	\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+	2)\\
+	By definition of EF:
+	\begin{align*}
+		l'(y, \theta) &= C'(\theta)(y - B'(\theta))\\
+					  &= C'(\theta)(y - \theta)\\
+	\end{align*}
+	By property of regular model we know $\mathbb{E}_\theta[l'(\theta)] \equiv 0$. Therefore:
+	\begin{align*}
+		Var_\theta[l'(\theta)] &= \mathbb{E}_\theta C'(\theta)^2 (y - \theta)^2\\
+		&= C'(\theta)Var[Y_i] \\
+		(3) &= \frac{1}{C'(\theta)}
+	\end{align*}
+3)\\
+\begin{equation*}
+	\begin{aligned}
+		\int y p(y, \theta)dy = \theta \\
+		\frac{d}{d\theta} \int y p(y, \theta) dy = \int \frac{d}{d\theta} y p(\theta, y) dy = 1\\
+		\int y(C'(\theta)y - B'(\theta))p(\theta, y)dy = 1\\
+		\int (y - \theta)(C'(\theta)y - B'(\theta))p(\theta, y)dy = 1\\
+		\int (y - \theta) C'(\theta)(y - \theta)p(\theta, y)dy = 1\\
+	\end{aligned}
+\end{equation*}
+We have the result.
+\end{proof}
+
+\subsubsection*{MLE and ML for the EFn}
+
+\begin{align*}
+	L(\theta) &= \sum l(y_i, \theta)\\
+	&= \sum y_iC(\theta) - B(\theta) + R\\
+	&= S C(\theta) - n B(\theta) + R
+\end{align*}
+
+\begin{theorem}
+	let $\mathcal{P}$ be a EFn, then
+	\begin{enumerate}
+		\item $\tilde{\theta} = \frac{S}{n} = \frac{1}{n} \sum Y_i$ is an unbiased MLE.
+		\item $\tilde{\theta}$ is R-effcient, and 
+			\begin{equation*}
+				Var_\theta[\tilde{\theta}] = \frac{1}{nC'(\theta)} = \frac{1}{n F(\theta)}
+			\end{equation*}
+		\item $\forall \theta$, the excess can be written in terms of KL-divergence.
+			\begin{equation*}
+				L(\tilde{\theta}) - L(\theta) = n KL(\tilde{\theta}, \theta)
+			\end{equation*}
+	\end{enumerate}
+\end{theorem}
+	
+\begin{proof}
+1)\\
+\begin{equation*}
+	\begin{aligned}
+		\frac{d}{d\theta}L(\theta) = S C'(\theta) - n B'(\theta) &\overset{!}{=} 0\\
+		SC'(\theta) - n \theta C'(\theta) &\overset{!}{=} 0\\
+		\theta &= \frac{S}{n}\\
+	\end{aligned}
+\end{equation*}
+By (\ref{ODE}).  Unbiasedness can be show by the property of EFn.\\
+2) 3) Follows directly by \ref{theorem: Properties of EFn} \\
+\end{proof}
+
+\begin{remark} The fact that $\tilde{\theta}$ is an MLE does not require the exponential family to be natural. 
+\end{remark}
+
+
+
+\begin{corollary}[KL-based confidence sets]
+	\begin{align*}
+		\varepsilon(\zeta) &= \{ \theta \in \Theta \mid L(\theta) - L(\theta^*) \leq \zeta \}\\
+		&= \{\theta \in \Theta \mid KL(\theta, \theta^*) \leq \frac{\zeta}{n} \}
+	\end{align*}
+\end{corollary}
+
+
+\begin{remark}
+Having an exponential family is like having a dream.
+If model misspecification, we apply $\tilde{\theta} = \frac{1}{n} \sum Y_i$ but $\mathcal{P} \notin (\mathcal{P}_\theta)$. The formula still applies, but $F(\theta)$ and $Var_\theta(\theta)$ change. We loose R-efficiency.	
+\end{remark}
+
+\subsection{Generalized linear Model}
+In the generalised linear the response variables do not have to be linear of the parameter, instead only the moment function $g(\mathbb{E}(Y))$. When we bring the exponential family to the canonical form, the 
+
+ model the we have the score function and Fischer-Information. The MLE could be calculated by letting the score function equals 0. The uniqueness is garanteed when the Fischer-Information is positive definite. The first step freed the assumption of the distribution of the sampling. We can have for example poisson distributed(in the case of poisson regression) and Bernoulli distributed sampling.\par 
+Second, by using the link function and dispersion parameter we are provided more freedom to fit the model. The linear model established relationship between the $\mathbb{E}[Y]$ and and $X\beta$. The expectation is typically linked with the parameter, and at the same time could be calculated w.r.t. $\eta$, while $\eta$ in the canonical link could be calculated by $\eta = X\beta$. Finally, We could write the parameter in terms of $X\beta$ and using ML method to get the $\hat{\beta}$.  
+\begin{definition}[Generalized Linear Model]
+Given a sampling $Y_1, \cdots, Y_n$ and the natural exponential family:
+\begin{equation}
+    \frac{d\mathbb{P}_\nu^{y_{i}}}{d\mu} = p(y_i)\exp(\nu y - d(\nu)), \quad i = 1, \dots, n
+\end{equation}
+In the case $\nu = \psi^T \theta$
+and the log-likelihood read:
+\begin{equation}
+    l(\theta, Y) = \log L (\theta, Y) = S^T \theta + A(\theta)
+\end{equation}
+where $S = \sum Y_i \psi_i$ and $A(\theta) = \sum d(\psi_i^T \theta)$
+\end{definition}
+
+\begin{example}[Logistic regression]
+\begin{equation*}
+	Y_i \sim Ber(\theta), \quad f(y) = \theta^y(1-\theta)^{(1-y)}
+\end{equation*}
+Given $ y \in \{0. 1\}^n$, the exponential family:
+\begin{align*}
+	\frac{dP}{d\mu}(y) &= \exp\left( y \log \frac{\theta}{1 - \theta} + \log (1 - \theta)\right) = \exp( \nu^T y - \log (1 + e^\nu))
+	\quad (\nu = \log \frac{\theta}{1-\theta})
+\end{align*}
+Whereas we get the \textbf{sigmoid function}
+\begin{align*}
+	 \Rightarrow \mathbb{E}(Y_i) = \theta = \frac{e^\nu}{1 + e^\nu} = \frac{1}{1 + e^{-\nu}}
+\end{align*} 
+Given the data $(X_1, Y_1), \dots, (X_n, Y_n) \in \mathbb{R}^p \times \{0, 1\}$. We assume $v = c^T X$, ($c, X \in \mathbb{R}^p$). We maximize the \textbf{logistic function}
+\begin{equation*}
+	l(c) = \sum_{i= 1}^n -\log (1+ e^{-c^TX_i}) - (1- Y_i) c^TX_i
+\end{equation*}
+and get $\hat{c}$.
+\end{example}
+
+
+\begin{example}(Poisson regression)
+\end{example}
+
+\begin{lemma}[Fischer Information]
+In the GLM with the canonical link function we have the score function:
+
+and the Fisher Information is therefore:
+\begin{equation}
+    \mathcal{I}(\theta) =  \sum_{i = 1}^n d'' \quad \in \mathbb{R}^{p* p}
+\end{equation}
+If the Fisher information is positive definite and and the score function admits a solution, then the parameter $\beta$ has an unique MLE $\hat{\beta}$.
+\end{lemma}
+
+\subsection{Canonical parametrisation}
+\begin{definition}
+	EF admits a canonical representation, if
+	\begin{equation} \label{DF:EFc}
+		p(y, v) := \frac{dP_v}{d\mu}(y) = p(y)\exp [yv - d(v)]
+	\end{equation}
+	for some convex function d(v). Notice now we parametrise by $v$
+\end{definition}
+The canonical form transforms the the log likelihood of the exponential family to a linear term plus a non-linear term. When differentiating under the integral sign, it provides a straightforward way to calculate the moments.\par 
+Notice the exponential family admitting a canonical form is i.g. not a natural exponential family. When a natural exponential family is linked to the canonical form, it is in general not natural anymore.
+\subsubsection*{Examples}
+\begin{enumerate}
+	\item Gaussian shift: $d(v)= \frac{v^2}{2}$
+	\item Bernolli: $l(y, \theta) = y \log \frac{\theta}{1 - \theta} + \log(1 - \theta)$. Let $v = \log \frac{\theta}{1 - \theta}$ we have $\theta = \frac{e^v}{1 + e^v}$. And 
+		\begin{equation*}
+			l(y, v) = yv - \log (1 + e^v)
+		\end{equation*}
+\end{enumerate}
+
+\begin{lemma}
+	Any EF$(P_\theta)$ has a canonical representation given by 
+	\begin{equation*}
+		v = c(\theta)
+	\end{equation*}
+	The EFn has a unique canonical link
+\end{lemma}
+
+
+
+\begin{lemma} \label{PP:EFc}
+	Let $(\mathbb{P}_v)_{v \in V}$ be a EFc, we have
+	\begin{itemize}
+		\item $\mathbb{E}_v Y_1 = d'(v)$
+		\item $F(v) = \mathbb{E}|l'(Y_1, v)|^2 = d''(v)$
+		\item $KL^c(v, v')= d'(v)(v - v') - [d(v) - d(v')]$
+	\end{itemize}
+\end{lemma}
+
+\begin{proof}.
+	\begin{enumerate}
+		\item Use (\ref{DF:EFc}), differentiating directly on the density
+		\item Use (\ref{DF:EFc}) and the lemma the fact that : $ \int (Y - d'(v)) p(v, y) d\mu(y) \equiv 0$
+	\end{enumerate}
+\end{proof}
+
+\begin{theorem}
+	Let $(P_v)$ be an EFc, then $\tilde{v}$ solves the equation:
+	\begin{equation*}
+		d'(\tilde{v}) = \frac{S}{n} = \tilde{\theta}
+	\end{equation*}
+	The MLE of the natural and canonical exponential family are linked by this equation.
+\end{theorem}
+
+
+\begin{remark}.
+	\begin{itemize}
+		\item $d$ is convex $\Rightarrow$ $d''() >0$. $d$ monotone and invertable.
+		\item Also $\forall v$ 
+		\begin{equation*}
+			L(\tilde{v}) - L(v) = n KL^c(\tilde{v}, v)
+		\end{equation*}
+	\end{itemize}
+\end{remark}
+
+
+
+\subsubsection*{11.May}
+R efficiency is only possible for exponential family.\\
+Let $\mathcal{P}$ be an EFc, $\mathcal{P} = (P_v, v \in \Theta)$, $l(y, v) = yv - d(v) + l(y)$
+
+
+
+
+\subsubsection*{Likelihood based confidence sets}
+The principle Question is: How to select $\zeta$? The likelihood confidence set is defined as:
+\begin{equation*}
+	\varepsilon(\zeta) = \{ v \in V: L(\tilde{v}) - L(v) \leq \zeta \}, L(v) = \sum l(v, y)
+\end{equation*}
+result of theorem 2 we know
+\begin{equation*}
+	L(\tilde{v}) - L(v) = n KL^c(\tilde{v}, v)
+\end{equation*}
+Therefore we have:
+\begin{equation*}
+	\varepsilon(\zeta) = \{v : KL^c(\tilde{v}, v) \leq \frac{\zeta}{n} \}
+\end{equation*}
+Consider the following probability condition:
+\begin{itemize}
+	\item $\mathcal{P}_v$ is regular;
+	\item $v$ is an unbounded interval
+	\item $F(v) = d''(v)$ satisfies $\frac{F(v_1)}{F(v_2)} \leq a^2, \forall v_1, v_2$
+\end{itemize}
+We get the limited but very practical result, before introducing the theorem, we need the following lemma.
+\begin{lemma}
+	Let $\mathbb{P} = (\mathbb{P}_v)_{v \in V}$ be an EFc, then for any $v_0 \in V, \exists v^+ > v_0, v^-< v_0$, s.t.
+	\begin{equation*}
+		\{ L(\tilde{v}) - L(v_0) > \zeta  \} \subset \{ L(v^+) - L(v_0) > \zeta\} \cup \{L(v^-) - L(v_0) > \zeta \}
+	\end{equation*}
+	The points $v^+, v^-$ satisfies 
+	\begin{equation*}
+		KL^c(v^+, v_0) = \frac{\zeta}{n}
+	\end{equation*}
+	\begin{equation*}
+		KL^c(v^-, v_0) = \frac{\zeta}{n}
+	\end{equation*}
+\end{lemma}
+
+\begin{proof}
+\begin{align*}
+	[ L(\tilde{v}) - L(v^*)>\zeta)] =& [\sup_v S(v - v_0) - n(d(v) - d(v_0)) > \zeta]\\
+	\overset{(*)}{=}& [S > \inf_{v > v_0} \frac{\zeta + n[d(v) - d(v_0)]}{v - v_0}] \\
+	&\cup [-S > \inf_{v > v_0} \frac{\zeta + n[d(v) - d(v_0)]}{v_0 - v}]
+\end{align*}
+	Define
+	\begin{equation*}
+		f(u) = \frac{\zeta + n[d(v_0 + u) - d(v_0)]}{u}
+	\end{equation*}
+	by convexity of $d$, we know:
+	\begin{equation*}
+		\exists! u^+ = arg\inf_{u > 0} f(u)
+	\end{equation*} .(Fischer)
+	differentiate $f$ we get the optimal point, which satisfies the condition:
+	\begin{equation*}
+		\frac{\zeta}{n} + d(v_0 + u) - d(v_0) - d'(v_0 + u)u = 0
+	\end{equation*} which could be written as KL-divergence:
+	\begin{equation*}
+		KL^c (v_0 + u, u) = \frac{\zeta}{n}
+	\end{equation*}
+\end{proof}
+
+Now we can prove the theorem:
+\begin{theorem}
+	Let PA be correct and i.i.d. setup. Then $\forall \zeta >0$
+	\begin{equation*}
+		\mathbb{P}_{v^*} (L(\tilde{v}) - L(v^*) \geq \zeta) \leq 2 e^{-\zeta}
+	\end{equation*}
+	We notice the right hand side is free of $n$ and $P$. Compared with Fischer is much preferable.
+\end{theorem}
+
+
+
+\begin{proof} of the Theorem\\
+By lemma 1.8.1.
+let $v_0 = v^*$
+\begin{equation*}
+	P_{v^*} [ L(\tilde{v}) - L(v^*)>\zeta)] \leq P_{v^*} [L(v^+) - L(v^*)>\zeta] + P_{v^*}[L(v^-) - L(v^*)>\zeta]
+\end{equation*}
+$\forall v$
+\begin{align*}
+	P_{v^*} [ L(v) - L(v^*)>\zeta)] &\leq e^{-\zeta} \mathbb{E} e^{L(v) - L(v^*)}\\
+	&= e^{-\zeta} \mathbb{E} e^{\log \frac{dP_v}{dP_v*}}\\
+	&= e^{-\zeta}
+\end{align*}
+
+	
+\end{proof}
+
+\begin{corollary}
+	Take $\zeta_\alpha = \log (\frac{2}{\alpha})$
+	\begin{equation*}
+		\mathbb{P}[ v^* \notin \varepsilon(\zeta_\alpha)] \leq \alpha
+	\end{equation*}
+\end{corollary}
+
+\begin{proof}
+	\begin{equation*}
+		\mathbb{P}[ v^* \notin \varepsilon(\zeta_\alpha)] = \mathbb{P}_{v^*} [L(\tilde{v}) - L(v^*) \geq \zeta] \leq 2 e^{-\zeta} = \alpha
+	\end{equation*}
+\end{proof}
+
+\begin{remark}.
+\begin{enumerate}
+	\item If the parametrisation is changed, given an EF, we still have
+		\begin{equation*}
+				KL(P_\theta, P_\theta') = KL^c(P_v, P_v')
+		\end{equation*}
+		because KL-divergence is defined by measure.The confidence set:
+		\begin{equation*}
+			\varepsilon(\zeta) = \{\theta : KL(\tilde{\theta}, \theta ) \leq \frac{\zeta}{n} \}
+		\end{equation*}
+		applies also for $v$
+	\item The shape of the confidence set:$\varepsilon(\zeta) = \{v : KL^c(\tilde{v}, v) \leq \frac{\zeta}{n} \} = \{\theta : KL(\tilde{\theta}, \theta ) \leq \frac{\zeta}{n} \}$. $\varepsilon(\zeta)$ is an interval around $\theta$, but it can be asymmetric.
+If Gaussian, it is symmetric , but it is the only case. In Bernoulli and other not symmetric. Especially near the edge point. The Fisher asymptotic theory suggests always symmetric confidence set.(A drawback in a vicinity of edge points)
+\end{enumerate}	
+\end{remark}
+\newpage
+
+
+
+
+
+
+It's clear we now established the connection between the sampling and parameter, moreover, we may get the MLE based on the sampling. \par 
+As for the UMVUE, it still presents problems. Notice in the case of BLUE, we have an explicit formula to get the BLUE based on the sampling. However now the UMVUE is calculated based on the expectation, which requires more than sampling?\par 
+
+We will see the problem is solved by specifying the statistical model. We could establish a (model) which link the expectation of the sampling to the linear combination of the parameter($\beta$). By calculating the derivative we may get the MLE w.r.t. the sampling. Notice that in this case the expectation is linear approximated by a new parameter and therefore also the original parameter $\eta$.
+
+
+
+\section{Bayesian estimation}
+\begin{definition}[minimax estimator]
+\begin{equation}
+	\sup_{\theta \in \Theta}	  R(\theta, \hat{\rho}):= \inf_{\rho} \sup_{\theta \in \Theta} 
+\end{equation}
+\end{definition}
+
+
+\begin{definition}[a-priori distribution, Bayes risk, Bayes estimator]
+	Suppose the parameter space is equipped with $\sigma$-algebra denoted by $(\Theta, \mathcal{F}_\Theta)$ and the probability function $\theta \rightarrow \mathbb{P}_\theta(B)$ is measurable for all $B \in \mathcal{F}$. Moreover the loss function
+	\begin{align*}
+		L: (\Theta \times 
+	\end{align*}
+	
+	\begin{equation}
+		R_\pi(\hat{\rho}):= \mathbb{E}_\pi R(\theta, \hat{\rho}). 
+	\end{equation}
+	
+	\begin{equation}
+		\hat{\rho} := \arg\inf_{\rho} R_\pi(\theta, \rho). 
+	\end{equation}
+\end{definition}
+
+\subsection{The Bayes Formula}
+
+
+\begin{definition}[joint distribution]
+\begin{equation*}
+	\mathbb{P}(A \times B) = \int_A \int_B \mathbb{P}_\theta(dy) \pi(d\theta)
+\end{equation*}
+\end{definition}
+
+\begin{definition}[marginal(conditional distribution)]
+distribution of $\mathbb{Y}$.
+\begin{equation*}
+	\mathbb{P}(B) = \mathbb{P}(Y \in B) = \int_\Theta \int_B \mathbb{P}_\theta(dy) \pi(d\theta)
+\end{equation*}
+\end{definition}
+
+
+
+
+\begin{definition}[a-priori- and a-posteriori-distribution]
+\((\mathcal{X}, \mathcal{F}, \mathbf{P}_{\theta})\) a statistical model. \((\Theta, \mathcal{F}_{\theta})\) measurable space.
+ \(\Pi\) a distribution on the measurable parameter(a-priori-distribution).
+    the conditional distribution of \(\theta \) (given an observation) is called a-posteriori-distribution. 
+        \begin{equation*}
+    	\pi(\theta|x) = \frac{p_\theta(x)\pi(\theta)	}{\int_\Theta p_\theta(x) \pi(\theta) d\theta}
+    \end{equation*}
+    We can therefore define the MAP and the a-posteriori mean value.
+    \begin{equation*}
+    	\hat{\theta}^{MAP} = \sup_\theta \pi(\theta|x) \overset{(*)}{=}\int_\Theta \theta \pi(\theta|x)d\theta
+    \end{equation*}
+The a-posteriori is also the Bayes-optimal
+
+\end{definition}
+
+
+\begin{remark}
+the Bayes-optimal could be calculated with explicit formula: It equals to the a-posteriori mean value(Proof) (Review the interesting example where the statistic model admits binomial distribution and a-priori distribution is uniform. We can have a nice formula using Gamma function.)
+
+\end{remark}
+
+\begin{definition}[posterori]
+	\begin{equation*}
+		\mathbb{P}(\theta \in A | \mathbb{Y} \in B) = \frac{\mathbb{P} (B \times A)}{\mathbb{P}(B)}
+	\end{equation*}
+	formulation with density
+	\begin{equation*}
+		\mathbb{P}_\theta(dy) \approx p(y|\theta) \mathbb{P}_\theta(d\theta)
+	\end{equation*}
+	\begin{equation*}
+		\pi(d\theta) = \pi(\theta) d\theta
+	\end{equation*}
+	joint density:
+	\begin{equation*}
+		p(y, \theta) = p(y|\theta) \pi(\theta)
+	\end{equation*}
+	marginal:
+	\begin{equation*}
+		p(y) = \int_\Theta p(y, \theta) d\theta = \int_\Theta(y|\theta) \pi(\theta)d\theta
+	\end{equation*}
+	We have the a posterori density:
+	\begin{equation}\label{equ: apd}
+		p(\theta|y) = \frac{p(y, \theta)}{p(y)} = \frac{p(y|\theta)\pi(\theta)}{\int_\Theta p(y|\theta) \pi(\theta) d\theta}
+	\end{equation}
+\end{definition}
+
+
+\begin{example}[Gaussian shift]
+\begin{align*}
+	Y_i \sim N(\theta, \sigma^2)\\
+	\mathbb{Y} = (Y_1, \dots, Y_n)^T\\
+	\mathbb{Y}|\theta \sim p(y|\theta) 
+\end{align*}
+assume $\theta \sim N(\tau, g^2)$
+\begin{equation*}
+	p(y, \theta) = p(y|\theta) \pi(\theta) = exp(-\frac{1}{2\sigma^2} \sum_1^n (Y_i - \theta)^2 + c) exp(-\frac{1}{2g^2}(\theta-\tau)^2 + c)
+\end{equation*}
+observation 1: the expression is quadratic w.r.t. $\theta$ $\Rightarrow \theta|\mathbb{Y}$ is normal.\\
+observation 2: For the posterior $\theta|\mathbb{Y}$ the data $\mathbb{Y}$ is considered as fixed. 
+\end{example}
+
+\begin{example}[Bernolli]
+\begin{equation*}
+	Y_i \sim Ber(\theta), \theta \in [0, 1], \mathbb{P}(Y_i = 1 | \theta) = \theta, P(Y_i = 0|\theta) = 1 - \theta
+\end{equation*}	
+\begin{equation*}
+	Y_i|\theta \sim p(y|\theta) = \theta^y (1 - \theta)^{1 - y}
+\end{equation*}
+\begin{equation*}
+	\mathbb{Y} | \theta \sim p(\mathbb{Y} |\theta) = \prod \theta^y_i (1 - \theta)^{1 - y_i} = \theta^s ( 1 - \theta)^{n - s}
+\end{equation*}
+define a prior $\pi(\theta)(\theta, \alpha) = \theta^\alpha(1 - \theta)^b \pi(\alpha)$ \\
+Joint density:
+\begin{equation*}
+	p(y, \theta) = p(y|\theta) \pi(\theta) = \theta^s (1 - \theta)^{n - s} \theta^a (1 - \theta)^b \pi(\alpha) \propto
+	\theta^{s + a} (1 - \theta)^{n - s + b}
+\end{equation*}
+$\Rightarrow \theta|y$ is from Beta-family\\
+\end{example}
+
+\begin{example}[Exponential]
+\begin{equation*}
+	Y_i | \theta \sim Exp(\theta), p(y|\theta)= \theta e^{-y \theta}
+\end{equation*}	
+$\mathbb{Y} = (Y_1, \dots, Y_n)^T$ i.i.d. $Exp(\theta)$\\
+\begin{equation*}
+	p(y |\theta) = \prod_1^n \theta e^{y_i \theta} = \theta^n e^{-s\theta},
+\end{equation*}
+consider the Gamma-prior $\pi(\theta, \alpha)$, 
+\begin{equation*}
+	\pi(\theta, \alpha) = \theta^a e^{-b \theta} \pi(\alpha) \approx \theta^\alpha e^{-b\theta}
+\end{equation*}
+The joint density:
+\begin{equation*}
+	p(\theta, y) \propto \theta^{n + \alpha} e^{-b\theta-s\theta}
+\end{equation*}
+\end{example}
+
+\subsection{Conjugated priors}
+Given the Bayes model:
+\begin{equation*}
+	\mathbb{Y} |\theta \sim p(y | \theta), \theta \sim \pi(\theta) \in \{ \pi(., \alpha) \}
+\end{equation*}
+$\pi$ is conjugated if :
+\begin{equation*}
+	\pi(\theta| \mathbb{Y} = y) \in \{ \pi(., \alpha)\}
+\end{equation*}
+\begin{equation*}
+	\pi(\theta, y) = \pi(\theta, \alpha(y))
+\end{equation*}
+
+
+\subsubsection*{Conjugated priors and the exponential families}
+
+
+
+\begin{theorem}
+	Let $P_\theta$ be a EF, 
+	\begin{align*}
+		p(y_i|\theta) = \exp(y_1 C(\theta) - B(\theta)) p_1(y_1)
+	\end{align*}
+	Then $\pi(\theta, \alpha) \propto \exp(a C(\theta) - b B(\theta))$ is a conjugated family
+\end{theorem}
+\begin{proof}
+	conditional density:
+	\begin{align*}
+		p(y|\theta) = \prod_1^n p(y_i|\theta) \propto exp(\sum y_i c(\theta) - B(\theta))\\
+		= exp(sc(\theta) - nB(\theta)
+	\end{align*}
+	joint density:
+	\begin{align*}
+		p(y, \theta) = p(y|\theta) \pi(\theta) \propto exp((s+a)C(\theta) - (n+b)B(\theta))\\
+	\end{align*}
+\end{proof}
+
+\subsection{Linear Gaussian model and Gaussian priors}
+
+Univariate case:
+\begin{align*}
+	Y_i \sim N(\theta, \sigma^2), \theta \sim N(\tau, \gamma^2)
+\end{align*}
+
+\begin{theorem}
+	The joint, marginal and posterior distributions are all Gaussian and 
+	\begin{align*}
+		\mathbb{Y} \sim N(\tau, \sigma^2 + \gamma^2) marginal\\
+		\theta|Y \sim N(\frac{\tau + Y_1 \gamma^2}{\sigma^2 + \gamma^2}, \frac{\sigma^2 \gamma^2}{\sigma^2 + \gamma^2})
+	\end{align*}
+\end{theorem}
+
+\begin{proof}
+	\begin{align*}
+		Y_i = \theta + \epsilon_i, \epsilon_i \sim N(0, \sigma^2)\\
+		\theta = \tau + \xi, \xi N(0, \gamma^2)\\
+		\epsilon_i \perp \xi\\
+		Y_i = \tau + \xi + \epsilon_i\\
+	\end{align*}
+	$\xi + \epsilon$ is sum of 2 independent normals\\
+	\begin{align*}
+	\Rightarrow \xi + \epsilon \sim N(0, \sigma^2 + \gamma^2)\\
+	\theta |Y_i \propto exp(-\frac{1}{2\sigma^2}(y_i - \theta)^2 - \frac{2}{\gamma^2}(\theta - \tau)^2)		
+	\end{align*}
+	Idea: represent the quadratic (in $\theta$) expression in canonical form:
+	\begin{align*}
+		\frac{1}{2\sigma^2}(y_i - \theta)^2 + \frac{1}{2\gamma^2}(\theta-\tau)^2\\
+		= \frac{\theta^2}{2}(\sigma^{-2} + \gamma^{-2}) - \theta(\frac{y_i}{\sigma^2} + \frac{\tau}{\gamma^2}) + \frac{1}{2}(\frac{y_i}{}
+	\end{align*}
+\end{proof}
+
+
+
+
+\subsubsection*{22.June}
+Exam on 20.July.
+
+
+\begin{flalign*}
+	\mathbb{Y} |\theta \sim \mathbb{P}_\theta \propto p(y | \theta)\\
+	\theta \sim \pi \qquad \pi(\theta)
+\end{flalign*}
+The a posterori has the density form: \ref{equ: apd}
+
+\begin{example}
+i.i.d. Gaussian
+\begin{equation*}
+	Y_i = \theta + \epsilon_i, \qquad \epsilon_i \sim N(0, \sigma^2)
+\end{equation*}
+\begin{flalign*}
+p(\mathbb{Y}|\theta) = \exp(\frac{1}{2\sigma^2} \sum Y_i^2 - 2\sum Y_i \theta + n\theta^2  )	
+\end{flalign*}
+
+\end{example}
+
+
+\subsubsection*{Linear Gaussian models with Gaussian priors}
+
+$\mathbb{Y} | \theta \sim N(\psi\theta. \Sigma)$\\
+$\theta \sim N(\tau, \Gamma) \in \mathbb{R}^p$\\
+Target: $\theta|\mathbb{Y}$\\
+Expect: Gaussian priors are conjugated $\Leftrightarrow$ posterior is Gaussian as well. If so, it remains to compute the parameters(mean and variance).\\
+Another representation:
+\begin{align*}
+	\mathbb{Y} &= \psi^T\theta + \epsilon, \qquad \epsilon \sim N(0, \Sigma)\\
+	\theta &= \tau + \xi, \\
+	\mathbb{Y} &= \psi^T(\tau + \xi) + \epsilon = \psi^T \tau + \psi^T\xi + \epsilon
+\end{align*}
+the last two terms are Bayesian noise
+
+\begin{theorem}
+	The joint distribution of $\mathbb{Y}, \theta$ is Gaussian with:
+	\begin{equation*}
+		\mathbb{E}(\mathbb{Y}, \theta)^T = 
+	\end{equation*}
+	\begin{equation*}
+		Var(\mathbb{Y}, \theta)^T = 
+		\left(\begin{matrix}
+			\psi^T \Gamma \psi^T + \Sigma & \psi^T \Gamma  \\
+			 \psi^T \Gamma & \Sigma
+		\end{matrix}\right)
+	\end{equation*}
+\end{theorem}
+
+\begin{proof}
+	\begin{align*}
+		\mathbb{Y} &= \psi^T \tau + \psi^T\xi + \epsilon\\
+		\theta &= \tau + \xi\\
+		Var(\theta) &= \Gamma \\
+		Var(\mathbb{Y}) &= \psi^T \psi \Gamma + \Sigma  \\ 
+		Cor(\mathbb{Y}, \theta) &=  \psi^T \Gamma \\
+	\end{align*}
+\end{proof}
+
+\begin{theorem}
+	The posterior $\theta|\mathbb{Y}$ is Gaussian and 
+	\begin{align*}
+		\mathbb{E}(\theta|\mathbb{Y}) &= \tau + \Gamma\psi(\psi^T\Gamma \psi + \Sigma)^{-1}(\mathbb{Y} - \psi^T\tau)\\
+		 &= B^{-1} \Gamma^{-1} \tau + B^{-1} \psi \Sigma^{-1}\mathbb{Y}
+	\end{align*}
+	where $B = \Gamma^{-1} + \psi \Sigma^{-1}\psi^T$, and $Var(\theta|\mathbb{Y}) = B^{-1}$
+\end{theorem}
+
+\begin{proof}
+\end{proof}
+
+\begin{lemma}
+	Let $\xi$ and $\eta$ be jointly normal with 
+	\begin{align*}
+		Var(\xi) &= V\\
+		Var(\eta) &= W\\
+		Cor(\xi, \eta) &= C
+	\end{align*}
+	Then we have:
+	\begin{align*}
+		\mathbb{E}(\xi|\eta) &= \mathbb{E}\xi + CW^{-1}(\eta - \mathbb{E}\eta)\\
+		Var(\xi|\eta) &= V - CW^{-1} C^T
+	\end{align*}
+\end{lemma}
+
+\begin{proof}
+	Reduce to $\mathbb{E}\xi = \mathbb{E} \eta = 0$, consider
+	\begin{equation*}
+		S  = \xi - C W^{-1} \eta
+	\end{equation*}
+	The $S$ is Gaussian and 
+	\begin{equation*}
+		\mathbb{E}(\eta = \mathbb{E}\xi - C W^{-1} \eta) \eta^T = \mathbb{E}(\xi\eta^T - CW^{-1}\mathbb{E}\eta \eta^T = 0
+	\end{equation*}
+	\begin{flalign*}
+		\xi = S + C W^{-1} \eta \\
+		\Rightarrow \xi|\eta \sim N(C W^{-1} \eta, Var(S))\\
+		Var(S) = Var(\xi - C W^{-1} \eta)
+	\end{flalign*}
+\end{proof}
+
+
+\begin{corollary}
+	\begin{equation*}
+		\var(\theta|\mathbb{Y}) = B^{-1}
+	\end{equation*}
+\end{corollary}
+
+Assume homogenous error and linear model, we can further simplify the model:
+\begin{flalign}
+	\mathbb{E}(\theta|\mathbb{Y}) = \\
+	Var(\theta|\mathbb{Y})
+\end{flalign}
+
+Let $\Gamma = r^2 I_p$ homogen prior, then:
+\begin{equation*}
+	Var(\theta|\mathbb{Y}) = (r^{-2} I_p + \sigma^2 \psi\psi^T)^{-1}
+\end{equation*}
+
+
+\subsubsection*{25. June}
+
+\subsection{Bayes risk and posterior mean}
+
+Model: 
+Let $\hat{\theta} = \hat{\theta}(\mathbb{Y})$ be an estimator of $\theta$. Define the Bayes risk of $\hat{\theta}$ for a loss function $\rho(\theta, \theta')$.
+
+\begin{equation*}
+	R_\pi = \mathbb{E} \rho(\hat{\theta}, \theta) = \int_\Theta [\int \rho(\hat{\theta}(y), \theta) 
+\end{equation*}
+
+
+\begin{equation*}
+	R_\pi(\hat{\theta}) = \mathbb{E}_\pi \mathbb{E}[\rho(\hat{\theta}, \theta)|\theta]
+\end{equation*}
+
+\begin{flalign*}
+	p(\mathbb{Y}) = \int p(\mathbb{Y}|\theta) \pi(\theta) 
+\end{flalign*}
+
+%
+In what follows we only consider:
+\begin{equation*}
+	p(\theta, \theta') = \| \theta - \theta'\|^2
+\end{equation*}
+
+We define the posterior mean:
+\begin{equation*}
+	\tilde{\theta}_\pi = \mathbb{E}(\theta|\mathbb{Y}) = \int_\Theta \theta p(\theta|\mathbb{Y})d\theta = \frac{1}{p(\mathbb{Y})}\int \theta
+\end{equation*}
+
+%
+\begin{theorem}
+	Let $\rho(\theta, \theta') = \|\theta - \theta'\|^2$, then for any $\hat{\theta} = \hat{\theta}(\mathbb{Y})$:
+	\begin{equation*}
+		R_\pi(\hat{\theta}_\pi) \leq R_\pi(\hat{\theta})
+	\end{equation*}
+\end{theorem}
+
+\begin{proof}
+	In fact we proof:
+	\begin{equation*}
+		\mathbb{E}[\|\hat{\theta} - \theta\|^2|\mathbb{Y}] \geq \mathbb{E} [ 
+	\end{equation*}
+	main observation:
+	\begin{equation*}
+		\mathbb{E}(\tilde{\theta} - \theta|\mathbb{Y})  = 0
+	\end{equation*}
+	
+	\begin{flalign*}
+		\mathbb{E}[\|\hat{\theta} - \theta\|^2 |\mathbb{Y}] = \\
+		\|\hat{\theta} -\tilde{\theta}_\pi\|^2 + 
+	\end{flalign*}
+\end{proof}
+
+Consider the Bayes approach with the prior $\pi = N(0, G^{-2}$, we know that $\theta|\mathbb{Y}$ is Gaussian with the mean :
+\begin{equation*}
+	\tilde{\theta}_\pi = \sigma^{-2} B^{-1} \mathbb{Y}
+\end{equation*}
+
+\begin{theorem}
+	For any prior $\pi$ and any $\hat{\theta}$, 
+	\begin{equation*}
+		R_\pi(\hat{\theta}) \leq R(\hat{\theta})
+	\end{equation*}
+\end{theorem}
+
+Le Cam Theorem:
+\begin{theorem}
+\begin{equation*}
+	\sup_\pi R_\pi(\hat{\theta}) = R(\hat{\theta})
+\end{equation*}
+	
+\end{theorem}
+
+VanTrees Inequality(Univariate Case):
+
+\begin{definition}
+	\begin{equation*}
+		F(\theta) = \mathbb{E}|\frac{p'(y|\theta)}{}
+	\end{equation*}
+	\begin{equation*}
+		I_\pi = \mathbb{E}
+	\end{equation*}
+\end{definition}
+
+\begin{theorem}[VanTrees Inequality]
+	$\theta \in \mathbb{R}, \rho(\theta, \theta') = |\theta - \theta'|^2$, 
+	Goal: A lower bound on the Bayes riks $R_\pi(\tilde{\theta}_\pi)$. similar to the Camer-Rao inequlity, we have $\forall \hat{\theta}$:
+	\begin{equation*}
+		\mathbb{E}\|\hat{\theta} - \theta||^2 \geq [ \int_\Theta F(\theta) \pi(\theta) d\theta + F_\pi]^{-1}
+	\end{equation*}
+\end{theorem}
+
+\begin{proof}
+	\begin{equation*}
+		L_pi'(\mathbb{Y}, \theta) = \frac{p'(\mathbb{Y}}{}
+	\end{equation*}
+\end{proof}
+
+The main observation:
+\begin{equation*}
+	\mathbb{E}(\hat{\theta} - \theta) L_\pi'(\mathbb{Y}, \theta) = 1
+\end{equation*}
+
+We use that:
+\begin{equation*}
+	\int_\Theta [(\hat{\theta}(y) - \theta) p(\theta, y)]' d\theta = 0
+\end{equation*}
+
+\begin{theorem}[a-priori substitution]
+\begin{equation}
+\sup_{\theta \in \Theta} R(\theta, \hat{\theta}) = \sup_{\Pi} \int_{\Theta} R(\theta, \hat{\theta}) \Pi(d\theta)
+\end{equation}
+\end{theorem}
+
+
+
+\section{Model selection}
+\subsection{AIC}
+The Akaike-Information-Criterion is based on the maximum likelihood approach and strongly related to the Kullback-Leibler divergence. 
+\begin{definition}[Kullback-Leibler Divergence(relative entropy)]
+\begin{equation}
+    KL(\mathbb{P}|\mathbb{Q}) = 
+    \left\{\begin{aligned}
+    \int \log(\frac{d\mathbb{P}}{d\mathbb{Q}})\mathbb{P}(dx),\qquad & \mathbb{P} \ll \mathbb{Q}\\
+    \infty,\qquad & \texttt{else}
+    \end{aligned}\right.
+\end{equation}
+\end{definition}
+
+\begin{remark}
+	A generalisation of Kullback-Leibler divergence is the $f$-$divergence$. Given a convex function $f$, we define:
+\begin{equation*}
+	D_f(\mathbb{P}, \mathbb{Q}) = \mathbb{E}_\mathbb{Q} f( \frac{d\mathbb{P}}{d\mathbb{Q}} )
+\end{equation*}
+Plug $f(x) = -\log(x)$ we get the Kullback-Leibler divergence.
+\end{remark}
+
+
+\subsubsection{Deduction of the AIC}
+We see that the Kullback-Leibler gives a semi metric of between probability measures. The deviance is:
+\begin{equation*}
+	KL(\theta, \theta') = \mathbb{E}_{\mathbb{P}_\theta} \log(d\mathbb{P}_\theta) - \mathbb{E}_{\mathbb{P}_\theta} \log(d\mathbb{P}_{\theta'})
+\end{equation*}
+If $\mathbb{P}_\theta$ is the real(yet unknown) measure we want to approximate, since the real measure is independent from the parameter. To minimise the KL divergence is to minimise the distance $-\mathbb{E}_{\mathbb{P}_\theta} \log(d\mathbb{P}_{\theta'})$. Therefore it has become a optimization problem: to minimise \textbf{Kullback dispersion}: 
+\begin{equation*}
+    d(\theta') = \mathbb{E}[-2\log (L(\theta'))]
+\end{equation*}
+By moment generating method we could easily determine the MLE $\hat{\theta}_k$, it is then to solve the optimization problem:
+\begin{equation*}
+		\max_k \log(L(\hat{\theta}_k))
+\end{equation*}
+
+
+
+
+\begin{definition}[AIC]
+Given a set of statistical models:
+\begin{equation*}
+    \bigg(\mathcal{X}, \mathcal{F}, (\mathbb{P}_\theta^{(k)})_{\theta \in \Theta^k}\bigg), \quad k = 1, 2, \dots, K \leq n,\quad \Theta_k \subset \mathbb{R}^k,
+\end{equation*}
+with
+$L_{(k)}(\theta, .)$ the likelihood of $(\mathbb{P}_\theta^{(k)})$; 
+$\hat{\theta}^{(k)}$ the MLE of in the parameter set $\Theta_{(k)}$; 
+The Akaike-Information-criterion is defined as:
+\begin{equation}
+    AIC^{(k)}(x) := -2\log L_k(\hat{\theta_k}) + 2k
+\end{equation}
+Then 
+\begin{equation}
+    \hat{k}_{AIC} = \arg \min_k AIC^{(k)}(x)
+\end{equation} would be determined and $\hat{\theta}_k$ is the according AIC determined estimator. 
+\end{definition}
+
+\begin{theorem}
+Assuming the linear model holds with the feature $\mu \in \mathbb{R}^n$ and error $\epsilon \sim \mathcal{N}(0, \sigma^2 E_n)$
+\begin{align*}
+	& Y = \mu + \epsilon
+\end{align*}
+Observe the parametric model:
+\begin{align*}
+	&Y \approx X^{(k)} \beta^{(k)}\\
+	&\texttt{with}\\
+	&\beta^{(k)} \in \mathbb{R}^k , \quad X^{(k)} \in \mathbb{R}^{n \times k} \text{ full rank}
+\end{align*}
+ Then for the known $\sigma > 0$, the MLE is $\hat{\beta}^{(k)} = ((X^{(k)})^T X^{(k)})^{-1} (X^{(k)})^T Y$. It holds
+\begin{equation}
+    AIC^{(k)}(Y) = n \log (2\pi \sigma^2) + \frac{1}{\sigma^2} \|Y - X\hat{\beta}^{(k)} \| + 2k
+\end{equation}
+And the model(aka. the parameter) we choose based on the AIC method is:
+\begin{equation}
+    \hat{k}_{AIC}(Y) = \arg\min_{k = 1, \dots, K} \|Y - X\hat{\beta}^{(k)} \| + \sigma^2 2k
+\end{equation}
+\end{theorem}
+
+
+
+\subsection{BIC (Bayes' Information criterion)}
+We assume that the parameter space admits a-priori distribution(for each k). And the a-posteriori distribution could be calculated. 
+
+\begin{definition}
+Given a family of statistical model(the number should be smaller than the observation to maintain the full rankness), $\Theta_k \in \mathbb{R}^k$(generally specifies how many features we choose), $\hat{\theta}^{(k)}$ is the MLE of the accordingly parameter space. The Bayes Information criterion is:
+\begin{equation}
+    BIC^{(K)}(X) := -2\log L^{(k)}(\hat{\theta}^{(k)}, x) + k\log(n)
+\end{equation}
+The maximum estimator $\hat{k}_{BIC}$ would also accordingly be determined. 
+\end{definition}
+
+
+\subsection{LASSO}
+
+\begin{definition}
+In a standard linear design, The LASSO (least absolute shrinkage and selection operator) estimator is defined as:
+\begin{equation}
+    \hat{\beta}^{LASSO} =  argmin_{\beta \in \mathbb{R}^p}( \|Y - X\beta \|^2 + \lambda \| \beta \|_1)
+\end{equation}
+where the $\|.\| := \sum_{i = 1}^{p} |\beta_i|, \quad \lambda > 0$
+\end{definition}
+\newpage
+
+
+
+\subsection{Penalised Least Square Error Method}
+In the linear model, the oracle inequality gives us a tool to estimate the distance between dimensional penalized optimal estimator and an arbitrary estimation by the distance of the $k$ dimensional MSE, penalizing function, and the variance of error in the linear model.  
+
+\begin{theorem}
+Observe the linear model $Y = \mu + \epsilon$ with $\mu \in \mathbb{R}^n$ and error $\epsilon \sim \mathcal{N}(\sigma^2 E_n)$ with $\sigma > 0$ known. Given a sequence of subspace $S_k \subset \mathbb{R}^n$ with $\dim S_k = d_k \leq n, k = 1, \dots, K$($d_k$ not necessarily equals k), the orthogonal projection $\Pi_{(k)}$on $S_k$ and the respective LSE $\hat{\mu} = \Pi^{(k)} Y$. Define:
+\begin{equation}
+    \hat{k} := \arg\min_k (\| Y - \hat{\mu}^{(k)} \|^2 + Pen(d_k))
+\end{equation}          
+with the non-negative penalization and $Pen(d_k) \geq \gamma \sigma^2 (d_k + 1)$ for a constant $\gamma > 1$. We have:
+\begin{enumerate}
+    \item $\forall \alpha \in (0,\sqrt{\gamma} - 1)$  
+    \begin{equation}
+        \| \hat{\mu}^{(\hat{k})} - \mu \|^2 \leq C_{\alpha, \gamma} \min_k (\| (E_n - \Pi^{(k)})\mu \|^2 + Pen(d_k) + \sigma^2 \tau)
+    \end{equation}
+    for a constant $C_{\alpha, 0} > 0$ with at least the probability $1 - \epsilon_{\alpha, \tau}$, where:
+    \begin{equation}
+        \epsilon_{\alpha, \tau} := \sum_{k = 1}^{K} e^{(-d_k \alpha^2/2 - \tau/2)}
+    \end{equation}
+    and $C_{\alpha, \gamma} \longrightarrow \infty$ for $\alpha \longrightarrow \sqrt{\gamma} -1$
+    
+    \item We have
+    \begin{equation*}
+    	\mathbb{E}(\|\hat{u}^{\hat{k}} - u \|^2) \leq C_{\alpha, \gamma} \min_k (\| (E_n - \Pi^{(k)})\mu \|^2 + Pen(d_k) + \sigma^2 \epsilon_{\alpha, 0})
+    \end{equation*}
+\end{enumerate}
+\end{theorem}
+
+\begin{remark}.
+\begin{enumerate}
+    \item The AIC model is a special form of the penalized least square model. 
+    \item If the Penalty term $Pen(d_k) \approx \sigma^2 d_k$, Then we have :
+    \begin{equation}
+        \mathbb{E}_{\mu}[\| \hat{\mu}^{(\hat{k})} - \mu \|^2] \approx \min_k \mathbb{E}_{\mu}[\| \hat{\mu}^{(\hat{k}}) - \hat{mu}^{(k)} \|^2]
+    \end{equation}
+    which the right hand side is called the oracle error.
+\end{enumerate}
+\end{remark}
+
+\begin{lemma}[The fundamental inequality]
+$\forall k \in {1, \dots, K}$ we have:
+\begin{equation}
+    \| \hat{\mu}^{(\hat{k})} - \mu \|^2 \leq \| (E^n - \Pi^{(k)}) \mu\|^2 + Pen(d_k) - Pen(\hat{d_k}) - 2<\epsilon, \Pi^{(k)}\mu - \hat{\mu}^{(\hat{k})}>
+\end{equation}
+\end{lemma}
+
+\begin{corollary}[The complete variable selection]
+\end{corollary}
+
+
+
+\section{Classification}
+For all classification method we are interested in: 1. the classifier 2. the generalisation error. \par 
+The Bayes-classifier is based on the conditional probability $\eta$ and serves as the lower boundary of the classification error.\par 
+The k-NN method is based on the wighted average/moment estimation. The upper boundary of the generalisation error approximates twice of the Bayes error as the feature increases or the sample size increases. \par 
+The ERM classifier is based on the minimising the empirical reconstruction error. The existence is guaranteed with construction, it is however not unique. The expected generalisation error for a finite set of the classifier is bounded by the minimum plus a constant, which depends on the size of the set and decreases as sample size increases. \par 
+The SVM is an affine classifier. The basic idea is to find a hyperspace that separates the sample data. Determining the SVM classifier is an optimisation problem, with the separating property serves as NB and the objective function is the minimal distance from the nearest point to the separating space.
+
+
+
+
+
+\subsection{Bayes-classifier}
+
+\begin{definition}[Classifier].
+\begin{enumerate}
+	\item a measurable function: $h:\chi \rightarrow \{0, 1 \}$ is called a classifier
+	\item The \textbf{classification error} of $h$:
+		\begin{equation*}
+			R(h) = \mathbb{P}(Y \neq h(x)) = \int_\chi \mathbbm{1}_{(y \neq h(x))} dP^{X, Y}(x, y)
+		\end{equation*}
+\end{enumerate}
+\end{definition}
+
+\begin{definition}[the MAP(maximum a posteriori) classifier]
+We define $\eta: \chi \rightarrow \{0, 1\}$
+\begin{equation*}
+	\eta(x) = \mathbb{P} (Y = 1| X = x)
+\end{equation*}
+And the Bayes classifier $h^*$ is given by:
+\begin{equation*}
+	h^*(x) = 
+		 \left\{\begin{aligned}
+		 		1, \quad & \eta(x) \geq \frac{1}{2}\\
+		 		0, \quad & \eta(x) \leq \frac{1}{2}
+		 		\end{aligned}\right.
+\end{equation*}
+which is also called the MAP-classifier
+\end{definition}
+
+\begin{theorem} \label{technique: conditioning}
+The Bayes error admits the minimum of classification error.
+\begin{equation*}
+	R(h^*) = \min_h R(h) = \min \mathbb{E} \{ \eta, 1 - \eta \}	
+\end{equation*}
+\end{theorem}
+
+\begin{proof}
+	
+\end{proof}
+
+
+In reality, the distribution of $(X,Y)$ is unknown so the Bayes error is not applicable. Given n i.i.d sample: $(X_i, Y_i)$, we define the \textbf{Generalisation error}:
+\begin{equation*}
+	R(\hat{h}_n) = \int_\chi \mathbbm{1}_{(\hat{h}(x) \neq Y)} dP^{X, Y}(x, y)
+\end{equation*}
+
+
+
+\subsection{k-NN-Classifier}
+\begin{definition}[K-NN]
+$\chi = \mathbb{R}^p$ with Euclidian scalar product. For a given point $x \in  \mathbb{R}^p$ and $n$ observation of $x$
+\begin{align*}
+	X_1, \dots, X_n
+\end{align*}
+Reordering the observation by:
+\begin{equation*}
+	\|X_{(j)}(x) - x \| \leq  \| X_{(j + 1)}(x) - x \|
+\end{equation*}
+Then $X_{(j)}$ is called the j-th nearest neighbour. And we denote the set of the $k$-nearest neighbour of $x$ by:
+\begin{align*}
+	N_k(x):= \{X_{(1)}(x), \dots , X_{(k)} \}
+\end{align*}
+	
+\end{definition}
+
+\subsubsection*{The Method:}
+We define the k-NN Classifier:
+\begin{equation*}
+	\hat{h}_k^{k-NN} = 
+	\left\{ 
+	\begin{aligned}
+		1, \quad & \sum_{i: X_i \in N_k} \mathbbm{1}_{(Y_i = 1)} > \sum_{i: X_i \in N_k} \mathbbm{1}_{(Y_i = 0)} \\
+		0, \quad & sonst \\
+	\end{aligned}\right.
+\end{equation*}
+which is equivalent to:
+\begin{equation*}
+	\hat{h}_k^{k-NN} = 
+	\left\{ 
+	\begin{aligned}
+		1, \quad & \eta_n^{k-NN}(x) > \frac{1}{2} \\
+		0, \quad & sonst \\
+	\end{aligned}\right.	
+\end{equation*}
+where $\eta_n^{k-NN}(x) = \sum_{i: X_i \in N_k} \frac{1}{k} Y_i $
+
+\subsubsection*{Curse of dimensionality}
+When the dimension increases, the minimal distance
+
+\subsubsection*{The generalisation error of k-NN classification}
+
+\begin{theorem} \label{1-NN:UB}
+Let $X$ random variable takes value in $[-M, M]^p$ and $\eta$ is Lipschitz continuous with Lipschitz constant $L$. Then we have:
+	\begin{equation*}
+		R(\hat{h}_n^{1-NN}) \leq 2 R^* + C n^{-\frac{1}{p+1}}
+	\end{equation*}
+	with constant $C = C(M, p, L)$
+\end{theorem}
+
+We first prove the lemma:
+\begin{lemma}
+	Under the assumption of the theorem above:
+	\begin{equation*}
+		\mathbb{E} \| X - X_1(X) \| \leq C n^{-\frac{1}{p + 1}}
+	\end{equation*}
+\end{lemma}
+
+\begin{proof}.
+	\begin{itemize}
+		\item In the q-dimensional cube $[-1, 1]^p$ we divide the edge length by 2N and each cube would have the diameter of length $\frac{\sqrt{p}}{N}$. $Q_1, \dots, Q_{(2N)^p}$ is a cover of the p-dimensional cube.
+		\item Decompose 1 into characteristic functions: $\mathbbm{1}_{(\forall i: X_i \notin A)} + \mathbbm{1}_{(\exists i:X_i \in A)} $
+		\item The exponential inequality:
+			\begin{equation*}
+				x + 1 \leq e^x
+			\end{equation*}
+			\begin{equation*}
+				x - 1 \geq \log x \Rightarrow x e^{-x} \leq e^{-1}
+			\end{equation*}
+	\end{itemize}
+\end{proof}
+
+\begin{theorem}
+	Given the condition in \ref{1-NN:UB} and $p \geq 1$ and $k \leq \frac{2}{n}$, we have the estimation:
+	\begin{equation*}
+		\mathbb{E} R(h^{k-NN}_n) - R^* \leq \frac{2}{\sqrt{k}} + C(\frac{k}{n})^{\frac{1}{p}}
+	\end{equation*}
+\end{theorem}
+
+
+\subsection{ERM-Principle}
+\begin{definition}[Empirical Classification error]
+	\begin{equation*}
+		R_n(h) = \frac{1}{n} \sum_{i = 1}^n \mathbbm{1}_{(h(X_i) \neq Y_i)}(X_i)
+	\end{equation*}
+	and the ERM-Classifier is defined as :
+	\begin{equation*}
+		\hat{h}_n \in \arg \min_{ h \in \mathcal{H}} R_n(h)
+	\end{equation*}
+\end{definition}
+
+\begin{remark}
+	The ERM-classifier always exists but not necessarily unique.
+\end{remark}
+
+\begin{lemma}
+Given $\mathcal{H}$ a set of classifier and $\hat{h}_n$ one of the according ERM-classifier, then we have
+\begin{equation*}
+	\mathbb{E} R(\hat{h}_n) - \inf_{h \in \mathcal{H}} R(h) \leq \mathbb{E} \sup_{h \in \mathcal{H}} \{R_n(h) - R(h) \}
+\end{equation*}
+\end{lemma}
+
+\label{technique. empirical bridging}
+\begin{proof} 
+	Bridging by the empirical classification error.
+\end{proof}
+
+
+\subsection{Supporting Vector Machines(SVM)}
+
+\subsubsection*{Affine Classification}
+Observe all the classifier in the form:
+\begin{equation*}
+	h(x) = \sign( \langle w, x \rangle + b) := 
+	\left\{\begin{aligned}
+		+1,& \quad \langle w, x \rangle + b \rangle > 0\\
+		-1,& \quad \langle w, x \rangle + b \rangle \leq 0
+	\end{aligned}\right.
+\end{equation*}
+where $w \in \mathbb{R}^p, b \in \mathbb{R}$
+
+\subsubsection*{Vector geometry}
+\textbf{1. separating hyperspace:} $(X_1, Y_1), \dots, (X_n, Y_n)$ is separated by the hyperspace $\langle w, x \rangle + b$, if $\exists w$:
+\begin{equation*}
+	y_i(\langle w, x_i \rangle + b) > 0
+\end{equation*}
+\textbf{2. Distance between a point and the separating hyperplane:} Define $H:= \{ x: w^T x + b = 0\} \subset \mathbb{R}^p $ The distance between $X_0 \in \mathbb{R}^p  $ and the separating hyperspace $H$ is given by :
+\begin{equation*}
+	\frac{| \langle w, X_0 \rangle + b |}{\| w \|} 
+\end{equation*}
+
+
+\subsubsection*{The Method}
+\textbf{Hard-SVM}
+\begin{equation}
+\begin{aligned}
+	\text{maximise:}& \quad \min_{i \leq n} | \langle w, x_i \rangle + b| \quad \|w \| = 1 \\
+	\text{condition:}& \quad y_i(\langle w, x_i \rangle + b) > 0
+\end{aligned}
+\end{equation}
+which is equivalent to
+\begin{equation}
+	\begin{aligned}
+	\text{minimise:}& \quad \|w\| \qquad b \in \mathbb{R},\quad w \in \mathbb{R}^p \\
+	\text{condition:}& \quad y_i(\langle w, x_i \rangle + b) > 1	
+	\end{aligned}
+\end{equation}
+(To see the equivalence we define $\eta := \min_{i \leq n} | \langle w, x_i \rangle + b|$, notice $\forall \alpha > 0 \in \mathbb{R}:$ $\alpha w, \alpha b, \alpha \eta$ gives the same optimisation result. Choose $\alpha = \frac{1}{\eta}$. ) \\
+\newline
+\textbf{Soft-SVM}
+\begin{equation}
+	\begin{aligned}
+	\text{minimise:}& \quad \lambda \|w\|^2 + \frac{1}{n} \sum_{i = 1}^n \xi_i \\
+	\text{condition:}& \quad y_i(\langle w, x_i \rangle + b) > 1 - \xi_i\\
+					&\quad \xi_i \geq 0	
+	\end{aligned}
+\end{equation}
+The soft-SVM improved the Hard-SVM by removing the assumption of the existence of the separating hyperspace by an approximation
+
+\begin{theorem}[Supporting Vector Classifier]
+	For $\lambda > 0$, observe:
+	\begin{equation*}
+		(\hat{w}, \hat{b}) \in  \arg \min_{w \in \mathbb{R}^p, b \in \mathbb{R}} \frac{1}{n} \sum_{i =1}^n \max (1 - y_i(\langle x_i, w\rangle + b), 0) + \lambda \| w\|^2
+	\end{equation*}
+	then the classifier:
+	\begin{equation}
+		\hat{h}_n^{SMV} = \sign(\langle w, x_i \rangle + b)
+	\end{equation}
+\end{theorem}
+The new form removes $n$ parameter $\xi_i$ and we have a quadratic approximation
+
+
+\subsubsection*{Generalisation Error}
+\begin{theorem}
+	Given $\mathcal{H} = \{h(x) = \sign( \langle w, x \rangle + b) : w \in \mathbb{R}^p, b \in \mathbb{R} \}$ the set of all the affine classifiers. Then :
+	\begin{equation*}
+		\mathbb{E} R(\hat{h}_n) \leq \inf_{h \in \mathcal{H}} R(h) + 2 \sqrt{\frac{2 \log(M)}{n}}
+	\end{equation*}
+\end{theorem}
+
+
+
+\subsubsection*{The generalisation error of SVM classifier}
+
+Convex relaxation:
+\begin{definition}
+\begin{align*}
+	R^{hinge} (w) &= \mathbb{E}  (1 - Y_i \langle w, X_i \rangle)_+\\
+	R^{hinge}_n (w) &= \frac{1}{n} \sum (1 - Y_i \langle w, X_i \rangle)_+
+\end{align*}
+\end{definition}
+
+\begin{method}
+	for $\lambda' > 0$, 
+	\begin{equation*}
+		w^{hinge}_n \in \arg \min_{\|w\| \leq \lambda'} R_n^{hinge}(w)
+	\end{equation*}
+\end{method}
+
+\begin{theorem}
+	Assume $X \leq M$ a.s., for the SVM-Classifier we have:
+	\begin{equation*}
+		\mathbb{E}R(\hat{h}_n^{SVM}) \leq \min_{\|w \| \leq \lambda'} R^{hinge}_n(w) + \frac{2 \lambda' M}{\sqrt{nx}}
+	\end{equation*}
+\end{theorem}
+
+
+
+\subsection{LDA and logistic Regression}
+\begin{method}
+The probability $\mathbb{P}(Y_i) = 1 | X = x) = p$ is maximised by the sigmoid function:
+\begin{equation*}
+	(\hat{\alpha}, \hat{\beta}) = \arg \max_{\alpha, \beta} \prod_{i = 1}^n \frac{e^{\alpha + \beta^Tx}}{1 + e^{\alpha + \beta^Tx}}
+\end{equation*}
+We get the logistic classifier:
+\begin{equation*}
+	\hat{h}_n^{LR} = 
+	\left\{\begin{aligned}
+		  1, \qquad &\frac{e^{\hat{\alpha} + \hat{\beta}^Tx}}{1 + e^{\hat{\alpha} + \hat{\beta}^Tx}} > \frac{1}{2} \Leftrightarrow \hat{\alpha} + \hat{\beta}^Tx > 0\\
+		  0, \qquad &sonst
+	\end{aligned}\right.
+\end{equation*}	
+\end{method}
+
+
+
+\section{PCA}
+The PCA method is based entirely on geometry not probability. Given $n$ $p$-dimensional samples, the goal is to find a $d$-dimensional projected space to minimise the distance to the covariance space. The principle components are essentially the projection of the sample to the empirical eigen space(which maximises the objective function), see \ref{PCA 1.}, \ref{PCA k.}. \par 
+First we study the calculation: it is noticeable that the principle component could be computed inductively. The calculation intensiv part would be the spectral decomposition of the Gram matrix. Then we could use the formula $PC_k = \sigma_k \hat{v_k}$(see \ref{PCA k.}) to get the results. \par 
+Then we study the generalisation error(in terms of a subspace). The generalisation error is the remaining factors of the covariance matrix not explained by the subspace(given by the orthogonal complement). Depending on whether the covariance matrix is real or empirical, we have the empirical and the real generalisation error in the form of the sum of the remaining eigenvalue, given by the spectral decomposition in the calculation of the principle components. \par 
+Lastly we study the confidence, given by the theorem of Davis-Kahan. 
+
+
+\subsection{Elementary: Projection in Hilbert Space}
+\begin{definition}[Frobenius-Norm]
+Given $A \in \mathbb{R}^{p \times p} $
+\begin{equation*}
+	tr (A) = \sum_{j = 1}^p a_{jj}, \quad \langle A, B \rangle_{HS} = tr(A^TB), \quad \|A\|_{HS} = \sqrt{\langle A, A \rangle_{HS}}
+\end{equation*}
+\end{definition}
+Given a data set of $n$ samples, we are looking for an affine function $f: \mathbb{R}^p \rightarrow \mathbb{R}^q, f(\nu) = \mu + A \nu$, such that the distance
+\begin{align*}
+	\sum_{i = 1}^n \|X_i - \mu - A\nu_i\|,
+\end{align*} 
+is minimised, i.e., we are solving the optimisation problem
+\begin{align*}
+	\min_{A, \nu, \mu} \sum_{i = 1}^n \|X_i - \mu - A\nu_i\|.
+\end{align*}
+By solving the normal equation we get 
+\begin{align*}
+	\min_{A}\|(E_n - AA^T)X^T\|_{FB}^2. 
+\end{align*}
+
+
+\begin{definition}
+	Given $X \in \mathbb{R}^{n \times p}$ with $\bar{X} = 0$, observe the centralised matrix
+	\begin{align*}
+		\tilde{X} = 
+		\begin{bmatrix}
+			(X_1 - \bar{X})^T \\
+			\dots\\
+			(X_n - \bar{X})^T
+		\end{bmatrix}
+	\end{align*}
+\end{definition}
+
+\subsubsection*{1-dim approximation of $X$}
+Given $X_1, \dots, X_n \in \mathbb{R}^p$, observe the minimisation problem
+\begin{equation}
+	\min_v  \sum_{i = 1}^n \| X_i - v \langle X_i, v \rangle \|^2 = \frac{1}{n} \sum_{i = 1}^n ( \|X_i \|^2 - v^T X_iX_i^T v_i), \quad v \in \mathbb{R}^p, \|v\| = 1
+\end{equation}
+which is equivalent to maximise the projection of the empirical covariance matrix to a 1-dimensional subspace:
+\begin{equation}\label{PCA 1. :OF}
+	\frac{1}{n} \sum_{i = 1}^n ( v^T X_iX_i^T v_i) = \langle v_i, \hat{\Sigma} v_i \rangle
+\end{equation}
+The solution we denote as $\hat{u}$.
+
+\begin{definition}[First Principle Component]
+ Let $\hat{u}$ be the solution of the minimisation problem $\ref{PCA 1. :OF}$, we define the \textbf{first principle component:}
+\begin{equation}\label{PCA 1.}
+	(\langle X_1, \hat{u}_1 \rangle , \dots, \langle X_n, \hat{u}_1 \rangle)^T \in \mathbb{R}^n
+\end{equation} 
+is called the first principle component.
+\end{definition}
+ 
+ 
+\subsubsection*{k-th principle component}
+\begin{definition}[empirical Reconstruction error of $V$]
+Given $V \leq \mathbb{R}^n$, 
+\begin{align*}
+	R_n(V) 
+		&= \frac{1}{n} \sum_{i = 1}^n \| X_i - P_V X_i \|^2\\
+		&= \frac{1}{n} \sum_{n = 1}^n \|X_i\|^2 - \|P_v X_i\|^2\\
+	 	&= tr(\hat{\Sigma}(I_p - P_v))
+\end{align*}
+\end{definition}
+
+
+
+
+
+
+
+
+\subsubsection*{Characterisation of $\hat{V}_d$}
+
+\begin{theorem}
+	for $d \leq p$, The minimisation problem :
+	\begin{equation}
+		\hat{V}_d \in arg \min_{dim V = d} R_n(V)
+	\end{equation}
+	admits the solution:
+	\begin{equation*}
+		\hat{V_d} = span\{ \hat{u}_1, \dots, \hat{u}_d \} 
+	\end{equation*}
+	where $\hat{u}_i$ is the eigenvector of the $i$-th biggest eigenvalue. And we have the empirical reconstruction risk:
+	\begin{equation}
+		R_n (V_d) = \sum_{j > d } \hat{\lambda}_j
+	\end{equation}
+\end{theorem}
+
+\begin{proof}
+It is equivalent to show:
+\begin{equation*}
+	\max \sum_{i = 1}^d \langle \hat{\Sigma} v_j, v_j \rangle = \sum_{i = 1}^d \hat{\lambda}_i
+\end{equation*}
+the proof follows from the spectral theorem.\\
+'$\leq$': Plug in $\hat{\mu}_i$ on the left side we get the right side. \\
+'$\geq$': matrix scalar product(the norm has a name?) admits the maximum in the eigenvector.
+\end{proof}
+
+
+\begin{theorem}
+	For $k > 1$ we have:
+	\begin{equation}
+		\hat{u_k} \in  arg\max_{\|v\| = 1, v \perp \hat{u}_1, \dots, \hat{u}_{k - 1}} \langle \hat{\Sigma} v, v \rangle
+	\end{equation}
+\end{theorem}
+
+\begin{definition}[k-th Principle component]
+	The vector $(\langle X_1, \hat{u}_k \rangle, \dots, \langle X_n, \hat{u}_k \rangle )^T \in \mathbb{R}^n$ is called the k-th principle component.
+\end{definition}
+
+\subsubsection*{Calculation of PCA}
+Given $\mathbf{X}$ the transposed matrix of $n$ observation with $p$ features:\\
+Gram matrix: $\mathbf{X} \mathbf{X}^T : \langle X_i, X_j \rangle_{i, j}$ with the diagonal: $\mathbf{X} \mathbf{X}^T  = \sum_{j = 1}^n \hat{\sigma}^2 \hat{v}_j \hat{v_j}^T$ \\
+
+
+
+\begin{lemma}
+	We have:
+	\begin{equation*}
+		\hat{u}_j = \hat{\sigma}_j^{-1} \mathbf{X}^T \hat{v}_j
+	\end{equation*}
+\end{lemma}
+
+\begin{proof}
+	First show that $\hat{u}_j$ build a ONB. Then show it is an eigenvector of $\mathbf{X}^T \mathbf{X}$ with the eigenvalue $\hat{\lambda_j} = \frac{\hat{\sigma}_j^2}{n}$
+\end{proof}
+
+\begin{corollary}
+	the k-th principle component could be written as 
+	\begin{equation} \label{PCA k.}
+		(\langle X_1, \hat{u}_k \rangle, \dots, \langle X_n, \hat{u}_k \rangle)^T = \mathbf{X} \hat{u}_k = \hat{\sigma}_k^{-1} \mathbf{X} \mathbf{X}^T \hat{v}_k \overset{diagonalisation}{=} \hat{\sigma}_k \hat{v}_k
+	\end{equation}
+\end{corollary}
+
+\subsection{Generalisation error of PCA}
+Given $n$ i.i.d observation with value in $\mathbb{R}^p$ ($\forall i \in \{1, \dots, n \}: X_i \in \mathbb{R}^p$)  We define the real projection risk:
+\begin{align*}
+	R_V = \|X - P_V X \|^2
+\end{align*}
+and accordingly the \textbf{real projection risk.}
+\begin{align*}
+	V_d \in \arg\min_{dim V = d} R(V_d)
+\end{align*}
+Obviously $V$ is the $d-dim$ best approximation of $X$. In reality, since the distribution of $X$ is unknown, we are not able to calculate $R(V)$, instead, we may calculate the \textbf{empirical projection risk.} Recall
+\begin{align*}
+	R_n (V) := \frac{1}{n} \sum_{i = 1}^n \|X_i - P_V X_i\|^2 = tr(\hat{\Sigma}(I - P_V))
+\end{align*}
+and 
+\begin{align*}
+	\hat{V} := \arg\min_{dimV = d} R_n(V)
+\end{align*}
+
+
+\subsubsection*{The theorem of Davis-Kahan}
+
+
+\begin{theorem}
+	\begin{equation} \label{PCA: David-Kahan}
+		\| P_{\hat{V}_d} - P_{V_d} \|_{HS}^2 \leq \min (2d, \frac{4 \| \hat{\Sigma} - \Sigma \|_{HS}^2}{(\lambda_d - \lambda_{d-1} )^2} )
+	\end{equation}
+\end{theorem}
+
+\begin{proof}
+\end{proof}
+
+\begin{remark}
+The principle angle: if $d = 1$, 
+\begin{equation*}
+	\| P_{\hat{V}_1} - P_{V_1} \|_{HS}^2 = 2 - 2 \langle v_1, \hat{v_1}  \rangle^2 = 2\sin^2(v_1, \hat{v}_1)
+\end{equation*}	
+\end{remark}
+
+\subsubsection*{Excess risk of PCA}
+
+\begin{theorem}
+	We have:
+	\begin{equation*}
+		\mathbb{E}R(\hat{V}) - R(V) \leq \min (\sqrt{\frac{2d}{n}\mathbb{E}\|X\|^4 - \|\Sigma\|^2, \frac{2}{n} }
+	\end{equation*}
+
+\end{theorem}
+
+
+\section{Kernel Method}
+\subsection{reproducing kernel Hilbert space}
+
+
+
+
+\section*{equations and inequalities}
+\textbf{Multidimensional-Univariate:}
+\begin{equation*}
+	e^x \leq x + e^{x^2}
+\end{equation*}
+
+\begin{equation*}
+	\Gamma(n) = (n - 1)! = \int_0^\infty x^{n -1} e^{-x} dx
+\end{equation*}
+
+\section{Technique}
+
+\subsubsection*{1. Indicator function and density}
+
+\subsubsection*{2. function and density}
+\begin{enumerate}
+	\item dimension
+\end{enumerate}
+
+\subsubsection*{3. Consistency, convergence in probability, Chebyschev}
+
+\subsubsection*{4. Conditioning}
+
+\subsubsection*{5.Empirical Bridging}
+
+\subsubsection*{6. Vector Space and Orthogonality}
+\begin{theorem}
+	The deduction of $P_{A(x)} = A(A^T A)^{-1} A^T$
+\end{theorem}
+\begin{proof}
+	see the math stack-exchange and bilinear form of Fischer. 
+\end{proof}
+
+
+
+\subsubsection*{Symmetry Trick}
+
+\subsubsection*{Projection calculation}
+
+
+
+
+
+
+
+
+
+
+
+
+\chapter{High-dimensional statistics}
+
+\section{Sparse Recovery}
+\subsubsection*{Notation}
+\textbf{$l_0$ norm:} $	\|\beta\|_0 = |\{j: \beta_j \neq 0\}|$\\
+\textbf{support of} $\beta^*:= \{j: \beta_j \neq 0\}$. \\
+Suppose $S \subset \{1, \dots, p \}$. the support of $\beta^*$, we define $X_S \in \mathbb{R}^{n \times |S|}$ the matrix consisting the columns of $S$ is the matrix $X$.
+\subsection{The linear model in higher dimensions}
+The problem under investigation is the linear system in high dimension:
+\begin{align*}
+X \in \mathbb{R}^{n \times p}, Y \in \mathbb{R}^n, \beta^* \in \mathbb{R}^p: 
+ Y = X \beta^* = 
+ \begin{bmatrix}
+ 	X_1^T\\
+ 	X_2^T\\
+ 	\vdots\\
+ 	X_n^T
+ \end{bmatrix}	\beta^*
+\end{align*}
+We observe the case where $p \gg n$, 
+
+
+\begin{example}[Shannon's sampling theorem]
+\end{example}
+
+
+
+\begin{definition}[Euclidean Norm on a net]
+Given a $\epsilon \in (0, 1)$, we define
+	\begin{align*}
+		\mathcal{N} \subset S^{p-1} := \{u \in \mathbb{R}^p: \|u\|_2 = 1\}
+	\end{align*}
+	as a subset of the unit ball in $\mathbb{R}^p$, such that
+	\begin{align*}
+		\forall u \in S^p \exists u_0 \in \mathcal{N}: \|u- u_0\|_2 \leq \epsilon
+	\end{align*}
+\end{definition}
+
+
+
+
+
+\begin{method}[naive convex minimization]
+\end{method}
+
+\subsubsection*{The basis pursuit linear program}
+
+Given the computational difficulties of the $\|\|_{l_0}$ norm(it's NP-hard and the cost function is non-differentiable and non-convex), it's natural to consider the \textbf{convex relaxation} by approximating $\|\cdot\|_0$ with the nearest $l_p$ norm, namely the $l_1$ norm. We refer to \ref{bpp} as the \textbf{Basis Pursuit Program}
+
+\begin{method}[convex sparse linear regression(Basis Pursuit Programm)]
+\begin{align}\label{bpp}
+	\text{minimize} \|\theta\|_1 \quad \textbf{under the constraint}\quad \mathbf{X} \theta = y
+\end{align}
+\end{method}
+
+
+\begin{definition}[Null space propertiy]
+	A matrix $\mathbf{X}$ admits null space property regarding $S$ if:
+	\begin{align*}
+		\{ \Delta \in \mathbb{R}^p: \|\Delta_{S^c}\|_1 \geq \|\Delta_S\|_1 \} \cap Ker(X) = \{0\}
+	\end{align*}
+	i.e the only dominated vector in the kernel with the dominated $l_1$ S-sparse norm is 0
+\end{definition} 
+
+\begin{theorem}
+	The following arguments are equivalent:
+	\begin{enumerate}
+		\item The matrix $\mathbf{X}$ satisfies the null space property with respect to $S$ $(S \subset\{1, \dots, d\})$.
+		\item For any vector $\theta^* \in \mathbb{R}^d$ with support $S$, the basis pursuit linear program admits an unique solution
+	\end{enumerate}
+\end{theorem}
+\begin{remark}
+Notice it only gives condition for the optimal $S$-sparse solution	 given a specific subset $S$. 
+\end{remark}
+
+\begin{proof}
+\quad\\
+1)$\rightarrow$2): Assume $\tilde{\theta}$, $\theta^*$ satisfies the BPP, $\tilde{\theta}$ is the optimal choice, and $\delta = \tilde{\theta} - \theta^*$, then we have:
+\begin{align*}
+	\|\theta^*\|_1 = \|\theta^*_S\|_1 &\geq  \|\theta^* + \delta\|_1\\
+	&= \|\theta^*_S + \delta_S \|_1 + \|\delta_{S^C}\|_1\\
+	&\geq \|\delta_{S^c}\|_1 - \|\delta_S\|_1
+\end{align*}
+which violate the null space property\\
+2)$\rightarrow$1):w.l.o.g. assuming $\theta^* \in Ker(X)$. We have:
+\begin{align*}
+	X [\theta^*_S, \theta^*_{S^c}]^T &= 0\\
+	\Rightarrow X \theta^*_S &= X(-\theta^*_{S^C}) = 0
+\end{align*}  
+$\theta^*_{S^C}$ is also feasible for our BPP. Since $\theta^*$ is the unique solution of the BPP, we have:
+\begin{align*}
+	\|\theta^*_S\|_1 \leq \|\theta^*_{S^c}\|_1
+\end{align*}
+\end{proof}
+
+\begin{definition}[Restricted Isometry Property]
+	For a given integer $s \in \{1, \dots, d\}$, we say $X \in \mathbb{R}^{n \times d}$ satisfies the restricted isometry property of order $s$ with constant $\delta_s(X)$ if:
+	\begin{align*}
+		\|\frac{X_S^T X_S}{n} - I_s\|_2 \leq \delta_s(X) \quad \textbf{for all subset $S$ of size at most $s$}
+	\end{align*}
+	where $\delta_{PW}(X) = \max_{j, k = 1, \dots, d} |\frac{X_j, X_k}{n} - \mathbbm{1}_{j = k}|$ is called the incoherence parameter. Equivalently as above:
+	\begin{align*}
+		\forall \beta \in \mathbb{R}^p, \|\beta\|_0 \leq s:(1-\delta)\|\beta\|^2_2 \leq \frac{1}{n} \|X\beta\|^2_2 \leq (1+\delta)\| \beta\|^2_2
+	\end{align*}
+\end{definition}
+
+\begin{proposition}
+	If the RIP constraint is bounded of order $2s$ with $\delta_{2s}(X) < \frac{1}{3}$, then the nullspace property hold for any $S$ with $|S| \leq s$.
+\end{proposition}
+\begin{proof}
+	w.l.o.g. assuming $\theta_s\in Ker(X)$ is a feasible solution of basis pursuit program, and $S$ the index set of the $s$-largest entries, we want to show:
+	\begin{align*}
+		\|\theta_{S}\|_1 \leq  \|\theta_{S^C}\|_1 
+	\end{align*} 
+	Decompose $S^c$ by subset of the size of $|s|$ and $\forall a \in S_j \forall b \in S_{j+1}: |\theta_a| \geq |\theta_b|$, $j \geq 1$ therefore:
+	\begin{align*}
+		\|\theta_s\|_2 ^2 &\leq \frac{1}{(1-\delta)n} |\langle X\theta_s, X\theta_s\rangle|\\
+		&= \frac{1}{(1-\delta)n} |\langle X \theta_s , X \sum_{j \geq 1} \theta_{s_j} \rangle\\
+	(1)	&=  \frac{1}{(1-\delta)n} \sum_{j \geq1} \langle X \theta_s, X \theta_{s_j}\rangle\\
+		&\leq \frac{1}{1 - \delta} \delta \sum_{j \geq 1} \|\theta_s\|_2 \| \theta_{s_j}\|_2 
+	\end{align*}
+	We have:
+	\begin{align*}
+		\|\theta_s\|_2 \leq \frac{\delta}{1 - \delta}\sum_{j \geq 1} \|\theta_{s_j}\|_2
+	\end{align*}
+	Now we have to transform the $l^2$ norm to $l^1$ norm. By $\|\theta_s\|_1 \slash n \geq \|\theta_j\|_\infty$ for all $j \geq 1$ we get:
+	\begin{align*}
+		weiter
+	\end{align*}
+\end{proof}
+The idea now is to construct the design matrix that satisfies the RIP. To do so we first need the concentration's inequality.
+
+\subsection{Concentration Inequality}
+\subsubsection*{From Markov to Chernoff}
+The purpose of this section is to control the probability of the tail event. 
+\begin{definition}[sub-Gaussian random variables]
+	A centred random variable $X$ is sub-Gaussian with respect to $\sigma^2 > 0$, if:
+	\begin{align*}
+		\mathbb{E} e^{\mu X} \le e^{\frac{\mu^2 \sigma^2}{2} } \qquad \forall u \in \mathbb{R}
+	\end{align*}
+	Notation: $X \in SG(\sigma^2)$.
+\end{definition}
+\begin{remark}
+	
+\end{remark}
+
+\begin{example}[Rademacher random variables]
+Given $\epsilon$ the Rademacher random variable( i.e. $\mathbb{P}(\epsilon = 1) = =\mathbb{P}(\epsilon = -1) = \frac{1}{2}$). Then $\epsilon \in SG(1)$
+\begin{proof}
+	\begin{align*}
+		\mathbb{E} e^{u \epsilon} &= \frac{1}{2} (e^u + e^{-u})\\
+		&= \sum_{k = 0}^\infty \frac{u^{2k}}{(2k)!}\\
+((2k)! \geq 2^k k!)
+ 		&\leq \sum_{k =0} \frac{u^{2k}}{k!2^k}\\
+ 		&\leq \frac{(u^2\slash 2)^k}{k!}\\
+ 		& = e^{\frac{u^2}{2}}
+	\end{align*}
+\end{proof}
+Therefore $\epsilon \in SG(1)$.
+\end{example}
+\begin{remark}
+For a zero-mean random variable $X$, $\epsilon$ random variable. $\epsilon X$ admits the same distribution as $X$.	
+\end{remark}
+
+\begin{example}[Bounded random variables]
+	Let $X$ be a zero-mean random variable on the support $[a, b]$, we show $X \in SG()$\\\
+	Let $X'$ be a independent copy of $X$, then by symmetry argument we know 
+	\begin{align*}
+		\epsilon(X' - X) \sim X - X'
+	\end{align*} 
+	Observe:
+	\begin{align*}
+		\mathbb{E}e^{u(X'- X)} &= \mathbb{E}[ \mathbb{E}_\epsilon e^{u\epsilon(X'-X)}]\\
+		&\leq \mathbb{E} e^{\frac{u^2(b-a)^2}{2}}\\
+		&= e^{\frac{u^2(b-a)^2}{2}}x
+	\end{align*}
+\end{example}
+
+
+\subsubsection{Net}
+\begin{definition}
+	A $\epsilon$-net on a $p-$sphere is defined as ($\epsilon \in(0, 1)$):
+	\begin{align*}
+		\forall x \in S^{p-1} \exists u \in \mathcal{N}: \|x - u\|_2 \leq \epsilon
+	\end{align*}
+\end{definition}
+
+\begin{lemma}
+	$\|x\|_2$ could be discretely approximated by
+	\begin{align*}
+		\|x\|_2 \leq \frac{1}{1 - \epsilon} \max_{ \nu \in \mathcal{N}} \langle x, \nu \rangle
+	\end{align*}
+\end{lemma}
+
+\begin{theorem}[Characterisation of sub-Gaussian random variables]
+$X$ is a zero-mean, real-valued random variable. The followings are equivalent:
+\begin{enumerate}
+	\item $X \in SG(\sigma^2)$
+	\item $\mathbb{P}(|X| \geq t) \leq 2e^{\frac{-t^2}{2\sigma^2}}$
+	\item $\mathbb{E} |X|^p \leq $
+\end{enumerate}	
+\end{theorem}
+\begin{proof}
+$\quad$
+\begin{itemize}
+	\item $1)\Rightarrow 2)$
+	\begin{align*}
+		\mathbb{P}(|X| \geq t) &= \mathbb{P}(e^{ux} \geq e^{ut})\\
+		&\leq \mathbb{E}e^{ux} e^{-ut}\\
+		&\leq e^{u^2 \sigma^2} e^{-ut}
+	\end{align*}
+	select $u = \frac{t}{\sigma^2}$ and get the result
+	\item $2) \rightarrow 3)$ Apply Fubini:
+	\begin{align*}
+		\mathbb{E}|X|^p = \int \mathbb{P}(|X| \geq x) dxd\omega
+	\end{align*}
+\end{itemize}
+\end{proof}
+
+\begin{lemma}[Sum of sub-Gaussian random variables]
+	Given $X_1, \dots, X_n$ i.i.d sub-gaussian random variables with $X_i \in SG(\sigma_i^2)$, we have:
+	\begin{align*}
+		\mathbb{E}S_n \in SG(\sum_{i = 1}^n \sigma_i^2)
+	\end{align*}
+\end{lemma}
+\begin{proof}
+\begin{align*}
+	\mathbb{E}e^{u S_n} = \mathbb{E}\prod^n e^{uX_i} = \prod^n \mathbb{E}e^{uX_i} \leq \prod^n e^{\frac{u^2 \sigma_i^2}{2}} = e^{\frac{u^2(\sum \sigma_i^2)}{2}}
+\end{align*}
+\end{proof}
+
+\begin{theorem}[Hoeffding's inequality]
+	Given $X_i$ i.i.d with $X_i \in SG(\sigma_i^2)$, we have:
+	\begin{align*}
+		\mathbb{P}(|S_n| \geq t) \leq 2e^{-\frac{t^2}{\sum\sigma_i^2}} 
+	\end{align*}
+	Moreover, if $\mathbb{E}X_i = 0$ and $X_i \in [a_i, b_i]$, we have:
+	\begin{align*}
+		\mathbb{P}(|S_n| \geq t) \leq 2e^{-\frac{t^2}{\sum(b_i - a_i)^2}}
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	Combine the last lemma and the characterization of sub-gaussian random variables.
+\end{proof}
+
+\begin{definition}[sub-exponential random variables]
+	A centred random variable $X$ is called sub-exponential with respect to $\alpha > 0, \sigma^2 > 0$ if
+\begin{align*}
+	\mathbb{E} e^{ux} \leq e^{\frac{u^2 \sigma^2}{2}} \quad \forall u \le \frac{1}{\alpha}
+\end{align*}
+We write: $X \in SE(\sigma^2, \alpha$).
+\end{definition}
+
+\begin{example}[$\chi^2$ distributed variable]
+	Given $X = Z^2, Z\sim N(0, 1)$, we have $Z^2 - 1 \in SE(4, 4)$, $ZZ' \in SE(2, \sqrt{2})$:
+	\begin{align*}
+		\mathbb{E}e^{Z^2 - 1} = \frac{1}{\sqrt{2\pi}} \int_\mathbb{R} e^{u(z^2 - 1)}e^{-z^2}dz
+	\end{align*}
+\end{example}
+
+\begin{proposition}[The sub-exponential tail bound]
+\end{proposition}
+
+\begin{proposition}[Sum of the sub-exponential random variables]
+\end{proposition}
+
+\begin{theorem}[The Bernstein inequality]
+Let $X_1, X_2, \dots, X_n$ be independent random variable, with $X_i \in SE(\sigma_i^2, \alpha_i)$, then
+\begin{align*}
+	\mathbb{P}(|S_n| \ge t ) \le 2 \exp \bigg( {-\min(\frac{t^2}{2\sum_{i = 1}^n \sigma_i^2}, \frac{t}{2\max_{1 \le i \le n} \alpha_i})}\bigg)
+\end{align*}
+in particular, for $\sigma_i^2 \le \sigma^2, \alpha_i \le \alpha$ for all $i$:
+\begin{align*}
+	\mathbb{P}(|S_n| \ge t) \le 2 \exp\bigg(-\frac{n}{2} \min(\frac{t^2}{\sigma^2}, \frac{t}{\alpha}) \bigg)
+\end{align*}
+\end{theorem}
+
+\begin{example}[The $\chi^2$ distributed random variables]
+	Let $Z_1, \dots, Z_n, Z_1', \dots, Z_n'$ be standard normal distributed, then we have:
+	\begin{align*}
+		\mathbb{P}(|\frac{1}{n}\sum_{i = 1}^n Z_i^2 - 1|> t ) &\le 2\exp \bigg(-\frac{n}{8}\min(t^2, t) \bigg) \quad \forall t \ge 0\\
+		\mathbb{P}(\frac{1}{n}\sum_{i = 1}^n Z_i^2 > t) &\le 2\exp\bigg(-\frac{n}{8}\min(t^2,t)\bigg) \quad \forall t \ge 0
+	\end{align*}
+\end{example}
+
+\begin{example}[Empirical covariance estimation]
+	In particular
+\end{example}
+
+
+
+\subsection{Restricted Isometry Property for random matrices}
+The central result of this subsection is the sufficient condition of $n$ to satisfies the RIP.
+\begin{lemma}[The packing argument]
+	Define the ball:
+	\begin{align*}
+		B_2^m:= \{ x \in \mathbb{R}^m: \|x\|_2 = 1\}
+	\end{align*}
+	$\epsilon \in (0, 1)$, then we can find $\mathcal{N}$ with 
+	\begin{align*}
+		|\mathcal{N}| \leq (1 + \frac{2}{\epsilon})^m
+	\end{align*}
+	such that
+	\begin{align*}
+		\forall y \in B_2^m \exists x \in \mathcal{N}: \|x - y\| \leq \epsilon
+	\end{align*}
+	In particular, this holds for $S^{m-1}$ instead of $B^m$.
+\end{lemma}
+\begin{proof}
+	by construction we find $M$ $\frac{\epsilon}{2}$-ball such that:
+	\begin{align*}
+		\bigcup_{i = 1}^M B(x_i, \frac{\epsilon}{2}) \subset B(0, 1 + \frac{\epsilon}{2})
+	\end{align*}
+	Therefore:
+	\begin{align*}
+		M (\frac{\epsilon}{2})^m vol(B_1^m) &\le (1 + \frac{\epsilon}{2})^m vol(B_1^m)\\
+		M &\le (\frac{\epsilon + 2}{\epsilon} )^m
+	\end{align*}
+	For the sufficiency: (TBC)
+\end{proof}
+
+\begin{lemma}[operator norm by packing]
+	Given $A \in Sym^{m \times m}$, and $\mathcal{N}$ a $\epsilon$-Net of $S^{m-1}$ with $\epsilon < \frac{1}{2}$, then we have:
+\begin{align*}
+	\|A\|_{op} \leq \frac{1}{1 - 2 \epsilon}  \max_{ x \in \mathcal{N}} |\langle Ax, x \rangle|
+\end{align*}
+\end{lemma}
+\begin{proof}
+\begin{align*}
+	\|A\|_2 &= \sup_{x \in S^{m-1}}|\langle Ax , x \rangle|\\
+	&= \sup |\langle Ax, x - u\rangle + \langle Ax, u \rangle|\\
+	&= \sup \langle Ax, x - u\rangle + \langle A (x - u), u \rangle + \langle Au, u \rangle |\\
+	&\le \|A\|_{op} \epsilon + \|A\|_2 \epsilon + \max_{ u \in \mathcal{N}} \langle Au, u\rangle
+\end{align*}
+Therefore
+\begin{align*}
+	\|A\|_2 \le \frac{1}{1- 2 \epsilon} \max_{x \in \mathcal{N}} |\langle Ax, x \rangle|
+\end{align*}
+\end{proof}
+
+The main result of the subsection is to give a sufficient condition for the RIP of a random matrix. 
+
+\begin{theorem}
+	Given the matrix $\mathbf{X} = (X_{ij}) \in \mathbb{R}^{n \times p}$ with $X_{ij} \sim N(0, 1)$, $s \le p$, $\delta \in (0, 1)$. There exists $c(\delta), C(\delta)$, such that\\
+	\begin{align*}
+		n \ge \log(\frac{ep}{s}) \Rightarrow \text{$\mathbf{X}$ satisfies the RIP of order $s$}
+	\end{align*}
+	with the probability at least $1 - e^{-cn}$.
+\end{theorem}
+\begin{proof}\quad \\
+	1. \textbf{Approximation:} Constructing $\frac{1}{4}$ net on $S^{s -1}$, by the packing argument we get $|\mathcal{N}| \le 9^s $. Estimating the operator norm by packing:   
+	\begin{align*}
+		\|\frac{X_S^T X_S}{n} - I_S\|_2 &\le 2 \max_{u \in \mathcal{N}} |\langle (\frac{X_S^T X_s}{n} - I_S)u, u \rangle|\\
+		&\le 2\max_{u \in \mathcal{N}} |\frac{1}{n} \|X_Su\|^2_2 - 1|
+	\end{align*}
+	2. \textbf{Concentration Inequality:}
+	\begin{align*}
+		\delta_s(X) = \max_{|S| = s}  \|\frac{X^T_S X_S}{n} - I_S\|_2^2
+		 &\le \max_{|S| = s} \max_{u \in \mathcal{N}} 2| \frac{1}{n} \|X_Su \|^2_2 - 1|\\
+	\end{align*}
+	Since
+	\begin{align*}
+		\|X_S u\|_2^2 = \langle X_S u, X_Su\rangle \sim \chi^2(n)\quad (\chi^2(s)???)
+	\end{align*}
+	we apply Bernstein inequality and get:
+	\begin{align*}
+		\mathbb{P}(\frac{1}{n} \|X_Su \|_2^2 - 1 \ge \frac{\delta}{2}) &\le 2\exp\bigg(-\frac{n}{32} \delta^2\bigg) \quad \forall \delta \in (0, 2)
+	\end{align*}
+	3.\textbf{Union bound}
+	\begin{align*}
+		\mathbb{P}(\delta_s(X) \ge \delta) &= \mathbb{P}(\max_{|S| = s}  \|\frac{X^T_S X_S}{n} - I_S\|_2^2 \ge \delta)  \\
+		&\le \mathbb{P}(\max_{|S| = s} \max_{u \in \mathcal{N}} |\frac{1}{n} \|X_Su \|^2_2 - 1| \ge \frac{\delta}{2})   \\
+		&\le \sum_{|S| = s} \sum_{u \in \mathcal{N}}\mathbb{P}(|\frac{1}{n}\|X_S^T X_S\|^2_2 - 1| \geq \frac{\delta}{2})
+	\end{align*}
+\end{proof}
+
+
+
+\newpage
+\section{Covariance estimation and sparse PCA}
+\subsection*{Matrix analysis}
+\begin{itemize}
+	\item \textbf{The trace scalar product:} $\langle A, B \rangle := tr(A^T B) = \sum_{i = 1}^p \sum_{j = 1}^p a_{ij} b_{ij}$
+\end{itemize}
+
+\begin{definition}[The $l^p$ norm of matrix]
+	As the $l^p$ norm of the vector, we may define the $l^p$ norm of the matrix:
+	\begin{align*}
+		\|A\|_p = (\sum_{i, j = 1}^n |a_{ij}|^p)^{\frac{1}{p}}
+	\end{align*}
+\end{definition}
+\begin{example}\quad
+\begin{itemize}
+	\item $l^1$: $\|A\|_1$
+	\item \textbf{$l^2$: The Frobenius norm:} $\|A\|_2 = \|A\|_F = \sqrt{\langle A, A \rangle}$
+\end{itemize}	
+\end{example}
+
+\begin{proposition}[estimation between $l^p$ norms]
+\end{proposition}
+
+
+\begin{definition}[The Schatten p-norm]
+	For $A \in \mathbb{R}^{m \times n}$ we define:
+	\begin{align*}
+		\||A\||_p := \max_{\|x\| \neq 0} \frac{\|Ax\|_p}{\|x\|_p}
+	\end{align*}
+	For $A \in Sym^{n \times n}$:
+ 
+\end{definition}
+\begin{example}\quad
+\begin{itemize}
+	\item \textbf{The maximum column norm}: $\||A\||_1 = \max_{1 \le j \le n } \sum_{i = 1}^m  |a_{ij}|$
+	\item \textbf{The maximum row norm}: $\||A\||_\infty = \max_{1 \le i \le m} \sum_{j =1}^n |a_{ij}|$
+	\item \textbf{the operator norm:} $\|A\|_{op}: = \max_{x \in S^{p-1}} \|Ax\|= \max_{\|x\|\in S^{p-1} }\langle A x, x\rangle$
+\end{itemize}	
+\end{example}
+
+
+
+
+
+\subsection{Covariance matrices in higher dimension}
+The Gaussian mixing model:
+If we assume  $X = \theta z + \epsilon$, $\epsilon \sim N(0, \sigma^2 I_p)$, and $z$ Radamacher random variable. Then the covariance matrix of $XX^T$ is :
+\begin{align*}
+	\mathbb{E}[XX^T] = \theta \theta^T + I_p \sigma^2
+\end{align*}
+That motivates the following definition. Notice that using the Radamacher random variable is another way to normalise the vector to reduce the parameter(?).
+\begin{definition}[spiked covariance model]
+	A covariance matrix $\Sigma \in \mathbb{R}^{d \times d}$ is said to satisfied the \textbf{spiked covariance model} if it satisfies:
+	\begin{align*}
+		\Sigma = \lambda v v^T + I_d
+	\end{align*}
+	In a word, $X_i$ is generated with a 1-dimensional deterministic part and a p-dimensional random noise.
+\end{definition}
+\quad\\
+Beyond the scope of the classical PCA, we would like to ask the following questions:
+\begin{itemize}
+	\item 
+	\item What if $p \gg n, \|u\|_0 = s \ll n$
+	\item the convex relaxation
+\end{itemize}
+
+
+\subsection{Estimation of the Covariance matrix}
+\begin{definition}[Sub-Gaussian random vector]
+$X\in \mathbb{R}^p$ random vector.
+\begin{align*}
+	X \in SG(\sigma^2) \Leftrightarrow \forall u \in \mathbb{R} \forall x \in \mathbb{R}^p:  e^{u\langle x, X \rangle} \leq e^{u^2 \sigma^2 \slash 2}
+\end{align*}
+\end{definition}
+\begin{remark}
+$x$ in the scalar product is introduced as a weight to normalise the random vector to a constant.	
+\end{remark}
+
+\begin{example}
+	Give $Y \in \mathbb{R}^p $ a random vector with $\mathbb{E} Y Y^T = I_p$. $\Sigma$ a SPD matrix, then $X = \Sigma^{\frac{1}{2}} Y$ is a sub-gaussian random vector with $X \in SG_p(C\|\Sigma\|_{op})$
+\end{example}
+
+\begin{theorem}
+Let $X_1, \dots, X_n \in SG_p(\sigma^2)$
+\begin{align*}
+	\mathbb{P}\bigg( \frac{\|\hat{\Sigma} - \Sigma\|_{op}}{\sigma^2} \geq 
+	C(\sqrt{\frac{p+\delta}{n}} + \frac{p+ \delta}{n}) \bigg) \le2e^{-\delta}, \quad \forall \delta > 0
+\end{align*}
+\end{theorem}
+\begin{proof}
+	\quad\\
+	\textbf{1. Approximation}:choose a net $\mathcal{N}$ with $\epsilon = \frac{1}{4}$, 
+	\begin{align*}
+		\|\Sigma - \hat{\Sigma}\|_{op} &\le 2\max_{u \in \mathcal{N}}|\langle (\Sigma - \hat{\Sigma})u, u \rangle|\\
+		&= 2\max_{u \in \mathcal{N}}|\frac{1}{n}\sum_{i = 1}^n \langle X_i, u \rangle^2 - \mathbb{E}\langle X, u\rangle^2|
+	\end{align*}
+	2. \textbf{Concentration inequality:}By the exercise we know $\langle X, u\rangle^2 - \mathbb{E}\langle X, u\rangle^2 \in SE(C\sigma^4, C\sigma^2)$, therefore:
+	\begin{align*}
+		\mathbb{P}(\frac{1}{n}\sum_{i = 1}^n \langle X_i, u\rangle^2 - \mathbb{E}\langle X, u\rangle^2 \ge t) &\le 2\exp\bigg(-cn \min(\frac{t^2}{\sigma^4}, \frac{t}{\sigma^2})\bigg)\\
+	\end{align*}
+	3.\textbf{Union bound:}
+	\begin{align*}
+		\mathbb{P}(\frac{\|\hat{\Sigma} - \Sigma\|_{op}}{\sigma^2} \ge t) &= \mathbb{P}(\|\hat{\Sigma} - \Sigma\|_{op} \ge \sigma^2 t ) \\
+		(1)&\le\mathbb{P}\bigg( \max_{u \in \mathcal{N}}(\frac{1}{n}\sum_{i = 1}^n \langle X_i, u\rangle^2- \mathbb{E}\langle X, u\rangle^2) \ge \frac{\sigma^2 t}{2} \bigg)\\
+		(2)&\le\sum_{u \in \mathcal{N}}\mathbb{P}\bigg( \frac{1}{n} \sum_{i = 1}^n \langle X_i, u\rangle^2 - \mathbb{E} \langle X, u\rangle^2 \geq \frac{\sigma^2 t}{2}\bigg)\\
+		&\le 9^p \exp\bigg(-cn \min(t^2, t)\bigg)
+	\end{align*}
+	choose the suitable $t$ to get the assumption.
+\end{proof}
+
+
+
+
+
+
+
+\subsection{Inequality of eigenvalue and eigenvectors}
+\begin{theorem}[The spectral theorem]
+	Give $A \in Sym^{p \times p}$, then there exists $\lambda_1 \geq \lambda_2 \dots \lambda_p$, and $u_1, u_2, \dots, u_p$ in $\mathbb{R}^p$ with:
+	\begin{align*}
+		A = \sum_{i = 1}^p \lambda_i u_i u_i^T
+	\end{align*}
+\end{theorem}
+
+\subsubsection*{Perturbation result of eigenvalues}
+Given matrix $B$ the observation, and $A$ the real parametric matrix. We are interested in the behavior of $A$ with small perturbation $B - A$.
+\begin{theorem}[Courant Fischer]
+	Given a space $X \subset \mathbb{R}^n$ and $S \subset X$ a k-dimensional subset of $X$, then we have:
+	\begin{align*}
+		\lambda_k = \max_{dim S = k} \min_{x \in S^{p-1}, x \in S} \langle Ax, x\rangle
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	First convince yourself in finite dimension:
+	\begin{align*}
+		\lambda_{\max} = \max_{\|x\| \in S^{p-1}}\langle Ax, x \rangle, \quad \lambda_{\min} = \min_{\|x\|\in S^{p-1}} \langle Ax, x\rangle \quad (Rayleigh)
+	\end{align*}
+	"$\le$":
+	\begin{align*}
+		\max_{S}\min_x \langle Ax, x \rangle &\overset{(1)S = \hat{S}}{\ge} \min_{x\in \hat{S}} \langle Ax, x \rangle \\
+		&= \lambda_k 
+	\end{align*}
+	where in (1) we choose $\hat{S} = \{u_1, \dots, u_k\}$.\\
+	"$\geq$": choose arbitrary $V$ with $dimV = k$, and $W= \{ u_k , \dots, u_p\}$, observe $V \bigcap W \neq \{0\}$.
+	\begin{align*}
+		\min_{x \in V}\langle Ax, x \rangle &\le \min_{x \in V\cap W, \|x\| = 1} \langle Ax, x \rangle \\
+		& = \min_{i \in \{k, \dots, p\}} \lambda_i  \\
+		&= \lambda_k
+	\end{align*}
+\end{proof}
+
+\begin{theorem}[Hoffman-Wielandt]
+Given $A$, $B \in Sym^{p\times p}$, we have:
+\begin{itemize}
+	\item (Wyel)
+	\begin{align*}
+		|\lambda_j(B) - \lambda_j(A)| \leq \|A - B\|_{op}
+	\end{align*}
+	\item(Hoffman-Wielandt)
+	\begin{align*}
+		\sum_{j = 1}^p (\lambda_j(B) - \lambda_j(A))^2 \le \|B - A\|_F^2
+	\end{align*}
+\end{itemize}
+\end{theorem}
+\begin{proof}
+	Wyel will be proved in the exercise. For the Hoffmann Wielandt:
+\end{proof}
+
+
+
+\subsubsection*{Perturbation result of eigenvectors}
+\begin{definition}[Eigenprojection]
+	Given $A \in Sym^{p\times p}$, we define the linear map
+	\begin{align*}
+		P_j(A) = u_j(A)u_j(A)^T, \quad 1 \le j \le p
+	\end{align*}
+	Notice that $P_j(A)$ satisfies:
+	\begin{align*}
+		&P_j(A)^2 = P_j(A)\\
+		&P_i(A)P_j(A) = 0 \quad \forall i \neq j, \\
+		&\sum_{j = 1}^pP_j(A) = I_p \\
+		&\|P_i(A)\|_F = 1 \\
+		&P_i(A)^T = P_i(A)\\
+	\end{align*}
+\end{definition}
+
+\begin{theorem}[Davis-Kahn]
+Let $A, B \in Sys^{p \times p}$, $1 \le j \le p$, define
+\begin{align*}
+	g_j(A):= \min(\lambda_{j-1}(A) - \lambda_j(A), \lambda_j(A) - \lambda_{j+1}(A))
+\end{align*}
+we have
+\begin{align*}
+	\frac{1}{\sqrt{2}}\|P_j(B) - P_j(A)\|^2_F \le \frac{2\|B - A\|_{op}}{g_j(A)}
+\end{align*}
+\end{theorem}
+\begin{proof}
+If $g_j(A) \le 2\|B-A\|_2$, the righthand side is greater than $1$, by $\|P_i\|_F^2 = 1$ we know:
+\begin{align*}
+	\|P_j(B) - P_j(A)\|_F^2 \le 1
+\end{align*}
+The assumption follows. \\
+If $g_j(A) \ge 2\|B-A\|_2$, then we have
+\begin{align*}
+	\lambda_j(B) - \lambda_k(A) &= \lambda_j(B) + \lambda_j(A) - \lambda_j(A) - \lambda_k(A)\\
+	&=\lambda_j(A) - \lambda_k(A)  -(\lambda_j(A) - \lambda_j(B))\\
+	&\ge \lambda_j(A) -\lambda_k(A) - \|B - A\|_2\\
+	&\ge g_j(A) - g_j(A) \slash 2 \\
+	&= \frac{g_j(A)}{2}
+\end{align*}
+
+\begin{align*}
+	\|P_j(A) - P_j(B)\|_F^2 &= \sum_{k \neq j} \|P_k(A)P_j(B)\|_F^2\\
+	(1)&= \sum_{k \neq j}\frac{\|P_k(A)(B - A)P_j(B)\|_F^2}{(\lambda_j(B) - \lambda_k(A))^2}\\
+	&\le \frac{4}{g_j(A)^2}\sum_{k \neq j}\|P_k(A)(B - A)P_j(B)\|_F^2\\
+	&= \frac{4}{g_j(A)^2}\|(I_p - P_j(A) (B - A)P_j(B) \|_F^2\\
+	(2)&\le \frac{4}{g_j(A)^2}\|(I_p - P_j(A)\|_{op}^2 \|B - A\|_2^2\|P_j(B)\|_F^2\\
+	&\le \frac{2\|B - A\|_2}{g_j(A)} 
+\end{align*}
+	where in 1) we use the spectral decomposition of $(B - A)$ and 2) the induced operator norm of the Frobenius norm.
+\end{proof}
+
+For the next theorem we define:
+\begin{align*}
+	\mathcal{F}_1:= \{P \in Sys^{p \times p}: P^T = P, tr(P) = 1\}
+\end{align*}
+and we consider the bound over a set of projection instead of 1.
+\begin{theorem}[Davis-Kahn for $j = 1$]
+\begin{align*}
+	\|P_1(A) - P\|_F^2 \le \frac{2\langle A, P_1(A) - P \rangle}{\lambda_1(A) - \lambda_2(A)}
+	\quad \forall P \in \mathcal{F}_1
+\end{align*}
+\end{theorem}
+\begin{proof}
+	\begin{align*}
+		\langle A, P_1(A) - P\rangle &= \langle A, P_1(A)(I_p - P) \rangle - \langle A, (I_p - P_1(A))P \rangle\\
+	(1)	&= \lambda_1(A)\langle P_1(A), I_p- P\rangle - \langle A, (I_p - P_1(A))P \rangle \\
+	(2)	&\le \lambda_1(A)\langle P_1(A), I_p- P\rangle - \lambda_2\langle I_p - P_1(A), P\rangle\\
+	&= \lambda_1 (tr[P_1(A)I_p] - \langle P_1(A), P\rangle) - \lambda_2(tr[PI_p]- \langle P_1(A), P\rangle)\\
+	&= (\lambda_1 - \lambda_2 )(1- \langle P_1(A) , P\rangle)
+	\end{align*}
+	in(1) we used the spectral decomposition of symmetric matrix,  in (2) we used:
+	\begin{align*}
+		\langle A, (I_p - P_1(A))P \rangle &= \sum_{k >1}\langle \sum_{j = 1}^p \lambda_j(A)P_j(A), P_k(A) P\rangle\\ 
+		&= \sum_{k >1}\lambda_k(A)\langle P_k(A), P\rangle\\
+		&\le \lambda_2(A) \langle\sum_{k >1}P_k(A), P\rangle\\
+		&= \lambda_2(A)\langle I_p - P_1(A), P\rangle
+	\end{align*}
+	Finally, 
+	\begin{align*}
+		2 - 2\langle P_1(A), P\rangle &= \|P_1\|_F^2 + \|P\|_F^2 - 2\langle P_1, P \rangle\\
+		&= \|P_1 - P\|_F^2
+	\end{align*}
+\end{proof}
+
+
+
+
+\subsection{Sparse PCA and sparse clustering}
+\subsubsection*{sparse PCA}
+
+\begin{method}[sparce PCA]
+\begin{align*}
+	\hat{u}_1 \in  \arg\max_{x \in S^{p-1}, \|x\|_0 = s} \langle \hat{\Sigma}x, x\rangle
+\end{align*}
+\end{method}
+
+\begin{theorem}
+	Given the setting above, $X \in SG_p(\|\Sigma\|_2)$, and $\|u_1(\Sigma)\|_0 = s \le \frac{p}{2}$, then the s-sparse maximal eigenprojection satisfies:
+	\begin{align*}
+		\|P_1(\Sigma) - \hat{P}_1\|_F \le \frac{\|\Sigma\|_{op}}{\lambda_1 - \lambda_2} C\bigg\{\sqrt{\frac{s\log(\frac{ep}{2s})+ \delta}{n}} + \frac{s\log(\frac{ep}{2s})+\delta}{n}\bigg\}
+	\end{align*}
+	with the probability at least $1 - 2e^\delta$.
+\end{theorem}
+\begin{proof}
+	By Rayleigh:
+	\begin{align*}
+		\lambda_{max}(\hat{\Sigma}) =  \langle \hat{\Sigma}\hat{u}_1, \hat{u}_1\rangle = \|\hat{\Sigma}\|_2^2 \ge \|\hat{\Sigma}u_1(\Sigma)\|_2^2 &= \langle \hat{\Sigma}u_1(\Sigma), u_1(\Sigma)\rangle \\
+		\Rightarrow \langle\hat{\Sigma}, \hat{P_1}- P_1\rangle &\ge 0 \\
+		\Rightarrow - \langle\hat{\Sigma}, P_1 - \hat{P}_1\rangle &\ge 0
+	\end{align*}
+	therefore by Davis-Kahan:
+	\begin{align*}
+		\|P_1 - \hat{P_1}\|_F^2 \le \frac{2\langle \Sigma - \hat{\Sigma}, P_1 - \hat{P_1}\rangle}{\lambda_1 - \lambda_2}
+	\end{align*}
+	Observe:
+	\begin{align*}
+		\langle \Sigma - \hat{\Sigma}, P_1 -\hat{P_1}\rangle &\le \|\Sigma - \hat{\Sigma}\|_{op} \|P_1 - \hat{P_1}\|_1\\
+		(1)&= \|\Sigma_S - \hat{\Sigma}_S\|\|P_1 - \hat{P_1}\|_1\\
+		(2)&\le  \max_{|S| = 2s}\|\Sigma_S - \hat{\Sigma}_S\|\|P_1 - \hat{P_1}\|_1\\
+		(3)?&\le \max_{|S| = 2s}\|\Sigma_S - \hat{\Sigma}_S\|\sqrt{2}\|P_1 - \hat{P_1}\|_2
+	\end{align*}
+	In 1) we used Holder, 2) Jensen(sup-out) 3)Cauchy-Schwartz. In the end we have:
+	\begin{align*}
+		\|P_1 - \hat{P_1}\|_F^2 \le \frac{8\max_{|S| = 2s}\|\Sigma - \hat{\Sigma}\|_{op} }{\lambda_1 - \lambda_2} (8??)
+	\end{align*}
+	The problem now becomes the estimation of the covariance matrix:
+	\begin{align*}
+		\mathbb{P}(\max_{|S| = 2s}\|\Sigma - \hat{\Sigma}\|_{op} \ge t\|\Sigma\|_{op}) &\le \sum_{|S| = 2s}\mathbb{P}(\|\Sigma_S - \hat{\Sigma}_S\|_{op} \ge t \|\Sigma\|_{op})\\
+		&\le \binom{p}{2s} 9^{2s} \cdot 2\exp(-cn\min(t^2,t))\\
+		&\le \bigg(\frac{ep}{2s})^{2s} \cdot  9^{2s} \cdot 2\exp(-cn\min(t^2,t))
+	\end{align*}
+\end{proof}
+
+
+
+\subsubsection*{The convex relaxation of sparse PCA}
+For the convex case, instead of searching for the maximum eigenprojection of the covariance matrix, we search for the orthogonal symmetric matrix that maximise $\langle \hat{\Sigma}, P \rangle$ under the Lasso condition.
+\begin{method}
+Find
+\begin{align*}
+	\text{maximize } \langle \hat{\Sigma}, P\rangle\qquad \text{ over }
+	P \in \mathcal{F}_1, \|P\|_F= \sum_{ij}|P_{ij}| \le R^2
+\end{align*}
+Alternatively Lasso:
+\begin{align*}
+		\arg\max_{P \in \mathcal{F}^1}\langle \hat{\Sigma}, P\rangle - \lambda\sum_{i, j = 1}^p|P_{ij}|
+	\end{align*}
+\end{method}
+
+\begin{theorem}
+	Consider the method the above, given $u_1$ s-sparse, $R = \|u_1\|_1$.
+	\begin{align*}
+		\|P_1 - \hat{P}\|_F \le C \frac{\sigma^2}{\lambda_1 - \lambda_2}\bigg\{s \sqrt{{\frac{\log(p) + \delta}{n}}} + s \frac{\log(p) + \delta}{n} \bigg\} 
+	\end{align*}
+	with the probability at least $1 - 2e^\delta$.
+\end{theorem}
+\begin{proof}\quad\\
+	1.\textbf{The basic inequality:}
+	\begin{align*}
+		\|P_1 - \hat{P}\|_F \le \frac{2\langle \Sigma - \hat{\Sigma}, P_1 - \hat{P}\rangle}{\lambda_1 - \lambda_2}
+	\end{align*} 
+	2. \textbf{Estimating by maximum norm}
+	\begin{align*}
+		\|(P_1)_S\|_1 &= \|P_1\|_1 \\
+		&\ge \|\hat{P}\|_1\\
+		&= \|\hat{P} - P_1 + P_1\|\\
+		&= \| (P_1 - \hat{P})_S + (P_1 - \hat{P})_S + (P_1)_S + (\hat{P} - P_1)\|\\
+		&\ge \|(P_1)_S\|_1 - 2\|(P_1 - \hat{P})_S\|_1 + \|P_1 - \hat{P}\|_1  \\
+		\Rightarrow
+		\|P_1 - \hat{P}_1\|_1 &\le 2 \|(P_1 - \hat{P}_1)_S\|_1
+	\end{align*}
+	Therefore:
+	\begin{align*}
+		\|P_1 - \hat{P}\|_F &\le \frac{2\langle \Sigma - \hat{\Sigma}, P_1 - \hat{P}\rangle}{\lambda_1 - \lambda_2}\\
+		&\le \frac{1}{\lambda_1 - \lambda_2} 4\langle \Sigma- \hat{\Sigma}, (P_1 - \hat{P}_1)_S\rangle\\
+		&\le \frac{1}{\lambda_1 - \lambda_2} 4 \|\Sigma - \hat{\Sigma}\|_\infty \|(P_1 - \hat{P})_S\|_1  \\
+		&\le \frac{1}{\lambda_1 - \lambda_2} 4s \|\Sigma - \hat{\Sigma}\|_\infty \|(P_1 - \hat{P_1})_S\|_2\\
+		&\le \frac{1}{\lambda_1 - \lambda_2} 4s \|\Sigma - \hat{\Sigma}\|_\infty		
+	\end{align*}
+	3. \textbf{Concentration inequality }
+\end{proof}
+
+
+
+
+\newpage
+\section{The minimax lower bound}
+\begin{definition}[The maximum q-riks]
+Given a statistical model $(Y, \mathcal{F}, (\mathbb{P}_\theta)_{\theta\in \Theta})$ with $\Theta$ a subset of a metric space $(S, d)$. Let $\hat{\theta}$ be an estimator, we define the \textbf{maximum q-risk}
+\begin{align*}
+	\sup_{\theta \in \Theta} \mathbb{E}_\theta[ d^q(\hat{\theta}(Y), \theta)]
+\end{align*}
+And the Minimax-risk is defined as:
+\begin{align*}
+	\inf_{\hat{\theta}} \sup_\theta \mathbb{E}[d(\theta, \hat{\theta})^q]
+\end{align*}
+\end{definition}
+
+\begin{theorem}[The generalised Fano method]
+	Let $\Theta$ be a subset of the pseudometric space $(S, d)$. Observe the statistical model $(Y, \mathcal{F}, (\mathbb{P}_\theta)_{\theta \in \Theta})$. Given $\delta, \kappa > 0, \theta_1, \dots, \theta_M \in \Theta$ with
+	\begin{align*}
+		d(\theta_j, \theta_k) &\ge \delta \quad \forall j\neq k\\
+		KL(\mathbb{P}_{\theta_j}, \mathbb{P}_{\theta_k}) &\le \kappa \quad \forall j\neq k
+	\end{align*}
+	Then for every estimator $\hat{\theta}: Y \rightarrow S$ we have:
+	\begin{align*}
+		\max_{1 \le j \le M} \mathbb{E}_{\theta_j}[d^q(\hat{\theta}, \theta_j)] \ge (\frac{\delta}{2})^q \bigg(1 - \frac{\kappa + \log 2}{\log M}\bigg)
+	\end{align*}
+\end{theorem}
+
+\begin{example}[Kullback-Leibler divergence of Gaussian variable]
+For $\mathbb{P}_1 = N(\mu_1, \Sigma_1), \mathbb{P}_2 = N(\mu_1, \Sigma_2)$
+\begin{itemize}
+	\item For $\Sigma_1 = \Sigma_2 = \Sigma$, $\mu_1 \neq \mu_2$ :
+\begin{align*}
+	KL(\mathbb{P}_1, \mathbb{P}_2) = \frac{1}{2}\langle \mu_1 - \mu_2, \Sigma^{-1} (\mu_1 - \mu_2)\rangle
+\end{align*}
+\item For $\mu_1 = \mu_2 = 0$, $\Sigma_1 = \Sigma_2$:
+\begin{align*}
+	KL( \mathbb{P}_1, \mathbb{P}_2) = \frac{1}{2}\bigg(\log(\det(\Sigma_1) \slash \det( \Sigma_2)) + tr(\Sigma_2^{-1} \Sigma_1) - p \bigg)
+\end{align*}
+\end{itemize}
+	
+\end{example}
+
+
+\begin{lemma}[Packing number of the sphere]
+Given $0 \le \delta \le R$ and $S^{p-1} := \{ x \in \mathbb{R}^p: \|x\|_2 = R\}$ we can find $\nu_1, \dots, \nu_M$ with
+\begin{itemize}
+	\item $\|\nu_j - \nu_k\| > \delta$ for all $1 \le j \neq \le M$
+	\item $M \geq (\frac{R}{\delta})^{p-1}$
+\end{itemize}
+\end{lemma}
+\begin{remark}
+Recall in the previous subsection we proved another packing argument. When having $d(x_j, x_k) \le \delta$, there exists packing number satisfies $M \le (\frac{\delta}{1+ \delta})^p$.	
+\end{remark}
+
+
+\begin{example}[The linear model]
+	The linear model has the statistical model:
+	\begin{align*}
+		\mathbb{P}_{\beta \in \mathbb{R}^p} \sim N(X\beta, I_p \sigma^2)
+	\end{align*}
+	we define the metric $d$ on $\mathbb{R}^p$:
+	\begin{align*}
+		d(\beta, \beta'):= \|X(\beta - \beta')\|_2
+	\end{align*}
+	apply the last lemma on the sphere:
+	\begin{align*}
+		\{\gamma \in Im(X): \|\gamma\|_2 = 2 \sqrt{n} \delta\}
+	\end{align*}
+	we find $\gamma_1 \dots, \gamma_M$:
+	\begin{align*}
+		d(\beta, \beta') = \frac{1}{\sqrt{n}}\|X(\beta - \beta')\|_2 = 2 \delta \ge \delta
+	\end{align*}
+	On the other hand, the KL-divergence of $\mathbb{P}_{\beta_j}, \mathbb{P}_{\beta_k}$ is:
+	\begin{align*}
+		KL(\mathbb{P}_{\beta_j}, \mathbb{P}_{\beta_k}) = \frac{1}{\sigma^2}\|X(\beta_j - \beta_k\|^2_2 \le \frac{8n\delta^2}{\sigma^2} \\
+	\end{align*}
+	Choose subtable $n$ Apply Fano, for any estimator $\hat{\beta}$ :
+	\begin{align*}
+		\sup_\beta\mathbb{E}[d(\beta , \hat{\beta})^2 ] \ge \max_{1 \le j \le M} \mathbb{E}_{\beta_j} \frac{1}{n}\|X(\beta - \beta')\|_2^2 \ge C 
+	\end{align*}
+\end{example}
+
+\begin{example}[Classical PCA]
+	The classical PCA admits the statistical model:
+	\begin{align*}
+		\mathbb{P}_{v \in S^{p-1}} \sim N(0, \lambda v v^T I_p \sigma^2)
+	\end{align*}
+	The KL-divergence:
+	\begin{align*}
+		KL(\mathbb{P}_1, \mathbb{P}_2) &= \frac{n\lambda^2}{4(\lambda + 1)}\|uu^T - vv^T\|_F^2\quad (Proof?)\\
+		&\
+	\end{align*}
+\end{example}
+
+
+\begin{example}[Sparse linear model]
+\end{example}
+
+\begin{example}[sparse PCA]	
+\end{example}
+
+
+
+
+
+
+
+
+\chapter{Not important}
+\subsection{regression models}
+\begin{definition}[Mean Regression model]
+	The mean regression model describes the dependance of Y on X.
+	\begin{equation}
+		Y = f(X) + \epsilon
+	\end{equation}
+	The equation is called the regression equation. In the mean regression the expected value of error is 0.
+\end{definition}
+
+\subsubsection*{Ingredients}
+\begin{enumerate}
+	\item \textbf{Observations}: $Y = (Y_1, \dots, Y_n)$. Data is a collection of pairs of $(Y_i, X_i)$. $Y_i$s are called dependant or explained variables. $X_i$s are called yvb or independent variable or features. 
+		\begin{itemize}
+			\item Example 1: $X$ collection of measurements and $Y_i \in \{0, 1\}$ for patients. 
+			\item Example 2: $Y_i$ is a value of process of time $t_i$. Like stock price.
+		\end{itemize}  $X$ is called \textbf{design}, it could be either random or deterministic. We focus on deterministic design but the random design is more typical, for example in machine learning. 
+	\item \textbf{Errors}: $\epsilon_i = Y_i - f(X_i)$. Usually(mean regression) $\mathbb{E} \epsilon_i = 0$. Denote $\sigma_i^2 = Var[\epsilon_i]$. We focus on the homogeneous case(the variance does not dependant on i). Most strict case: homogenous Gaussian noise.
+	\item \textbf{Regression function}: f(x). Examples: 
+		\begin{itemize}
+			\item linear
+			\item polynomial
+			\item linear basis expansion for a collection of functions $\{\psi_i \}_i$
+			\item parametric regression
+				\begin{equation*}
+					f(x) \in \{ f(x, \theta), \theta \in \Theta \subset \mathbb{R}^p \}
+				\end{equation*}
+				$\exists \theta^*$ s.t.
+				\begin{equation}
+					f(x) = f(x, \theta^*), \quad Y_i = f(X_i, \theta^*) + \epsilon_i
+				\end{equation} 
+			\end{itemize}
+\end{enumerate}
+
+
+
+
+In the regression model, our goal is to retract information in $x$ about $y$. In the mean regressions we have centralised error($\mathbb{E} Y_i = f(x_i)$), $f$ is the regression function(systematic), allows to predict and forecast. So our aim is to recover $f$.\par 
+But in reality, we always have to deal with the difference between real distribution and regression model. We have 2 main concerns.1)Distribution error; 2)Form of the regression function.\par 
+We have the model: $Y_i = f(x_i) + \epsilon_i$, where $f$ is the systematic part and $\epsilon$ the individual error. Usually we assume(mean regression): $\mathbb{E} \epsilon_i = 0$ to be true. Later we make our study under the assumption $\epsilon_i$ is Gaussian. In the analysis we try to account for the real data distribution. Model is used to derive the methods but the analysis is under true distribution.\par 
+As for the regression function $\mathbb{E} Y_i = f(X_i)$. The typical assumptions including:
+\begin{itemize}
+	\item $f(x) = f(x, \theta^*)$
+	\item $f(x) = \sum_{i = 1}^p \theta_j \psi_j(x), \quad p \leq \infty$
+\end{itemize}
+
+Our approach:
+\begin{itemize}
+	\item design some methods for the parametric model $Y_i = f(x_i) + \epsilon_i$;
+	\item Study and analysis under $\mathbb{P}$.
+\end{itemize} 
+
+
+
+
+\end{document}

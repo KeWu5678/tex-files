@@ -334,6 +334,7 @@ For enforcing the sparsity we implement the explicit sparsity-promoting penalty 
  
 The following proposition states that, any optimal solution of (\ref{opt_dis}) can be contracted on the unit sphere without increasing its value of the cost function. Hence we may constrain the optimization problem to a unit sphere. 
 
+
 \begin{proposition}[homogeneous reformulation]
 Assuming (\ref{opt_dis}) admits at least 1 global optimal solution and $\sigma$ is $p$-homogeneous with $p \ge 1$, then (\ref{opt_dis}) is equivalent to 
 \begin{equation}
@@ -359,10 +360,10 @@ Assuming (\ref{opt_dis}) admits at least 1 global optimal solution and $\sigma$ 
 	\end{align*}
     The fidelity is invariant w.r.t. the scaling. The similar result holds for the second part of the fidelity term by linearity
 	\begin{align*}
-		\tilde{c}_n \nabla_x \sigma (\tilde{a}_n \cdot x_k + \tilde{b}_n) = \hat{c}_n \frac{1}{\lambda_n^p} \nabla_x \bigg(\lambda^p \sigma(\hat{a}_n \cdot x+ \hat{b}_n) \bigg) = \hat{c}_n \nabla_x \sigma(\hat{a}_n \cdot x + \hat{b}_n).
+		\tilde{c}_n \nabla_x \sigma (\tilde{a}_n \cdot x_k + \tilde{b}_n) = \hat{c}_n \frac{1}{\lambda_n^p} \nabla_x \bigg(\lambda_n^p \sigma(\hat{a}_n \cdot x+ \hat{b}_n) \bigg) = \hat{c}_n \nabla_x \sigma(\hat{a}_n \cdot x + \hat{b}_n).
 	\end{align*} 
 	
-    On the other hand, the penalty term is nondecreasing by Assumption \ref{pen1}. Since $p \ge 1$, it holds $\tilde{c}_n < \hat{c}_n$, hence
+    On the other hand, the penalty term is nondecreasing by Assumption \ref{pen1}. Since $\lambda_n > 1$ and $p \ge 1$, it holds $|\tilde{c}_n| = |\hat{c}_n|/\lambda_n^p \le |\hat{c}_n|$, hence
 	\begin{align*}
 		\phi(|\tilde{c}_n|) \le \phi(|\hat{c}_n|),
 	\end{align*}
@@ -372,6 +373,13 @@ Assuming (\ref{opt_dis}) admits at least 1 global optimal solution and $\sigma$ 
 	\end{align*}
 	 admits smaller value. The statement holds. 
 \end{proof}
+
+% For any $\omega \neq 0$ in $\mathbb{R}^{d+1}$ (not just in a unit ball), we can always write:
+
+% $$c \cdot \sigma(x;, \omega) = c \cdot |\omega|^p \cdot \sigma!\left(x;, \frac{\omega}{|\omega|}\right) = \tilde{c} \cdot \sigma(x;, \tilde{\omega})$$
+
+% where $\tilde{\omega} = \omega/|\omega| \in \mathbb{S}^d$ and $\tilde{c} = c|\omega|^p$. This works for any starting $\omega$, regardless of its norm — inside a ball, outside a
+% ball, on a ball of radius $R$, etc. The norm gets absorbed into the outer weight.
 
 The proof relies essentially on the homogeneity of the activation function and the monotonicity of the penalty functions.
 

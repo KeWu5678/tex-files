@@ -170,7 +170,7 @@ The convergence rate measures how fast the next iterate approaching the limit co
 	3. The sequence converges \textbf{superlinearly} if 
 	\[ \lim_k \| \xkone - x_*\| / \|x_k - x_* \| \rightarrow 0, \]
 	4. The sequence converges \textbf{in order $p > 1$}, if 
-	\[ \|\xkone - x_*\| \le c \| x_k - x^*\| \quad c \ge 0, \]
+	\[ \|\xkone - x_*\| \le c \| x_k - x^*\|^p \quad c \ge 0, \]
 \end{definition}
 
 \begin{definition}[the relative \& absolute stopping criteria]
@@ -215,13 +215,28 @@ A "good" descent direction should stay close to the "optimal" descent diretion: 
 
 The question now arises: How do we choose the step size? There are conditions that a "good" step size should satisfy: 
 1. It should achieve enough linearized descent. 
-2.  
+2. It should achieve enough curventure. 
+More of that will be talked about in the line search method. 
 
 \begin{definition}[the efficient step size]
 	Given a function $F$ and a descent direction $d$ at $x$, 
 	a step size $\alpha$ is efficient if there exists $ \theta > 0$ such that
 	\[ F(x + \alpha d) \le F(x) -  \theta (\langle \nabla F(x),  \alpha d \rangle)^2 / \|d\|^2  \]
 \end{definition}
+
+\begin{theorem}
+	Given $F : \Rn \rightarrow \R$ differentiable, and in each iteration the desecnt 
+	satisfies the angle condition and the step size is efficient, then if either of 
+	the condition holds:
+	\begin{enumerate}
+		\item $x_k \rightarrow x$,
+		\item $F$ is bounded from below,
+	\end{enumerate}
+	then we have
+	\[
+	\lim_k \nabla F(x_k) \rightarrow 0
+	\]
+\end{theorem}
 
 \subsection{1st order method}
 
@@ -283,8 +298,9 @@ m_k(p) = f(x_k) + \langle \nabla f(x_k), p \rangle + \langle p, H(x_k) p \rangle
 \]
 and the local optimization problem:
 \begin{align*}
+	\tag{QP}
 	& \min_p m_k(p)\\
-	& \|p\| \le \Delta_k
+	& \|p\| \le \Delta_k 
 \end{align*}
 
 We evalate the local model by 
@@ -536,32 +552,35 @@ For \eqref{eq:PEQ}, if the LICQ is satisfied and $x$ is a minimizer of the probl
 
 
 \subsection{the algorithms}
-\subsubsection{the naive Newton method}
+\subsubsection{1. the null space method}
 \textbf{Questions}: 
 \begin{enumerate}
-	\item what is the null space method
+	\item what is the null space method, it is the null space of which operator. 
 \end{enumerate}
 
 
-\subsubsection{the penalty approaches}
+\subsubsection{2. the penalty approaches}
 \textbf{Questions}:
 \begin{enumerate}
 	\item what is the intention for penalty method and how to construct the minimization problem?
+	\item what is the main drawbacks of the penalty method and how do we fix it?
 \end{enumerate}
 
 
-\subsubsection{sequential quadratic programming}
+\subsubsection{3. the sequential quadratic programming}
 \paragraph{the vanilla SQP}
-\begin{equation}
+\begin{equation*}
+	\tag{$QP_k$}
 	\begin{aligned}
-		& \min_d \langle \nabla F(x+k), d \rangle + \langle d, H d \rangle\\
+		& \min_d \langle \nabla F(x_k), d \rangle + \frac{1}{2} \langle d, H d \rangle\\
 		& \text{s.t.}\\
 		& G(x_k) + \langle \nabla G(x_k), d \rangle = 0
 	\end{aligned}
-\end{equation}
+\end{equation*}
 
 
-\paragraph{the line-search SQP}
+\paragraph{the line-search SQP} 
+\quad\\
 \textbf{Questions}:
 \begin{enumerate}
 	\item What is the Maratos effect?
@@ -586,6 +605,7 @@ Depending on the problem, different parameter $r$ and different norm $\| \|$ can
 
 
 \paragraph{the trust-region SQP}
+
 
 
 
@@ -705,6 +725,20 @@ Here $h(u)=g(u)$, so $p=h(0)=g(0)=0$ is finite. However, $g$ has no subgradient 
 \]
 As a result, the associated dual supremum is not attained (one can compute it explicitly; it approaches $0$ only as $\phi\to\infty$).
 \end{example}
+
+The basic fact about the convex functions:\\
+\textbf{Fact:} Suppose $f : \R \to (-\infty, +\infty]$ is convex and $x < y < z$. Then
+\[
+	\frac{f(y) - f(x)}{y - x} \leq \frac{f(z) - f(x)}{z - x} \leq \frac{f(z) - f(y)}{z - y},
+\]
+whenever $x, y, z \in \dom f$.
+
+\begin{proof}
+Observe that $y = \frac{z-y}{z-x}x + \frac{y-x}{z-x}z$. Then the convexity of $f$ implies
+\[
+	f(y) \leq \frac{z-y}{z-x}f(x) + \frac{y-x}{z-x}f(z).
+\]
+\end{proof}
 
 \begin{theorem}[continuity of convex functions]
 Suppose $f: E \mapsto (-\infty, + \infty]$ is convex, then $f$ is locally Lipschitz if and only if $f$ is bounded locally in a neighborhood. 
