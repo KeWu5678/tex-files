@@ -63,6 +63,59 @@ The paper uses Omega = S^d (compact), so C(Omega)* = M(Omega) holds cleanly via 
 - C_b(Omega) (bounded continuous) has a larger dual — includes finitely additive measures capturing "mass at infinity" — analytically ugly and not suitable here.
 - This is part of why the sphere constraint is convenient: compactness makes C(S^d) = C_0(S^d) trivially, and the duality is unambiguous. Working on R^d would require C_0(R^d) and still implicitly controls weights via finite total variation of mu.
 
+---
+
+## Discussion Notes (2026-03-11): Extending Finite Support to Omega = R^d
+
+### Goal
+Prove that bar{mu} (a local minimizer of J) is finitely supported when Omega = R^d for general (possibly non-homogeneous) activations.
+
+### The Bottleneck in the Original Proof (page 24)
+The paper proves finite support via compactness of Omega = S^d:
+- If bar{mu} has infinitely many atoms, their weights c_n -> 0 (finite total variation)
+- **Compactness of S^d** => extract convergent subsequence bar{omega}_n -> hat{omega}
+- Optimality condition gives |bar{p}(hat{omega})| = alpha; construct competitor mu_N merging the tail, showing J(mu_N) < J(bar{mu}), contradiction
+
+For Omega = R^d, atoms may escape to infinity — no convergent subsequence guaranteed. Homogeneity reduction to S^{d-1} is not available for general activations.
+
+### Proof Plan: Decay Assumption (A_infty)
+
+**New assumption (A_infty)**: sigma(.; omega) -> 0 in L^2(D, nu) as ||omega|| -> infinity.
+
+#### Step 1: Atoms cannot escape to infinity
+
+- The dual variable bar{p}(omega) = <N(bar{mu}) - y, sigma(.; omega)>_{L^2} satisfies:
+  bar{p}(omega) -> 0 as ||omega|| -> infinity, by Cauchy-Schwarz and (A_infty)
+- For any atom with c_n -> 0, the optimality condition gives:
+  |bar{p}(bar{omega}_n)| = alpha * phi'(c_n) -> alpha * phi'(0) = alpha > 0
+- If ||bar{omega}_n|| -> infinity: then bar{p}(bar{omega}_n) -> 0, contradicting the above
+- **Conclusion**: all atoms are confined to a bounded set in R^d
+
+#### Step 2: Extract convergent subsequence
+
+Since {bar{omega}_n} is bounded in R^d, Bolzano-Weierstrass gives a convergent subsequence bar{omega}_n -> hat{omega} in R^d (no compactness of Omega needed — just local compactness of R^d plus the boundedness from Step 1).
+
+#### Step 3: Run original argument
+
+This step is identical to the paper's proof:
+- c_n -> 0, bar{omega}_n -> hat{omega}, and continuity of bar{p} give |bar{p}(hat{omega})| = alpha
+- Construct mu_N = bar{mu} - sum_{n>=N} c_n delta_{bar{omega}_n} + C_N delta_{hat{omega}} where C_N = sum_{n>=N} c_n
+- Regularization: phi(C_N) <= sum_{n>=N} phi(c_n) by subadditivity of concave phi with phi(0)=0
+- Loss: N(mu_N) - N(bar{mu}) = C_N sigma(.; hat{omega}) - sum_{n>=N} c_n sigma(.; bar{omega}_n) -> 0 in L^2 (by continuity of sigma and bar{omega}_n -> hat{omega})
+- Together: J(mu_N) < J(bar{mu}) for large N, contradicting local optimality of bar{mu}
+
+### What (A_infty) Rules Out
+
+- **ReLU**: sigma(x; omega) = max(omega^T x, 0) has ||sigma(.; omega)||_{L^2} ~ ||omega|| (growing), so (A_infty) fails. For ReLU, the sphere constraint (or homogeneity reduction) is genuinely necessary.
+- **Bounded activations** (sigmoid, tanh): if sigma is bounded and sigma(x; omega) -> 0 pointwise as ||omega|| -> infinity (for fixed x), then by dominated convergence (A_infty) holds if nu has finite mass.
+- **Gaussian-like activations**: sigma(x; omega) = exp(-||omega - x||^2 / 2) satisfies (A_infty) with exponential decay.
+
+### Functional-Analytic Consistency
+
+On Omega = R^d (locally compact, non-compact), the correct dual space is C_0(R^d)* = M(R^d) (signed finite Radon measures, by Riesz-Markov). For the optimality conditions to make sense via subdifferential calculus in M(R^d), we need the "test function" sigma(.; omega) to be in C_0(R^d) as a function of omega — i.e., sigma(.; omega) -> 0 as ||omega|| -> infinity. This is exactly (A_infty) (up to L^2 vs uniform decay). So (A_infty) is not just a technical device — it is the natural condition for the duality to work on R^d.
+
+---
+
 ### Proof Details: Why the Balancing Trick Works
 
 For the penalty g(tau) = A * tau^P + B * tau^{-Q} (A, B > 0):

@@ -531,7 +531,7 @@ To further investigate the optimality condition of (\ref{int_noncon}) and derive
  \begin{aligned}
  	\bar{p}(\omega) &:= \nabla L(\bar{\mu}) \\
  	& =  \mathcal{N}^*(\mathcal{N}[\bar{\mu}] - V) + \sum_{i = 1}^d (\partial_{x_i} \mathcal{N})^*( \partial_{x_i} \mathcal{N}[\bar{\mu}] - \partial_{x_i} V ) \\
- 	& = \int_D \sigma(x, \omega) (\mathcal{N}\mu - V) d\nu(x) + \sum_{i = 1}^d \int_D \partial_{x_i} \sigma(x, \omega) ( \partial_{x_i} \mathcal{N}[\bar{\mu}] - \partial_{x_i}V ) d\nu(x) .
+ 	& = \int_D \sigma(x, \omega) (\mathcal{N}[\bar{\mu}](x) - V) d\nu(x) + \sum_{i = 1}^d \int_D \partial_{x_i} \sigma(x, \omega) ( \partial_{x_i} \mathcal{N}[\bar{\mu}](x) - \partial_{x_i}V ) d\nu(x) .
  	 \end{aligned}
  \end{equation}
  For the finite sample and $\sigma(x) = \relu(x)^p$, the gradient admits the form:

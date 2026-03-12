@@ -1,14 +1,14 @@
 # Fdb version 4
-["bibtex Mthesis"] 0 "Mthesis.aux" "Mthesis.bbl" "Mthesis" 1771969419.346 0
+["bibtex Mthesis"] 1773197321.522 "Mthesis.aux" "Mthesis.bbl" "Mthesis" 1773197427.78581 0
+  "./ref.bib" 1772281797.85179 4836 00c8dde0ba3b4075e5a331d17c02e96a ""
   "/usr/local/texlive/2025/texmf-dist/bibtex/bst/base/plain.bst" 1292289607 20613 bd3fbfa9f64872b81ac57a0dd2ed855f ""
-  "Mthesis.aux" 0 -1 0 "pdflatex"
-  "ref.bib" 0 -1 0 ""
+  "Mthesis.aux" 1773197427.45873 14083 9f05a010cf821df74ec4ae50bef17d18 "pdflatex"
   (generated)
   "Mthesis.bbl"
   "Mthesis.blg"
   (rewritten before read)
-["pdflatex"] 1771969418.5194 "/Users/ruizhechao/Desktop/TeX/thesis/Mthesis.tex" "Mthesis.pdf" "Mthesis" 1771969419.34615 0
-  "/Users/ruizhechao/Desktop/TeX/thesis/Mthesis.tex" 1771969417.45682 55071 877f14cc8a60428d3407f92fc388be30 ""
+["pdflatex"] 1773197426.68474 "/Users/ruizhechao/Desktop/TeX/thesis/Mthesis.tex" "Mthesis.pdf" "Mthesis" 1773197427.786 0
+  "/Users/ruizhechao/Desktop/TeX/thesis/Mthesis.tex" 1773197426.55158 55094 5fdb2e3932156b77f1df5d6848d300b9 ""
   "/Users/ruizhechao/Library/texlive/2025/texmf-var/fonts/pk/ljfour/public/bbm/bbm12.600pk" 1769959035.17841 8424 cd0553d104a55a7a338af166e27ba22f ""
   "/usr/local/texlive/2025/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc" 1136849721 2971 def0b6c1f0b107b3b936def894055589 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/map/fontname/texfonts.map" 1577235249 3524 cb3e574dea2d1052e39280babc910dc8 ""
@@ -21,6 +21,7 @@
   "/usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/ecrm1200.tfm" 1136768653 3584 f80ddd985bd00e29e9a6047ebd9d4781 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/ecti0600.tfm" 1136768653 3072 80e486733e39bf8ad2a360793cc998ae ""
   "/usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/ecti0800.tfm" 1136768653 3072 828ba0ea87cf5b727c4bfd6367195ec2 ""
+  "/usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/ecti1000.tfm" 1136768653 3072 3bce340d4c075dffe6d4ec732b4c32fe ""
   "/usr/local/texlive/2025/texmf-dist/fonts/tfm/jknappen/ec/ecti1200.tfm" 1136768653 3072 8b5a64dc91775463bc95e2d818524028 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex7.tfm" 1246382020 1004 54797486969f23fa377b128694d548df ""
   "/usr/local/texlive/2025/texmf-dist/fonts/tfm/public/amsfonts/cmextra/cmex8.tfm" 1246382020 988 bdf658c3bfc2d96d3c8b02cfc1c94c20 ""
@@ -64,7 +65,9 @@
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfbx1200.pfb" 1215737283 140176 d4962f948b4cc0adf4d3dde77a128c95 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfcc1200.pfb" 1215737283 108594 1a08a22405bc37650b977f219cc3597d ""
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm0900.pfb" 1215737283 149037 995a6f1e12c1d647b99b1cf55db78699 ""
+  "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb" 1215737283 138258 6525c253f16cededa14c7fd0da7f67b2 ""
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb" 1215737283 136101 f533469f523533d38317ab5729d00c8a ""
+  "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfti1000.pfb" 1215737283 186554 e8f0fa8ca05e038f257a06405232745f ""
   "/usr/local/texlive/2025/texmf-dist/fonts/type1/public/cm-super/sfti1200.pfb" 1215737283 198221 ca5aa71411090ef358a6cc78b7458365 ""
   "/usr/local/texlive/2025/texmf-dist/tex/context/base/mkii/supp-pdf.mkii" 1461363279 71627 94eb9990bed73c364d7f53f960cc8c5b ""
   "/usr/local/texlive/2025/texmf-dist/tex/generic/atbegshi/atbegshi.sty" 1575674566 24708 5584a51a7101caf7e6bbf1fc27d8f7b1 ""
@@ -203,9 +206,9 @@
   "/usr/local/texlive/2025/texmf-var/fonts/map/pdftex/updmap/pdftex.map" 1769729467 5467155 19efa205003f9ecad95fbbaa6ff24da1 ""
   "/usr/local/texlive/2025/texmf-var/web2c/pdftex/pdflatex.fmt" 1769729416 3345728 596ec178b7e7c8621d5caa85ca9aeea9 ""
   "/usr/local/texlive/2025/texmf.cnf" 1741450484 577 418a7058ec8e006d8704f60ecd22c938 ""
-  "Mthesis.aux" 1771969419.08707 13355 46aacb69131e8dc49ef2a25d2bc2a8ac "pdflatex"
-  "Mthesis.bbl" 0 -1 0 "bibtex Mthesis"
-  "Mthesis.tex" 1771969417.45682 55071 877f14cc8a60428d3407f92fc388be30 ""
+  "Mthesis.aux" 1773197427.45873 14083 9f05a010cf821df74ec4ae50bef17d18 "pdflatex"
+  "Mthesis.bbl" 1773197321.64645 3146 cdf24608109c5e376339ec3f4866d6cb "bibtex Mthesis"
+  "Mthesis.tex" 1773197426.55158 55094 5fdb2e3932156b77f1df5d6848d300b9 ""
   (generated)
   "Mthesis.aux"
   "Mthesis.log"
