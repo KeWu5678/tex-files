@@ -1,0 +1,7 @@
+# Keep only LaTeX source files in Git.
+*
+.*
+!*/
+!.gitignore
+!*.tex
+!thesis/Mthesis.pdf

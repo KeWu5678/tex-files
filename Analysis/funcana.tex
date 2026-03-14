@@ -1,0 +1,3459 @@
+\documentclass[a4paper,11pt,fleqn]{book}
+
+%% ─── Encoding & fonts ────────────────────────────────────────────────────────
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}          % scalable CM fonts (no pixelation in PDF)
+\usepackage{microtype}        % optical margin alignment & character protrusion
+
+%% ─── Page layout ─────────────────────────────────────────────────────────────
+\usepackage{geometry}
+\geometry{left=18mm, right=18mm, top=18mm, bottom=16mm}
+\linespread{1.3}
+
+%% ─── Core mathematics ────────────────────────────────────────────────────────
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{mathtools}        % extends amsmath: \coloneqq, paired delimiters …
+\usepackage{bbm}              % \mathbbm{1} for indicator functions
+\usepackage{cancel}           % \cancel, \bcancel, \xcancel
+\usepackage{esint}            % extended integral signs (\oiint etc.)
+
+%% ─── Theorem environments (amsthm counters) ──────────────────────────────────
+\newtheorem{theorem}{Theorem}[section]
+\renewcommand{\thetheorem}{\arabic{section}.\arabic{theorem}}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{algorithm}{Algorithm}[section]
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\renewcommand{\thedefinition}{\arabic{section}.\arabic{definition}}
+\newtheorem*{example}{Example}
+\newtheorem{assumption}{Assumption}[section]
+\newtheorem{exercise}{Exercise}[chapter]
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem{review}{Review}
+
+%% ─── Graphics & colour ───────────────────────────────────────────────────────
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tikz}
+
+%% ─── Miscellaneous utilities ─────────────────────────────────────────────────
+\usepackage{multicol}
+\usepackage[normalem]{ulem}
+\usepackage{marvosym}
+\usepackage{algpseudocode}
+
+%% ─── Code listings ───────────────────────────────────────────────────────────
+\usepackage{listings}
+\lstset{
+  language=Python,
+  basicstyle=\ttfamily\small,
+  aboveskip={1.0\baselineskip},
+  belowskip={1.0\baselineskip},
+  columns=fixed,
+  extendedchars=true,
+  breaklines=true,
+  tabsize=4,
+  prebreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+  frame=lines,
+  showtabs=false, showspaces=false, showstringspaces=false,
+  keywordstyle=\color[rgb]{0.627,0.126,0.941},
+  commentstyle=\color[rgb]{0.133,0.545,0.133},
+  stringstyle=\color[rgb]{1,0,0},
+  numbers=left, numberstyle=\small, stepnumber=1, numbersep=10pt,
+  captionpos=t,
+  escapeinside={\%*}{*)}
+}
+
+%% ─── Hyperlinks (load last among packages) ───────────────────────────────────
+\usepackage[colorlinks=true,
+            linkcolor=blue!70!black,
+            citecolor=green!55!black,
+            urlcolor=blue!80!black]{hyperref}
+
+%% ─── Section / chapter numbering ─────────────────────────────────────────────
+\renewcommand{\thechapter}{\Roman{chapter}}
+\renewcommand*\thesection{\arabic{section}}
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+
+%% ─── Math operators ──────────────────────────────────────────────────────────
+\AtBeginDocument{\let\div\relax  \DeclareMathOperator{\div}{div}}
+\AtBeginDocument{\let\ran\relax  \DeclareMathOperator{\ran}{ran}}
+\DeclareMathOperator{\dom}{dom}
+\DeclareMathOperator{\var}{Var}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\diam}{diam}
+\DeclareMathOperator{\Int}{int}        % interior of a set
+\DeclareMathOperator{\co}{co}          % convex hull
+\DeclareMathOperator{\grad}{grad}
+\DeclareMathOperator{\curl}{curl}
+\DeclareMathOperator*{\esssup}{ess\,sup}
+\DeclareMathOperator*{\essinf}{ess\,inf}
+\DeclareMathOperator*{\spa}{span}
+\DeclareMathOperator*{\dist}{dist}
+\DeclareMathOperator*{\support}{supp}
+
+%% ─── Number fields ───────────────────────────────────────────────────────────
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\K}{\mathbb{K}}            % generic field (R or C)
+\newcommand{\T}{\mathbb{T}}            % torus
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\ind}{\mathbbm{1}}         % indicator function \ind_A
+
+%% ─── Paired delimiters (use starred form for auto-size, e.g. \norm*{f}) ──────
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\DeclarePairedDelimiter{\set}{\{}{\}}
+\DeclarePairedDelimiter{\ceil}{\lceil}{\rceil}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+\newcommand{\ip}[2]{\langle #1,\, #2 \rangle}       % inner product (fixed size)
+\newcommand{\IP}[2]{\left\langle #1,\, #2 \right\rangle} % inner product (auto-size)
+
+%% ─── Greek letter shortcuts ──────────────────────────────────────────────────
+\newcommand{\eps}{\varepsilon}
+\newcommand{\vp}{\varphi}
+\newcommand{\lam}{\lambda}
+\newcommand{\Lam}{\Lambda}
+\newcommand{\sig}{\sigma}
+\newcommand{\om}{\omega}
+\newcommand{\Om}{\Omega}
+\newcommand{\al}{\alpha}
+\newcommand{\be}{\beta}
+\newcommand{\ga}{\gamma}
+\newcommand{\Ga}{\Gamma}
+\newcommand{\de}{\delta}
+\newcommand{\De}{\Delta}
+\newcommand{\ka}{\kappa}
+\newcommand{\tht}{\theta}
+\newcommand{\Tht}{\Theta}
+
+%% ─── Calculus & analysis ─────────────────────────────────────────────────────
+\newcommand{\del}{\partial}                          % partial derivative / boundary
+\newcommand{\nab}{\nabla}                            % nabla
+\newcommand{\Lap}{\Delta}                            % Laplacian
+\newcommand{\dd}{\mathop{}\!\mathrm{d}}              % differential: \int f \dd x
+\newcommand{\ddt}{\tfrac{\mathrm{d}}{\mathrm{d}t}}  % d/dt
+
+%% ─── Topology & convergence ──────────────────────────────────────────────────
+\newcommand{\cl}[1]{\overline{#1}}                   % closure: \cl{A}
+\newcommand{\wto}{\rightharpoonup}                   % weak convergence
+\newcommand{\wsto}{\overset{*}{\rightharpoonup}}     % weak-* convergence
+\newcommand{\into}{\hookrightarrow}                  % injection
+\newcommand{\onto}{\twoheadrightarrow}               % surjection
+\newcommand{\xto}[1]{\xrightarrow{#1}}               % labelled arrow: \xto{L^p}
+
+%% ─── Miscellaneous math ──────────────────────────────────────────────────────
+\newcommand{\id}{\mathrm{id}}                        % identity operator
+\newcommand{\st}{\;\text{s.t.}\;}                    % such that
+\newcommand{\cco}{\overline{\co}}                    % closed convex hull
+
+%% ─── Page style ──────────────────────────────────────────────────────────────
+\usepackage{fancyhdr}
+\setlength{\headheight}{13.59999pt}
+\addtolength{\topmargin}{-1.59999pt}
+\pagestyle{fancy}
+\lhead{}\chead{}\rhead{}
+\lfoot{}\cfoot{}\rfoot{\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+%% ─── Title style ─────────────────────────────────────────────────────────────
+\newcommand{\linia}{\rule{\linewidth}{0.5pt}}
+\makeatletter
+\renewcommand{\maketitle}{%
+  \begin{center}
+  \vspace{2ex}
+  {\huge \textsc{\@title}}
+  \vspace{1ex}\\
+  \linia\\
+  \@author \hfill \@date
+  \vspace{4ex}
+  \end{center}}
+\makeatother
+
+\begin{document}
+
+\chapter{Functional Analysis}
+\section{Interpolation of \texorpdfstring{$C^0(\Omega)$}{C\textasciicircum{}0(Omega)}}
+
+\begin{example}[$C_c^0(\mathbb{R}^n)$ is not a complete metric space w.r.t. the sup norm]
+\end{example}
+
+\begin{example}[The completion of $C_c(\mathbb{R})$ is $C_\infty(\mathbb{R})$]
+\end{example}
+
+
+\section{Linear Operator}
+Given a linear operator $T: A \rightarrow B$, with $A, B$ NLS, we know the operator is bounded if $A, B$ are finite dimensional. 
+\subsection{Continuity}
+\begin{theorem}
+For $X, Y$ NLS and $T:X \rightarrow Y$ linear map, the following statements are equivalent:
+\begin{enumerate}
+	\item $T$ is continuous
+	\item $T$ is continuous in $0$
+	\item $\|Tx\|_Y \le M \|x\|_X$
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+\quad\\
+\textbf{2)$\Rightarrow$3):} In particular, for $B_0(1) \subset X$ we know $\|T B_0(1)\|_Y < \infty$. 
+\end{proof}
+\begin{example}[Unbounded linear operator]
+	Observe
+	\begin{align*}
+		L: \bigg(C_c^\infty([0, 1]), \|\|_\infty \bigg) \rightarrow \mathbb{R}, f \mapsto Df
+	\end{align*}
+	Consider the monoid $f = x^n$, we have $Df = n x^{n -1}$. For $n \rightarrow \infty$ notice $Tf$ is not bounded. 
+\end{example}
+
+\begin{remark}
+Every finite dimensional linear map is bounded. If $X$ has infinite dimension, can we construct an unbounded linear operator? Notice we can not explicitly constructed this space, but we can construct an unbounded operator on a dense subset of Hilbert space.  	
+\end{remark}
+
+
+
+\subsection{Completeness of the space of linear functionals}
+\begin{theorem}[B.L.T theorem]
+	$T$ is a bounded linear transformation from a normed linear space $( V_1, \| \|_1 )$to a \textbf{complete} normed linear space $(V_2, \| \|_2 )$. Then $T$ can be uniquely extended to a bounded linear transformation  $\hat{T}$ with $\|\hat{T}\| = \|T\|$, from the completion of $V_1$ to $(V_2, \|\|_2)$.  
+\end{theorem}
+
+\begin{theorem}
+	The space $L(X, Y)$ is complete if $Y$ is complete. 
+\end{theorem}
+\begin{proof}
+	observe the Cauchy sequence $f_n \in L(X,Y)$. We define 
+	\begin{align*}
+		f(x):= \lim_n f_n(x)
+	\end{align*}
+	since $Y$ is complete we know that $f$ is well-defined. It's trivial to show $f$ is linear. It's left to show that $f$ is bounded. Observe
+	\begin{align*}
+		\|f\| \le \|f_n\| + \|f - f_n\|< \infty
+	\end{align*}
+	by $\|f - f_n\| = \sup_{\|x\| = 1} \|f(x) - f_n(x)\|_Y \rightarrow 0$.
+\end{proof}
+
+\begin{theorem}[Quotient space]
+	Given a metric space $X$ and a \textbf{closed} subspace $U \subset T$, the quotient space $(X\slash U, \|\|_{X\slash U})$ :
+	\begin{align*}
+		X\slash U:= \{ x \sim y : \inf_{u \in U} \|x - u\| = \inf_{u \in U} \|y - u\| \}\quad 
+		\|[x]\|_{X\slash U } = \inf_{u \in U}\|x - u\|_X, \quad
+		[x] = x + U \in X\slash U
+	\end{align*}
+	is well defined. And if $X$ is Banach then the $X\slash U$ is also Banach.
+\end{theorem}
+\begin{proof}
+	by the definition of quotient norm we have: $\forall \epsilon >0, \|[x_k]\| + \epsilon  \ge \|x_k - y\|$ for all $y \in U$. Select now $\epsilon = 2^{-k}$.\par 
+	We use the series argument to prove the completeness, i.e. every absolute bounded sequence is convergent. Observe the series $\sum_{k = 1}^\infty \|[x_k]\| < \infty$. By the argument above we know $\sum_{k = 1}^\infty \|x_k - y\| < \infty$ for all $y \in U$. By the completeness of $X$ we know there exists $x$ such that $ \sum \|x_k - y\| \rightarrow \|x\|$. We have:
+	\begin{align*}
+		\|[x] - \sum [x_k]\| = \|[x - \sum x_k]\| \le \|x\| -  \sum\|x - y\| \rightarrow 0, \forall y \in U
+	\end{align*}
+\end{proof}
+
+
+
+\subsection{Uniform Boundedness of linear operators}
+\begin{theorem}[Banach-Steinhaus I]
+	Given $X$ a Banach space, $Y$ a NLS, $T_i \in L(X, Y)$ for $i \in I$, assume:
+	\begin{align*}
+		\sup_{i \in I} \|T_i x\| < \infty \quad \forall x \in X
+	\end{align*}
+	then
+	\begin{align*}
+		\sup_{ i \in I} \|T_i\| < \infty
+	\end{align*}
+	i.e. boundedness for all pointwise evaluation implies uniform boundedness of the family of operators
+\end{theorem}
+\begin{proof}
+Define:
+\begin{align*}
+	E_n:= \{x \in X| \forall i \in I: T_i x < n \} 
+\end{align*}
+By the pointwise boundedness we know $X = \bigcup_{n \in \mathbb{N}} E_n$. Since $X$ is non-empty open, it's of the second category of Baire. It follows that there exists at least a $N \in \mathbb{N}$, such that $E_N$ contains an open ball in $X$.\\
+Also, $E_N$ is convex and symmetric, given $u$ with $\|u\| \le \epsilon$, we have:
+\begin{align*}
+	u= \frac{1}{2}( (u + y) + (u - y)) \in E_N
+\end{align*}
+therefore
+\begin{align*}
+	\sup_{i \in I} \|T_i\|   \le  \frac{N}{\epsilon} < \infty
+\end{align*}
+\end{proof}
+
+\begin{example}[Assumption of Banach space is important]
+Define $(d, \|\|_\infty)$ the sequence space with at most finite non-zero entries, define:
+\begin{align*}
+	T_n: d \rightarrow \mathbb{R},\quad (s_m)_{m \in \mathbb{N}} \mapsto ns_n
+\end{align*}
+which maps the $n$-th entry and multiply by $n$. Since only finite entries are non-zero, we have the uniform boundedness for the sequence of operator. However $\|T_n\| = n \rightarrow \infty$. The reason is that the space is not Banach: 
+\begin{align*}
+	&x_n = (1, \frac{1}{2}, \dots, \frac{1}{n}, 0, \dots)\\
+	&x_{n+1} = (1, \frac{1}{2}, \dots, \frac{1}{n}, \frac{1}{n+1}, 0\dots)
+\end{align*} 
+notice the limit is not in $(d, \|\|_\infty)$.
+\end{example}
+
+\begin{corollary}
+	Given $M \subset X$ we have
+	\begin{align*}
+		M \texttt{ is bounded} \Leftrightarrow \forall x* \in X^*:  x^*(M) \texttt{ is bounded }
+	\end{align*}
+\end{corollary}
+\begin{proof}
+\quad\\
+$\Rightarrow$: trivial.\\
+$\Leftarrow$: Observe the canonical dual map $i_x$, by assumption
+\begin{align*}
+	\sup_{x \in M} \|i_x(x)\| < \infty \quad \forall x \in X
+\end{align*}
+Therefore
+\begin{align*}
+	\sup_{x \in M} \|x\| = \sup_{x \in M}\|i_x\| < \infty
+\end{align*}
+\end{proof}
+
+\begin{corollary}
+	weakly convergent sequences are bounded. 
+\end{corollary}
+
+\begin{theorem}[Banach-Steinhaus II]
+	$X, Y$ being the Banach space, $(T_n)_{n \in \mathbb{N}} \in L(X, Y)$, then the following are equivalent:
+	\begin{enumerate}
+		\item $\forall n \in \mathbb{N} \forall x \in X: T_n x$ converges.
+		\item 
+		\begin{enumerate}
+			\item $(T_n)_{n \in \mathbb{N}}$ uniformly bounded
+			\item $\exists D \subset X$ dense $\forall x \in D$: $T_n x $ converges. 
+		\end{enumerate}  
+	\end{enumerate}
+	Moreover, $T(x) := \lim_n T_n(x)$ defines a bounded linear operator and we have
+	\begin{align*}
+		\|T\| \le \liminf_n\|T_n\| \le \sup_{n \in \mathbb{N}}\|T_n\| < \infty
+	\end{align*}
+	and 
+	\begin{align*}
+		T_n \rightarrow T  \texttt{ in } L(L(X, Y))
+	\end{align*}
+\end{theorem}
+\begin{proof}\quad\\
+$"\Rightarrow"$:1)follows directly form the last Banach-Steinhaus I. 2) is trivial \\
+$"\Leftarrow"$: $\forall x \in X \exists y_n \in D:y_n \rightarrow x$
+\begin{align*}
+	\|Tx - T_n x\| &= \|Tx - T(y_n) + T(y_n) - T_n(y_n) + T_n(y_n) - T_n(x)\|\\
+	&\le \epsilon M  + 2M \epsilon + M_n \epsilon \rightarrow 0
+\end{align*}
+For the l.s.c. we observe
+\begin{align*}
+	\|T(x)\| = \lim\|T_n(x)\| \le \lim M \|x\|
+\end{align*}
+where $M = \inf_n C_{T_n}$. 
+\end{proof}
+
+
+
+
+
+
+\newpage
+\section{Hilbert Space}
+\subsection{Uniform Convexity}
+The central result of this section is the orthogonal projection theorem.
+
+\begin{definition}[convex sets and scalar function in vector space]
+Given $X$ a vector space and $K \subset \Omega$ a subset, if the line between 2 points in $K$ is contained in $K$:
+\begin{align*}
+	\forall x, y \in K: tx + (1-t)y \in \Omega \qquad t \in [0, 1],
+\end{align*}
+then $K$ is convex. \\
+A function $f: K \rightarrow \mathbb{R}$ on a convex set $K$ is \textbf{convex}, if the value along the line between 2 points are bounded by the convex combination of the values of the 2 end points, i.e., 
+\begin{align*}
+	\forall x, y \in K: f(tx + (1-t)y) \leq t f(x) + (1-t) f(y)
+\end{align*}
+Furthermore, we can define the \textbf{strictly convex} by replacing "$\leq$" with "$<$".	
+\end{definition}
+
+\begin{definition}[strictly convex normed vector space]
+	Given $\bar{B}$ the closed unit ball in $X$, $X$ is \textbf{strictly convex}, if 
+	\begin{align*}
+		x, y \in \bar{B} \texttt{ with } x \neq y: \quad t x + (1 - t)y  \in \bar{B} \backslash \partial\bar{B} \quad \forall t \in (0, 1).
+	\end{align*}
+\end{definition}
+
+\begin{example}[$L^1$ and $L^\infty$ space are not strictly convex]
+	The ball of a $\|\dot\|_\infty$ could by imagined by a square-shaped ball and we notice for 2 points on the edge the linear combination of the 2 points lies on the boundary but not the interior of the ball.\par
+	Similarly we can prove the case of $\| \dot \|_1$
+\end{example}
+
+\begin{definition}[Uniformly convex]
+	A normed vector space is uniformly convex if:
+	\begin{align*}
+		\forall \epsilon >0 \exists \delta >0: \texttt{ every }x, y \in \bar{B}\texttt{ with } \|x - y\| \geq \epsilon \Rightarrow \dist(\frac{x+y}{2}, \partial \bar{B}) \geq \delta
+	\end{align*}
+	Observe that uniformly convexity implies strictly convexity.
+\end{definition}
+\begin{remark}
+This definition amounts to a quantitative definition of strictly convex. By negating the argument we conclude that the distance from the middle point to the boundary cannot be arbitrary small unless the 2 points are close. 
+\end{remark}
+
+\begin{theorem}[Approximation Theorem]
+	Let $(X, \|\|)$ be a uniformly convex Banach space , $K \subset X$ a non-empty closed convex subset. Given the function which measure the distance of a point in $K$ to a certain points in $X$: $f:K \rightarrow \mathbb{R}^+, k \rightarrow \|k - x\|$. Then
+	\begin{equation*}
+		\forall x \in X\slash K \exists ! x_0 \in K: f(x_0) = \min_{x \in K} f(x).
+	\end{equation*}
+\end{theorem}
+
+\begin{remark}
+Heine-Borel only works in finite dimensional Banach space
+\end{remark}
+
+\begin{proof}
+We have to construct a Cauchy sequence $(k_n)_n$ in $K$ with $\|k_n - x\|$ approximating $\inf \|k - x\|$. We certainly want to apply uniform convexity to obtain that $\|k_m - k_n\|$ is bounded by $dis(\frac{k_m + k_n}{2}, \partial K)$. In order to do so it's convenient to construct an unit ball.\par
+Choose $k_n$ such that $\|k_n - x\| \rightarrow I:= \inf \{ \|k - x\|: k \in K\}$, also define $I_n := \|k_n - x\|$, and:
+\begin{align*}
+	z_n: = \frac{k_n - x}{I_n} = \frac{k_n - x}{I} + \frac{I - I_n}{I} z_n
+\end{align*}
+Since $I$ is the infimum 
+we get:
+\begin{align*}
+	\forall \epsilon > 0 \exists N \in \mathbb{N} \forall n \geq N: I > I_n - \epsilon
+\end{align*}
+By convexity of the subset $K$ we know $\frac{k_m + k_n}{2}\in K $, therefore
+\begin{align*}
+	\|\frac{(k_n - x) + (k_m - x)}{2}\| = \|\frac{k_n + k_m}{2} -x \| \geq I
+\end{align*}
+Now we would like to have $dis(\frac{z_m + z_n}{2}, 1)\rightarrow 0 $ in order to show $\|z_m - z_n\| \rightarrow 0$. Indeed, 
+\begin{align*}
+	\|\frac{z_m + z_n}{2}\| = \| \frac{(k_n - x) + (k_m - x) }{2I} + \frac{I - I_m}{I}z_m + \frac{I - I_n}{I}z_n \| \ge 1 - \frac{\epsilon}{I}
+\end{align*} 
+By choosing $\epsilon$ arbitrarily small we can see it approximates the boundary. By uniform convexity we know $\| z_m - z_n \| \rightarrow 0$. By closeness we know the Cauchy sequence converges.
+\end{proof}
+
+\subsection{Projection}
+\begin{definition}[Projection]
+	A projection in a vector space $V$ is defined as a mapping $P: V \rightarrow V, P^2 = P$, i.e. the mapping is idempotent. 
+\end{definition}
+
+From the linear algebra we know given $T \in L(X)$, $X = \ker(T) \times ran(T)$. We would like to know if this algebraic decomposition is also topological, i.t. $X = \ker(T) \oplus ran(T)$. ($(u_n + v_n \rightarrow x \Leftrightarrow u_n \rightarrow u, v_n \rightarrow v, u+v = x$.)
+
+\begin{lemma}
+	Given $P$ a continuous linear projection in the NLS $X$, then we have:
+	\begin{enumerate}
+		\item Either $P = 0$ or $\|P\| \geq 1$.
+		\item $\ker(P)$ and $\ran(P)$ is closed.
+		\item $X \cong \ker(P) \oplus \ran(P)$.
+	\end{enumerate}
+\end{lemma}
+\begin{proof}\quad\\
+1. 
+Observe
+\begin{align*}
+		\|Px\| = \|P(Px))\| &\le \|P\|\|Px\|\\
+		\Rightarrow \|P\| &\geq 1
+\end{align*}
+2. $\ker P$ closed is trivial. For $\ran (P)$, notice $(I - P)(Px) = Px - P^2x = 0$. And $(I - P)(x) = 0 \Rightarrow P (I - P)(x) = 0 \Rightarrow (P - P^2)x = 0$. Therefore $\ran P = \ker (I - P)$.\\
+3.  From linear algebra we have
+\begin{align*}
+	X = \ker (P) + \ran(P) = (I - P)x +   Px
+\end{align*}
+since $P$ is continuous we know the decomposition is also topological.
+\end{proof}
+
+\begin{theorem}[projective complement]
+	Given $X$ a Banach space and $U$ a closed subspace and there exists a continuous projection $P: X \rightarrow U$ and we have
+	\begin{align*}
+		X \slash U \cong \ker (P)
+	\end{align*}
+	Moreover $X \slash U$ is Banach.
+\end{theorem}
+\begin{proof}
+	By the theorem above we know $\ran(P) = \ker (I - P)$, $\ker(P) = \ran(I - P)$ for the bounded linear map $I - P$. Define $U := \ran(P)$, then for canonical map $(I- P): X\slash U \rightarrow \ker(P)$, the kernel is trivial and the map is also surjective. Then we have a bounded linear bijective map between $X\slash U$ and $\ker(P)$. By the open mapping theorem the map is isomorphic. 
+\end{proof}
+
+
+\subsection{Projection in Hilbert space}
+\begin{definition}[Hilbert Space]
+	A Hilbert Space is a complete inner product space, i.e. a Banach space $(H, \|\dot\|)$ with an inner product $\langle \cdot \rangle$ and the induced norm $:\|x\| = \sqrt{\langle x, x, \rangle}$. 
+\end{definition}
+\begin{remark}
+Recall the inner product is a bilinear form with the properties: 1)positive-definiteness(non-degeneracy). 2)Hermitian(symmetric).  3)linearity.	
+\end{remark}
+
+\begin{lemma}[Parallelogram identiry]
+	Every inner product space is uniformly convex
+\end{lemma}
+\begin{proof}
+	Denote the norm of the inner product space by: $\sqrt{\langle \cdot , \cdot \rangle}$
+	By the \textbf{parallelogram identity}:
+	\begin{align*}
+		\|x + y\|^2 + \|x - y\|^2 =  2\|x\|_2^2 + 2\|y\|_2^2 
+	\end{align*}
+	For $x, y$ with $\|x\|, \|y\| \leq 1$, we have:
+	\begin{align*}
+		\|x - y\|^2 \leq 4 - \|x+y\|^2\\
+		\frac{\|x -y\|^2}{4} \leq 1 - \|\frac{x + y}{2}\|^2
+	\end{align*}
+	we see the distance of 2 points is bounded by the distance between the boundary and its middle point. 
+\end{proof}
+
+\begin{corollary}[Projection in the Hilbert space]
+	The Hilbert space $X$ is uniformly convex. For any $M \subset X$ closed and convex, the mapping $P:X \rightarrow M, x \rightarrow  P(x) = \inf\{ \| x - m \|: m \in M \}$ is well-defined. (Any $x \in X$ admits an unique approximation point of $M$.) This mapping defines a \textbf{projection} in the Hilbert space. 
+\end{corollary}
+
+\begin{theorem}[Chebyshev property]
+	The projection in Hilbert space is \textbf{non-expensive} and \textbf{monotone}
+\end{theorem}
+\begin{proof}\quad\\
+1. \textbf{non-expansive:} First we show in an inner product space,  given $x \in X, x \notin M$:
+ \begin{equation}
+ 	p_x = P(x) \Leftrightarrow  \forall y \in M: \langle p_x - x, p_x - y \rangle \le 0
+ \end{equation} 
+$"\Rightarrow"$: For $y \in M, z = \lambda y + (1-\lambda) p_x $ for $\lambda \in (0, 1)$, we have:
+\begin{align*}
+	0 \le \|x - z\|^2 - \|x - p_x\|^2 &= \|x - p_x - \lambda(y - p_x)\|^2 - \|x - p_x\|^2 \\
+	&= - 2\lambda\langle x - p_x, y- p_x\rangle+ \lambda^2 \|y - p_x\|^2
+\end{align*}    
+Sending $\lambda \rightarrow 0$ we have $\langle x - p_x, y - p_x \rangle \le 0$,  \\
+$"\Leftarrow"$: For all $y \in M:$
+\begin{align*}
+	0 \le \|x - m \|^2 &= \langle x - m, x- y\rangle + \langle x - m, y - m\rangle\\
+(assumption)
+	&\le \langle x - m, x - y\rangle\\
+(CS-inequality)
+	&\le \|x - m\| \|x - y\|\\
+	\Rightarrow \|x - m\| &\le \|x - y\|
+\end{align*}
+we have
+\begin{align*}
+	\langle x - P(x), P(y) - P(x) \rangle \le 0\\
+	\langle P(y) - y, P(y) - P(x) \rangle \le 0 
+\end{align*}
+summing up we have
+\begin{align*}
+	\langle x - y  - (P(x) - P(y)), P(x) - P(y) \rangle &\geq 0\\
+	\Rightarrow \langle x - y, P(x) - P(y)\rangle &\geq \langle P(x) - P(y), P(x)-P(y) \rangle \ge 0\\
+	\Rightarrow \|x -y \|\|P(x - y)\| & \geq \|P(x-y)\|^2\\
+	\Rightarrow \|x-y\| & \geq \|P(x -y)\|
+\end{align*}
+\end{proof}
+
+
+\subsection{Orthogonal system}
+\begin{definition}[Orthogonal Complement]
+	Given a linear subspace of the Hilbert space $S \subset H$, the orthogonal complement is defined as:
+	\begin{align*}
+		S^\perp := \{ v \in H: \langle v, s \rangle = 0 \quad \forall s \in S \}
+	\end{align*}
+\end{definition}
+
+\begin{theorem}[Orthogonal Complement]
+$V$ is a \textbf{closed} subspace of the Hilbert space $H$, then every $x \in H$ can be written as $x = v + w$ for a unique $v \in V$ and $w \in V^\perp$. Symbolically
+\begin{equation*}
+	H = V \oplus V^\perp
+\end{equation*}
+\end{theorem}
+\begin{remark}
+The assumption that $V$ is closed is important. Observe $V = C^0(\mathbb{R})$, which is dense in $L^2(\mathbb{R})$. For $g \in V^\perp$, apply Cauchy-Schwarz we have for all $f \in L^2(\mathbb{R}), f_n \overset{L^2}{\rightarrow} f$ :
+\begin{align*}
+	|\langle g, f\rangle|^2 = |\langle g, f_n \rangle + \langle g, f - f_n\rangle|^2 \le \|g\|_2^2 \|f - f_n\|_2^2 \rightarrow 0
+\end{align*}	
+Therefore $g$ is orthogonal to all element in $L^2(\mathbb{R})$, $g$ is trivial. If the assumption holds, then all the element in $L^2$ would be linear combination of elements in $C^0(\mathbb{R})$, which clearly isn't the case.
+\end{remark}
+\begin{proof}
+	\quad\\ 1. $V \cap V^\perp = \{0\}$: For $x \in V^\perp \cap V$. Assume $x$ is non-trivial, then $\langle x , x \rangle \neq 0 \Rightarrow x \notin V, x \notin V^\perp$. Contradiction.\\
+	2. \textbf{Uniqueness:} Assuming otherwise $x = v + w = v' + w'$. Then $z:= v - v' = w - w' \neq 0$ and $z \in V \cap V^\perp$. Contradiction due to $1$. \\
+	3. \textbf{Existence.} Observe $Q = I - P_V$. It's trivial to see $x = P_Vx + Qx$ for all $x \in X$. We now show $Q$ satisfies 
+	\begin{align*}
+		\forall v \in V: \langle Qx, v\rangle = 0
+	\end{align*}
+	indeed:
+	\begin{align*}
+		\langle x - Px, (v + Px) - Px \rangle &\le 0\\
+		\langle x - Px, Px - (Px - v) \rangle &\ge 0
+	\end{align*}
+	we have indeed $\langle x - Px, v \rangle = 0$ for all $v \in V$. 
+\end{proof}
+
+\begin{lemma}[Bessel Inequality]
+	
+\end{lemma}
+
+\begin{theorem}[Orthogonal expansion]
+	Let $(x_n)_{n = 1}^N$ be an orthonormal set in an inner product space $(X, \langle, \rangle) $, the followings are equivalent:
+	\begin{enumerate}
+		\item $X = \overline{span(S)}$
+		\item $\forall x \in X: x = \sum \langle x, x_n\rangle x_n$
+		\item $\forall x \in X: \|x\| = \sum |\langle x, x_n\rangle|^2$ 
+	\end{enumerate} 
+	If any of the assumption holds, then $S$ is a CONS. If $X$ is Hilbert then the converse then the converse is true.	
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+\begin{theorem}[Riesz-Fischer]
+	Let $:$ be a infinit-dimensional Hilbert space, then the followings are equivalent:
+	\begin{enumerate}
+		\item $H$ is separable
+		\item all ONBs of $H$ are countable.
+		\item There exists a separable ONB
+	\end{enumerate} 
+\end{theorem}
+\begin{proof}
+	\quad\\
+	$1)\Rightarrow 2)$: Given a ONB $S$, for $e, f \in S: \|e -f\| = \sqrt{2}$ by the orthonormallity. Assuming there exists a uncountable basis, for any countable set $A \subset S$, $\bigcup_{x \in A} B_x(\epsilon)$ can't cover $H$ for $\epsilon < \sqrt{2}$.  \\
+	$2)\Rightarrow 3)$: trivial. 
+\end{proof}
+
+
+
+
+\newpage
+\section{Duality and Reflexivity}
+\subsection{The dual space}
+\begin{definition}[Dual Space]
+	Given a TVS $X$ on $\mathbb{K}$, the \textbf{dual space} of $X$ is defined as
+	\begin{equation*}
+		X^* := L(X, \mathbb{K}) := \{ A: X \rightarrow \mathbb{K} \quad \text{continuous linear operator}\}
+	\end{equation*}
+	with the operator norm:
+	\begin{align*}
+	\|\Lambda\|:= \sup_{\nu \in H \backslash 0} \frac{|\Lambda (\nu)|}{\|\nu\|}, \quad \|\Lambda\|:= \sup_{\|v\| = 1} \|\Lambda(v)\|
+\end{align*}
+\end{definition}
+
+\begin{proposition}
+	A vector space $X$ and its dual admit the same dimension iff it's finite dimensional
+\end{proposition}
+\begin{proof}
+	\quad\\
+	$"\Leftarrow"$: Given $X$ is finite-dimensional and admits the basis:
+	\begin{align*}
+		\mathfrak{B}:= \{v_1, \dots, v_n\}
+	\end{align*}
+	we define the dual basis
+	\begin{align*}
+		\mathfrak{B}':= \{\delta_{v_i}(x), \dots, \delta_{v_n}(x)\}
+	\end{align*}
+	We can show it constructs a basis of $X'$.\\
+	$"\Rightarrow"$: 
+\end{proof}
+\begin{corollary}
+	$\dim(X^*) \geq \dim(X)$
+\end{corollary}
+\begin{remark}
+This corollary does not imply that the canonical embedding $X^* \hookrightarrow X$ is surjective. 	
+\end{remark}
+
+
+\begin{example}
+	Dual space comes handy in the study of PDE. Given a PDE, after integrating by parts we get a reformulation which defines an element in a suitable dual space.
+\end{example}
+
+\begin{theorem}
+	The dual space $X^*$ always complete.
+\end{theorem}
+\begin{proof}
+	Apply the theorem in section 1 since $\mathbb{R}$ is always complete.
+\end{proof}
+
+\begin{theorem}
+	Given $X$ a NLS and U a closed subspace, there exists canonical isometric isomorphism:
+	\begin{align*}
+		(X\slash U)^* &\cong U^\perp \quad via \quad i: x' = l \circ \omega, l \in (X\slash U)'  \\
+		 X^* \slash U^\perp &\cong U^* \quad via \quad i: x' + U^\perp \mapsto x'|_U 
+	\end{align*}
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+
+\subsection{Duality in \texorpdfstring{$L^2$}{L\textasciicircum{}2} (Riesz representation)}
+\begin{theorem}[Riesz Representation theorem]
+There is bijective isometry between Hilbert space and its dual space:
+\begin{equation*}
+	\forall \Lambda \in H^* \quad  \exists! y \in H: \Lambda(z) = \langle x, z\rangle
+\end{equation*}
+\end{theorem}
+\begin{proof}\quad\\
+\textbf{Injectivity}:\\ The injectivity follows from the non-degeneracy of the inner product, suppose $\langle x, \cdot \rangle = \langle y, \cdot \rangle$ with $x \neq y$, then:
+\begin{align*}
+	\langle x, x \rangle = \langle y, x \rangle = \langle x, y \rangle = \langle y, y \rangle\\
+\end{align*}
+therefore
+\begin{align*}
+	\|x - y\|_2^2 = \|x\|^2 - \langle x, y\rangle - \langle y, x \rangle + \|y\|^2 = 0
+\end{align*}
+\textbf{Surjectivity:}\\
+By the continuity of $\Lambda$ we know $\ker\Lambda$ is a closed subspace of $H$.\\
+If $\Lambda \equiv 0$, the problem is trivial($0 \in H$ is the element to find).\\
+Otherwise $\Lambda \neq 0$, i.e. $\exists x \in H: \Lambda(x) = c$. Without loss of generality(we can multiply by a scalar) assuming $\Lambda(x) = 1$. By orthogonal representation theorem we know there exists $k \in \ker \Lambda, w \in \ker\Lambda^\perp$, such that $x = k + w$. we claim 
+\begin{align*}
+	v := \frac{w}{\|w\|}
+\end{align*}
+is the preimage of $\Lambda$ for our Riesz map. Indeed, 
+\begin{align*}
+	&\forall k \in \ker \Lambda : \langle v, k \rangle = 0\\
+	&\langle v, x\rangle = \langle v, w + k \rangle =  \langle w, w \rangle \frac{1}{\|w\|} = 1
+\end{align*}
+\textbf{Isometry:}\\
+By Cauchy-Schwarz:
+\begin{align*}
+	\|\Lambda\| \leq \|v\|\|z\| \quad \text{with } \|z\| = 1
+\end{align*}
+and plug $z = \frac{v}{\|v\|}$ the maximum $\|v\|$ is attained.
+\end{proof}
+
+As an application of \textbf{Riesz} we know prove the Lax-Milgram lemma. It's one of the essential result that proves the existence and uniqueness of the solution for weak Elliptic PDE. Later we would use finite representation and limit transformation to prove it. Now we see how we can prove it via \textbf{Riesz} and \textbf{Banach Fixpoint theorem}
+\begin{corollary}[Lax-Milgram lemma]
+	For every bounded coercive bilinear map with $B: H\times H \rightarrow \mathbb{R}$, $H$ Hilbert. if $B(u, v)$ bounded and coercive, i.e.:
+	\begin{align*}
+		\sup_{\|u\|, \|v\| = 1} B(u, v) = M < \infty, \quad \forall v \in H \exists \beta \in \mathbb{R}: B(v, v) \ge \beta\|v\|^2
+	\end{align*}
+	Then we have:
+	\begin{align*}
+		\forall \Lambda \in H^* !\exists v \in H: B(v, .) = \Lambda(.)
+	\end{align*}
+	the Map $M: H \rightarrow H^*, M(x) = B(x, .)$ is bijective. 
+\end{corollary}
+\begin{proof}
+ 	The injectivity is clear. For surjectivity observe the linear map $K_v$ on $H$:
+	\begin{align*}
+		K_v &:= \Lambda(\cdot) - B(v, \cdot) \\
+		&:= \Lambda(\cdot) - B_v(\cdot)
+	\end{align*}
+	(Notice $K_v\in H^*$)
+	Define $R$ as the inverse of Riesz map and define the map:
+	\begin{align*}
+		T(v) = v + \rho R(K_v)
+	\end{align*}
+	We show for all :
+	\begin{align*}
+		\|T(v) - T(w)\|^2 &= \|v - w + \rho R(\Lambda - B_v) - \rho R(\Lambda - B_w)   \|^2\\		
+		(x:= v - w)
+		&=\|x - \rho R(B_x)\|^2   \\
+		&= \|x\|^2 + \rho^2 \|R(B_x)\|^2 - 2\rho R(B_x)\cdot x\\
+		(\|B\|< M)
+		&\le \|x\|^2 + \rho^2 M^2\|x\|^2 - 2\rho R(B_x) \cdot x
+	\end{align*} 
+	Since $B_x \in H^*$, we have 
+	\begin{align*}
+		\langle R(B_v), u \rangle  = B_v(u) = B(v, u)
+	\end{align*} 
+	By the coercivity we have $R(B_x)\cdot x \ge \beta \|x\|^2$. Therefore
+	\begin{align*}
+		&= \|x\|^2 + \rho^2 M^2\|x\|^2 - \rho B(x, x)\\
+		&\le (1 + \rho^2M^2 - \beta) \|x\|^2
+	\end{align*}
+	Select the suitable $\rho$ to find the map is in fact a contraction. We therefore have an unique fixed point. $K_v$ is hence trivial. We find for $B_v$ an element in $H^*$ the map is therefore surjective. 
+\end{proof}
+
+
+\begin{theorem}
+	An orthogonal set $S$ is maximal $\Leftrightarrow$ $S$ is an orthogonal basis.
+\end{theorem}
+\begin{remark}
+Notice the difference to Hamal basis.	
+\end{remark}
+
+\begin{theorem}[Orthogonal representation]
+	If $H$ has an ONS $\{e_\alpha\}_{\alpha \in I}$ and $dimH = \infty$. Then $\forall x \in H \exists I_x  \text{ countable}$:
+	\begin{equation*}
+		x = \sum_{\alpha \in I_x}\langle e_\alpha, x \rangle e_\alpha
+	\end{equation*}
+\end{theorem}
+\begin{remark}
+You can not sum a uncountable set.c	
+\end{remark}
+
+\begin{theorem}[Correspondence theorem]
+Given a finite-dimensional vector space, the bilinear form $B: V \times V \rightarrow \mathbb{R}$ could be written as matrix multiplication. The bilinear form is symmetric if and only if the matrix is symmetric. 
+\end{theorem}
+
+
+
+\subsection*{Duality in $L^p$}
+\subsubsection*{Proof of measure theory}
+\begin{theorem}[Dual Paring between of $L^p(X)$ and $L^q(X)^*$] Given $(X, \mu)$ an arbitrary measure space. 
+	If either $p = 1$ and $\mu$ $\sigma$-finite, or $1 < p < \infty$ $\mu$ arbitrary, then:
+	\begin{equation*}
+		\varphi_g: L^p \rightarrow (L^q)^*, \quad \varphi_g(f) := \int_X fg d\mu \quad (f \in L^p, g \in L^q)
+	\end{equation*}
+	an isometric isomorphisms. 
+\end{theorem}
+\begin{remark}
+Notice the function should be real-valued.	
+\end{remark}
+\begin{proof}
+	The proof has the following steps:\\ 
+	\textbf{Injectivity} follows by the lemma\\
+	\textbf{Surjectivity:}
+	\begin{itemize}
+		\item \textbf{Proof for} $\mu(X) < \infty$
+			\begin{enumerate}
+				\item $\forall \psi \in L^{p'}$, $\nu(E) = \psi(\chi_E)$ defines a measure with $\nu \ll \mu$. By Radon-Nikodym there exist a $g$ with $\psi(f) = \langle g, f\rangle$, $g \in L^1$. 
+				\item By the theorem above we know the characteristic functions build a basis of $L^p$ if the measure space is finite. It implies:
+					\begin{equation*}
+						\forall f \in L^p \exists t_n \text{ with } \|t_n - f\|_p \rightarrow 0 : \lim \varphi(t_n) = \varphi(f)
+					\end{equation*}
+					By the dominated convergence theorem
+				\item We still have to show that $g \in L^q$. Notice $|g|^{q - 1}$ not necessarily in $L^p$, we use the \textbf{truncated characteristic function}. Define $E_\alpha := \{x|g(x) \leq \alpha \}$  :
+				\begin{equation*}
+					f_\alpha(x) = 
+					\left\{\begin{aligned}
+						&\chi_{E_\alpha} |g|^{q - 1}(x) \quad &g(x) \neq 0 \\
+						&\chi_{E_\alpha} (x) \quad &g(x) = 0
+					\end{aligned}\right.
+				\end{equation*}
+				Notice now that $f_\alpha \in L^p$, and we have:
+				\begin{equation*}
+					\int_{E_\alpha} |g|^q d\mu= \int_{E_\alpha}g f_\alpha d\mu 
+					\leq \|\psi\|\|f_\alpha\|_p = \|\psi\|(\int_{E_\alpha}|g|^q d\mu)^{\frac{1}{p}}
+				\end{equation*}
+				on $E_\alpha$ we get
+				\begin{equation*}
+					\|g\|_q \leq \|\psi\|
+				\end{equation*}
+				and by the monotone convergence theorem we can extend the result to the whole $X$.
+			\end{enumerate}
+		\item \textbf{Proof for $\mu(X)$ $\sigma$-finite:}
+			Since $\mu$ is $\sigma$-finite we can define a monotone increasing sequence of sets $X_n$ with $\cup_{n = 1}^\infty X^n = X$ with $X_n < \infty$. By the result above: $\forall \psi_n \in L^{p'}(\mu_n) \exists g_n \in L^q(\mu_n) \forall f \in L^p(\mu_n)$:
+			\begin{equation*}
+				\psi_n(f) = \int g_n f \mu_n
+			\end{equation*}
+			define $g(x)$ with $g(x)|_{X_n} = g_n(x)$. By the uniqueness of last part and $(X_n)$ is a cover of $X$ we know the $g$ is well defined on $X$. And we have:
+			\begin{equation*}
+				\psi(f) = \lim \psi_n(f) = \lim \int_{X_n}f g_n \mu_n= \int f gd\mu
+			\end{equation*}           
+			by the monotone convergence theorem.
+	\end{itemize}
+	\textbf{For $p = 1$ and $\mu$ $\sigma$-finite.} \\
+	First we proof:
+	$\sup \frac{\varphi_g(f)}{\|f\|_1} \leq \|g\|_\infty$ is proved by Holder. Assuming $\frac{\varphi_g(f)}{\|f\|_1} < \|g\|_\infty$. We have:
+	\begin{equation*}
+		\frac{\varphi_g(f)}{\|f\|_1} < c < \|g\|_\infty
+	\end{equation*}
+	Define $A := \{x| g(x) \geq c\}$ and $f := \frac{g}{|g|}$ on $A$ whereas 0 elsewhere.
+	\begin{equation*}
+		\varphi_g(f) = \int | \langle g, f \rangle| d\mu = \int |g| d\mu
+		\geq c \mu(A) = c\|f\|_1 > \int |\langle f, g \rangle|   d\mu
+ 	\end{equation*}
+ 	This proves the injective and isometry.
+\end{proof}
+\begin{remark}
+	 $(L^\infty)^* \neq L^1$.  The statement fails for $p \in \{1, \infty\}$ when the measure space is not $\sigma-finite$.
+\end{remark}
+
+\subsubsection*{Proof by uniform convexity}
+\begin{lemma}
+	for any $f, g \in L^p(X)$ with $1 < p < \infty$, the function $\mathbb{R} \rightarrow [0, \infty), t \rightarrow \|f + tg\|^p_p$ is differentiable and satisfies
+	\begin{equation*}
+		\frac{d}{dt} \|f + tg\|^p_p = p\int |f^{p -2}|\langle f, g\rangle d\mu
+	\end{equation*}
+\end{lemma}
+
+\begin{lemma}
+	For $1 < p < \infty$ and $\frac{1}{p} + \frac{1}{q} = 1$, and in the case where the measure space is $\sigma$-finite, the canonical bounded linear operator
+	\begin{equation*}
+		L^q \rightarrow (L^p)^*
+	\end{equation*}
+	 is an isometry. In particular, we can can find $f\in L^p$, s.t. the equality is attained.
+\end{lemma}
+
+\begin{example}[$L^1(X) \rightarrow L^\infty(X)^*$ injective but not surjective]\quad\\
+Injective follow from the canonical isometric mapping.\\
+For not surjective, observe:
+Assuming $ X = [0, 1]$, define:
+\begin{align*}
+	\delta: C_0(\Omega) \rightarrow \mathbb{R}, f \rightarrowtail f(0)
+\end{align*}	
+Notice $C_0(X)$ is a subspace of $L^\infty(X)$(with the maximum norm) and $\delta(f) = 0$ for all $f \in C_0(\Omega)$. Suppose there exists some $g \in L^1(\Omega)$ with:
+\begin{align*}
+	\delta(f) = \int gf d\lambda \quad \forall f \in L^\infty(X)
+\end{align*}
+Then by the fundamental lemma of CV we have for $g \in L^1_{loc}(X) \subset L^1(X)$ that $g \equiv 0$. Which contradicts to $\delta \neq 0$ for $\delta$ defined on $L^\infty(\Omega)$
+\end{example}
+
+
+\begin{corollary}
+	There exists a natural map $\Phi:$, $L^p(X)$ is therefore reflexive
+\end{corollary}
+
+\begin{lemma}
+	Given a Hilbert space $H$, we have
+	\begin{align*}
+		\forall x \in H \exists \Lambda \in H^*: \|\Lambda\|_{H^*} = 1, \Lambda(x) = \|x\|_H
+	\end{align*}
+\end{lemma}
+
+
+\begin{example}[bounded variation: ]$(C[a,b]^* = NBV[a, b])$
+	
+\end{example}
+
+\begin{definition}[Space of bounded variation]
+	The space of bounded variation is defined as:
+	\begin{align*}
+		BV:=\bigg \{ f:[a, b]\rightarrow \mathbb{R}\bigg| \sup_{I \textbf{ partition of }[a, b]} \sum_{I} f(t_i) - f(t_{i-1}) < \infty \bigg\}
+	\end{align*}
+\end{definition}
+
+\subsection{The Reflexivity}
+\begin{definition}[The bidual space]
+The dual space of the dual space, i.e., for $X$ Banach, $X^{**}$ is defined as $L(X^*, \mathbb{R})$. 
+\end{definition}
+
+\begin{definition}[reflexive space]
+	A NLS is $X$ reflexive if $X^{**} = \delta(X)$, i.e. , there exists an \textbf{isometric isomorphism} between the bidual space equals and space of the canonical evaluation maps
+\end{definition}
+
+\begin{remark}
+The reflexive space is a Banach space.
+\begin{proof}
+	Dual space is always complete since $L(X,Y)$ is complete if $Y$ is complete, in this case $Y = \mathbb{R}$. Therefore $X'$, $X''$ are complete.
+\end{proof}	
+\end{remark}
+
+\begin{theorem}
+	The Hilbert space is reflexive.
+\end{theorem}
+\begin{proof}
+	Apply the Riesz representation theorem twice.
+\end{proof}
+
+
+\subsubsection{The dual space of $H^1_0(\Omega)$}
+We define
+\begin{align*}
+	H^{-1}(\Omega) := H_0^1(\Omega)^* 
+\end{align*}
+since $H^1_0$ is a Hilbert space, we know $H_0^1 \approxeq H^{-1}$. However, this isomorphism is not the identification of the distribution. 
+
+
+\newpage
+
+\section{Compact Operator}
+\subsection{Compact Operator}
+Observation: in the infinite dimensional space, closed and bounded subspace are not necessary compact in the normal sense. The Weierstrass theorem is not applicable anymore. 
+
+\begin{example}
+Observe the $L^2(\mathbb{T}^d)$ space. Within the ball $B_1(0)$ we have the orthonormal basis $e_i$. Notice all the basis function forms a bounded and closed ball but they don't have convergent subsequence. 
+\end{example}
+
+\begin{definition}[Compactness]
+	In a complete metric space $X$(possibly infinite dimensional), $M \subset X$, the following definitions are equivalent.
+	\begin{enumerate}
+		\item $M$ is compact
+		\item Any open covering of $M$ admits a finite subcovering.
+		\item Any sequence admits a convergent subsequence. 
+		\item $\forall \epsilon > 0 \exists N(\epsilon) < \infty: M \subset \cup_{i = 1}^N B_{\epsilon_i}(0)$ with $\epsilon_i \le \epsilon$. 
+	\end{enumerate}
+\end{definition}
+
+
+\begin{definition}[Compact linear operator]
+	A subset $M$ is relative compact in $X$ if $\overline{M}$ is compact. A mapping between 2 NLS $T:X\rightarrow Y$ is compact if for any \textbf{bounded closed} subset $M \subset X$, $T(M)$ relative compact in $Y$, i.e., it maps the bounded and closed subset to the relatively compact set. 
+\end{definition}
+\begin{remark}
+recall the theorem of Heine-Borel, in a NLS bounded and closed subsets are compact. The compact operator basically maps compact sets to compact sets	.
+\end{remark}
+
+
+\begin{example}[The bidual operator $\delta_x: X \rightarrow X^{**}$ ]
+	Observe $X \rightarrow X^{**}$ with $\dim X < \infty$ , for bounded sequence $x_n \in $ with $\|x_n\| < C$, we have:
+	\begin{align*}
+		\forall \Lambda \in X^*: \Lambda(x_n)< \infty
+	\end{align*} 
+	Therefore for all $\Lambda \in X^*$, $\Lambda(x_n)$ contains a convergent subsequence by Balzano-Weierstrass.
+\end{example}
+
+
+\begin{theorem}[characterisation of compact operator]
+	given $X, Y$ \textbf{normed} LS and $T:X \rightarrow Y$ a linear operator. The followings are pairwise equivalent.
+	\begin{itemize}
+		\item $T$ is compact
+		\item Image of any bounded ball $T(B_1(0))$ is relatively compact in $Y$
+		\item For any bounded sequence $x_n$ in $X^{\mathbb{N}}$, $T(x_n)$ admits a convergent subsequence in $Y$.
+	\end{itemize}
+\end{theorem}
+\begin{proof}\quad\\
+	1)$\Rightarrow$2): Take $M = X(1)$.\\
+	2)$\Rightarrow$3): Given a bounded sequence $(x_n)_{n \in \mathbb{N}}$ with $x_n < c < \infty$. $\frac{x_n}{c} \in X(1)$.  From 2) follows $T(X(1))$ relatively compact in $Y$ we get the result.
+\end{proof}
+
+
+
+\subsection{Finite Dimensional Compact Subspace}
+\begin{lemma}[Riesz lemma]
+	Given a NLS $X$ and $U \subset X$ a real \textbf{closed} subspace. Then
+	\begin{align*}
+		\forall \delta \in (0, 1)\exists x_\delta \in X, \|x_\delta\| = 1: \|x_\delta - u\| \ge 1 - \delta \quad \forall u \in U
+	\end{align*}
+	i.e., given a subspace we can find an arbitrary close but disjoint unit vector to the subspace.
+\end{lemma}
+\begin{remark}
+	The lemma is often used to construct a bounded sequence with no convergent subsequence
+\end{remark}
+\begin{proof}
+	Assuming $x \in X\slash U$, $U \subset X$ closed. We have 
+	\begin{align*}
+		d:= \inf_{u \in U}\{\|x - u\|\} > 0
+	\end{align*}
+	because otherwise there exists $u_n$ with $\|x - u_n\| \rightarrow 0$ which implies $x \in \bar{U} = U$. For all $\delta > 0$, we have $d > \frac{d}{1 - \delta}$ and there exists $u_\delta$ such that
+	\begin{align*}
+		\|x - u_\delta\| < \frac{d}{1 - \delta}
+	\end{align*}
+	define 
+	\begin{align*}
+		x_\delta := \frac{x - u_\delta}{\|x - u_\delta\|}
+	\end{align*}
+	Then for all $u \in U$:
+	\begin{align*}
+		\|x_\delta - u\| = \bigg\| \frac{x - (u_\delta + \|x - u_\delta\| u) }{\|x - u_\delta\|} \bigg\| > \frac{1- \delta}{d} d = 1 - \delta
+	\end{align*}
+\end{proof}
+
+\begin{theorem}[Heine-Borel]
+For a normed vector space $X$ is the following equivalent:
+\begin{enumerate}
+	\item $\dim X < \infty$
+	\item $B_X:= \{x \in X: \|x\| \le  1\}$ is compact
+	\item every bounded sequence admits a convergent subsequence.
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+	3)$\Rightarrow$1) Assuming $X = \infty$, by \textbf{Riesz lemma} we can inductively find a sequence $(x_n)_{n \in \mathbb{N}}$ with $\|x_n\| = 1$, such that 
+	\begin{align*}
+		\|x_n - x_m\| \ge \frac{1}{2} \quad \forall m < n
+	\end{align*}
+	i.e. a bounded sequence without a convergent subsequence
+\end{proof}
+
+
+\subsection{Compact linear operators}
+
+\begin{theorem}\quad
+\begin{enumerate}
+	\item 	Given $X, Y$ Banach space, $K(X,Y)$ is closed in $L(X,Y)$. In particular, $K(X,Y)$ itself is a Banach space.
+	\item Given $Z$ another Banach space, $S\in K(X, Y), T\in K(Y, Z)$, then $T \circ S \in K(X, Z)$. 
+\end{enumerate}
+\end{theorem}
+
+\begin{theorem}[Arzela-Ascoli]
+ The functional space
+ \begin{align*}
+ 	\bigg\{f \in C([a, b]) | f \text{ uniformly continuous and uniformly bounded} \bigg\}
+ \end{align*} 
+ is relatively compact in $(C_{[a, b]}, \|\cdot\|_\infty)$ 
+ \end{theorem}
+ 
+ \begin{theorem}[The Schrauder's theorem]
+	Given $X, Y$ NLS, $T \in K(X, Y)$, then $T^* \in K(Y^*, X^*)$.
+\end{theorem}
+\begin{proof}
+	by the compactness of $T$ we know $T$ maps a closed unit ball to a pre-compact ball in $Y$. i.e., $M:= \overline{A(B_X)}$ is compact. In order to show the compactness of $T^*$, we show for a  bounded sequence $f_n \in Y^*, \|f_n\|_{Y^*}< C$, $T^*(f_n)$ admits a convergent subsequence. Observe 
+	\begin{align*}
+		\|T^*(f_{n_k}) - T^*(f_{n_l})\|_{X^*} = \sup_{x \in B_X} |f_{n_k}(Tx) - f_{n_l}(Tx)| = \|f_{n_k} - f_{n_l}\|_{Y^*}
+	\end{align*}
+	where the second equation follows by the density argument and compact subset are closed. What left to show is that the last term goes to 0. We show this by Arzela-Ascoli.
+	\begin{itemize}
+		\item $\|f_n\|_{Y_*}< \infty$ follows by assumption
+		\item Equal-continuity follows from all $f_n$ are Lipschitz continuous with Lipschitz constant $C$.
+	\end{itemize}
+	Therefore there exists a subsequence $f_{n_k}$ satisfies our claim.
+\end{proof}
+
+\begin{corollary}
+	If $X, Y$ Banach space, the converse is true.
+\end{corollary}
+\begin{proof}
+	Given $A^*$ is compact, by the argument above $A^{**}$ is compact. $A^{**} \circ \delta_x: X \rightarrow Y^{**}$ is compact. Therefore $\delta_Y\circ A: X \rightarrow Y^{**} $ is compact. Since $Y$ and $Y^{**}$ are isomorphic, $\delta_Y(Ax_n)$ converges in $Y^{**}$ implies $Ax_n$ converges in $Y$. 
+\end{proof}
+\newpage
+
+
+
+
+\newpage
+\section{Hahn-Banach Extension and Separation}
+\subsection{Hahn-Banach Extension Theorem}
+\begin{definition}[ordered vector space]
+	Let $X$ be a real vector space, and $\preccurlyeq$ be a partial relation satisfying:
+	\begin{itemize}
+		\item \textbf{O1:} $x \succcurlyeq 0 \Rightarrow \forall \lambda > 0: \lambda x \succcurlyeq 0$ . 
+		\item \textbf{O2:} $x \succcurlyeq y \Rightarrow \forall z \in X: x + z \succcurlyeq y + z$ . 
+	\end{itemize} 
+\end{definition}
+
+\begin{theorem}[Hahn-Banach for linear functional]
+	\textbf{O3}: $\forall x \in X \exists y \in Y: x \preccurlyeq y$. 
+\end{theorem}
+
+\begin{definition}[Sublinear map]
+	Given $X$ a vector space, a map $s: X \rightarrow \mathbb{R}$ is sublinear if:
+	\begin{itemize}
+		\item $\forall \alpha \in \mathbb{R} \forall x \in X : s(\alpha x) = \alpha s(x)$
+		\item $\forall x, y \in X: s(x + y) \leq s(x) + s(y)$ 
+	\end{itemize}
+\end{definition}
+
+
+\begin{theorem}[Hahn-Banach(linear algebra)]
+	Given $X$ a real vector space and $U$ a subspace of $X$. $l: U \rightarrow \mathbb{R}$ is a linear map on $U$ dominated by a sublinear map $s$ on $X$. Then there exists a linear extension $L$ of $l$ to $X$ satisfying\\
+	 1). $L|_U = l$.\\
+	 2). $L$ is dominated by $p$.  
+\end{theorem}
+\begin{proof}
+	Suppose $X = U \oplus U^1$ with $dim(U^1) = 1$, since $U$ and $U^1$ are linear independent, we have
+	\begin{align*}
+		\forall x \in X \forall x_0 \in U^1 \exists!u \in U, \lambda \in \mathbb{R} :
+		 x = u + \lambda x_0
+	\end{align*}
+	We can therefore define the linear map on $\mathbb{R}$(why linear? we may observe $r$ as the linear scaling of the $x_0 \in U^1$):
+	\begin{align*}
+		L_r: X \rightarrow \mathbb{R}, x \mapsto l(u_x) + \lambda _xr
+	\end{align*}
+	To prove the existence of the extension it's equivalent to find a $r$, such that:
+	\begin{align*}
+		\forall u \in U \forall \lambda \in \mathbb{R} :
+		 l(u) + \lambda r \leq p(u + \lambda x_0)\\
+	\end{align*} 
+	We have for $\lambda > 0$:
+	\begin{align*}
+		l(u) + \lambda r &\leq p(u + \lambda x_0)\\
+		r &\leq p(\frac{u}{\lambda} + x_0)- l(\frac{u}{\lambda})\\
+		r &\leq \inf_{v \in U}p(v + x_0) - l(v)
+	\end{align*}
+	Analog for $\lambda < 0$, we have:
+	\begin{align*}
+		l(u) + \lambda r &\leq p(u + \lambda x_0)\\
+		-r &\leq p(\frac{u}{-\lambda} - x_0)- l(\frac{u}{-\lambda})\\
+		r &\geq \sup_{w \in U}l(w) - p(w - x_0)  
+	\end{align*}
+	We get a condition that is independent from $\lambda$. The existence of such r is equivalent to:
+	\begin{align*}
+		\forall w, v \in X:  l(w) - p(w - x_0) &\leq p(v + x_0) - l(v) \\
+		l(w + v ) &\leq p(w + v)
+	\end{align*}
+	which is implied by the condition that $l$ is dominated by $p$.\\
+	Then by transient induction and Zorn's lemma we may extend the result to arbitrary $X \supset U $.
+\end{proof}
+
+\begin{theorem}[Hahn-Banach(NLS)]
+	$X$ a NLS and $U\subset X$ a linear subspace, $l \in U^*$ , then 
+	\begin{align*}
+		\exists L \in X^*: L|_U = l, \|L\|_{X^*} = \|l\|_{U^*}
+	\end{align*}
+\end{theorem}
+\begin{remark}
+	Recall the linear algebra:1)in finite dimension the dimension of the space equals the dimension of its dual. 
+\end{remark}
+\begin{proof}
+	For $C:= \|f\|_{Y^*}$, define the sublinear map:
+	\begin{align*}
+		p: X \rightarrow \mathbb{R},   s(x) = C\|x\|_X, 
+	\end{align*}
+	Notice: $l$ is dominated by $s$: $l\leq s$. Apply the Hahn Banach, there exist a $L \in X^*$ with
+	\begin{align*}
+					&L|_U = l, \quad L \leq S\\
+		\Rightarrow &\|L\|_{op} \leq C 
+	\end{align*}
+	Therefore:
+	\begin{align*}
+		C = \|l\|_{U^*} \leq \|L\|_{op} \leq C
+	\end{align*}
+	Therefore $\|L\|_{op} = C = \|l\|_{U^*}$
+\end{proof}
+
+The following corollaries plays an important role in applications.
+\begin{corollary}
+	$X$ a NLS, $x \in X$, then 
+	\begin{align*}
+		\forall x \in X\exists f \in X^*: \|f\|_{X^*} = 1, f(x) = \|x\|
+	\end{align*}
+	in another word:
+	\begin{align*}
+		\|x\| = \max_{f \in X^*, \|f\| \leq 1} f(x) 
+	\end{align*}
+	Especially we can separate $x_1 \neq x_2$ by a functional $f$ with $f(x_1) \neq f(x_2)$. 
+\end{corollary}
+\begin{remark}
+We can take the maximum because the dual is always complete 
+\end{remark}
+\begin{proof}
+	For $x \in X$ we define:
+	\begin{align*}
+		x': \spa\{x\} \rightarrow \mathbb{R}, x'(\lambda x) = \lambda\|x\|
+	\end{align*}
+	Naturally $\|x'\|_{op} = 1$ and by Hahn-Banach we may extend it to $X$. And $x'(x) = \|x\|$.
+\end{proof}
+
+\begin{corollary}
+	Given $Y$ a \textbf{closed} linear subspace of $X$, $x \in X \slash Y$, then
+there exists $F \in X'$,
+	\begin{align*}
+		F \in X^*: \|F\| = 1, Y \subset \ker(F), F(x) = \dist(x, Y)
+	\end{align*}
+\end{corollary}
+\begin{proof}
+	Define
+\begin{align*}
+	f: X (\spa\{x\} \times Y) \rightarrow \mathbb{R}, \quad
+	\alpha x + y \rightarrowtail \alpha \dist(x, Y)
+\end{align*}
+observe:
+\begin{align*}
+	f(\alpha x + y) \le  |\alpha| \dist(x, Y) \le |\alpha| \|x - \frac{-y}{\alpha }\| \le \|\alpha x + y\|
+\end{align*}
+Apply Hahn-Banach and we get an extension $F$ defined on $X$ with  
+\begin{align*}
+	\|F\| \le 1, 
+\end{align*}
+Observe $\forall y \in Y$:
+\begin{align*}
+	F(y) = \dist(Y, y) = 0
+\end{align*}
+therefore $Y \subset \ker(f)$. Also $F(x) = \dist(x, Y)$.
+Now what left to show is that $\|F\| = 1$, indeed, since $\dist$ is a continuous function and $Y$ closed, we may find $y_\epsilon$:
+\begin{align*}
+	\|x - y_\epsilon \| \le (1 + \epsilon) \dist(x, Y)
+\end{align*}
+hence
+\begin{align*}
+	F(x - y_\epsilon) = \dist(x, Y) \geq\frac{\|x - y_\epsilon\|}{1 + \epsilon}
+\end{align*}
+Let $\epsilon \rightarrow 0$ we get $\|F\| \geq 1$.
+\end{proof}
+
+\begin{corollary}
+	$X$ a NLS, $M \subset $ subspace then:
+	\begin{align*}
+		\overline{\spa(M)} = X \Leftrightarrow \bigg( \forall f \in X^*, M \subset \ker(f): f \equiv 0 \bigg)
+	\end{align*}
+	the density is characterised by the dual functions.
+\end{corollary}
+\begin{remark}
+To reformulate with annihilator:
+\begin{align*}
+	\overline{\spa(M)} = X \Leftrightarrow {} M^\perp = \{0\}
+\end{align*}
+\end{remark}
+
+\begin{proof} \quad\\
+$"\Leftarrow"$ assume $x \in X \slash \overline{M}$: then there exists $f \in X^*, M\subset ker(f), \|f\| = 1$, contradiction.\\
+$"\Rightarrow"$ By assumption $\forall x \in X \exists (x_n)_{n \in \mathbb{N}} \in \spa\{M\}: \lim_{n \rightarrow \infty} x_n \rightarrow x$. Also $\forall n: f(x_n) = 0$ since $x_n \in \spa\{ M \}\subset \ker(f)$. By continuity:
+\begin{align*}
+	\forall x \in X: f(x) = \lim_{n \in \mathbb{N}}f(x_n) = 0
+\end{align*}
+\end{proof}
+
+
+
+\subsection{Separation of convex subspace}
+\begin{definition}[Minkowski functional]
+	Given $X$ a vector space and a set $A \subset X$, with $\{\lambda a: \lambda \in [0, 1], a \in A\} \subset A$, then we can define the \textbf{Minkowski functional:}
+	\begin{align*}
+		p_A: X \rightarrow [0, \infty], p_A(x) = \inf\{\lambda >0 : \frac{x}{\lambda} \in A\} 
+	\end{align*}
+	We say a set $A$ is \textbf{absorbing}, if $\forall x \in X: p_A(x) < \infty$.
+\end{definition}
+
+\begin{lemma}[Properties of Minkowski functional]
+	Given $X$ a normed vector space and $N$ convex with $0 \in V$, the Minkowski functional admits the following properties
+	\begin{itemize}
+		\item \textbf{sublinear:} $\forall \alpha > 0: p_N(\alpha x ) = \alpha p_N(x)$, $p_N(\xi + \mu) \leq p_N(\xi) + p_N(\mu)$
+		\item $N$ is absorbing: $p_N(x) \le \frac{\|x\|}{\epsilon}$ (given $\|y\| \lneqq \epsilon$ for all $y \in V$). 
+		\item $N$ is open $\Rightarrow$ $p_N^{-1}([0, 1)) = N$
+	\end{itemize}
+\end{lemma}
+\begin{proof}
+	Exercise.
+\end{proof}
+
+\begin{lemma}
+	$X$ NLS and $V \subset X$ convex and open, $0 \notin V$, then there exists $x^* \in X'$ such that:
+	\begin{align*}
+		x^*(x) < 0 \quad \forall x \in V
+	\end{align*}
+\end{lemma}
+
+\begin{theorem}[Mazur]
+	Given a NLS $X$ and a closed and convex subspace $M$ with $0 \in M$. Given $y \in X \slash M$, there is a hyperplane $\{\xi \in X| f(\xi) = a\}$  that separates $x$ from $M$, i.e.:
+	\begin{align*}
+		\forall x \in X \slash M \exists f \in X^*: \sup_{y \in M} f(y) < a < f(x)
+	\end{align*}
+	for some $a \in \mathbb{R}$. 
+\end{theorem}
+
+\begin{theorem}[Separation of (open)convex sets]
+	
+\end{theorem}
+
+
+\newpage
+\section{Inversion In Banach Space}
+\subsection{The Baire Criterium}
+\begin{definition}[dense and Nowhere dense]
+	Given a metric space $(X, d)$, a subset $M \subset X$ is called
+	\begin{itemize}
+		\item dense: if $\overline{M} = X$
+		\item nowhere dense: if  $\mathring{\overline{M}} = \emptyset$
+	\end{itemize} 
+\end{definition}
+\subsubsection{Separability in $L^p$}
+Recall a topological space is separable iff it contains a countable dense subset. Like $\mathbb{R}^n$ is separable since it contains the dense subset $\mathbb{Q}^n$. The main result in this section is to prove that $L^p$ is separable.
+
+\begin{example}[$l^p(\mathbb{R})$ sequence space]
+The sequence space is defined as:
+\begin{equation*}
+	l^p := \{(a_n)_{n \in \mathbb{N}} | (\sum |a_n|^p)^{\frac{1}{p}} < \infty \}, \quad l^\infty := \{(a_n)_n | (\sup a_n < \infty\}
+\end{equation*}
+
+\begin{enumerate}
+	\item \textbf{Subset space: $p<q \Rightarrow l^p \subset l^q$:}
+	\item \textbf{Separability: $l^p$ is separable, $l^\infty$ is not.}
+\end{enumerate}
+\begin{proof}
+	2): Define $\chi_M \in l^\infty$ as $\chi_M(n) = 1$ for $n \in M$. Observe $\Delta:= \{\chi_M: M \subset \mathbb{N}\}$. Given any $A$ countable subset of $A$ of $l^\infty$, observe the ball of $x \in A, B_x(\delta):= \{ y \in l^\infty, \|y - x\|_\infty \le \epsilon\}$. Since $\|\chi_M - \chi_{M'}\|_\infty = 1$ for $M \neq M'$, $B_A(\epsilon)$ contains only 1 element in $\Delta$.  
+\end{proof}
+\end{example}
+
+\begin{lemma}
+	$\forall p \in [1, \infty)$ and measure space $(X, \mu)$, The set of simple functions $S(X)$ is dense in $L^p(X)$.
+\end{lemma}
+\begin{proof}
+	We would like to find a sequence $f_n \in S(X)$ such that $\int |f - f_n|^p d\mu \rightarrow 0$ for all $f \in L^p(X)$. Recall the definition of $L^p$-integrability, $\forall f \in L^p$, there exists a monotone sequence of simple functions $f_n^+, f_n^- \in S(X)$, such that 
+	\begin{align*}
+		\int |f - f^+_n|^p d\mu -\int |f - f^-_n|^p d\mu  \rightarrow 0
+	\end{align*}
+\end{proof}
+
+\begin{theorem}
+	For $1 \leq p < \infty$ and any Lebesgue measurable set $\Omega \subset \mathbb{R}^n$  the $L^p(\Omega)$ space is separable:
+	\begin{equation*}
+		\mathcal{T}_e = Span\{ \chi_E: E \in \mathcal{F}, \mu(E) < \infty\}
+	\end{equation*}
+	dense in the $L^p(\Omega)$ space. 
+\end{theorem}
+\begin{proof}
+	The \textbf{simple function} is the function that takes finite many values and is integrable if and only if all of the characteristic functions have finite measure.
+\end{proof}
+\begin{remark}
+It doesn't contradict the fact that $L^\infty([a, b]$ is not separable since the metric here is different.(Remember: subspace of separable metric space is separable) 	
+\end{remark}
+
+\begin{example}[$L^\infty$ is not seperable]
+Show that $S(X)$ is dense in $L^\infty(X)$ if and only if $\mu(X) < \infty$.	
+\end{example}
+
+\begin{lemma}
+	For a NLS $X$, the followings are equivalent.
+	\begin{itemize}
+		\item $X$ is separable
+		\item there exists a countable set $A$ such that $X = \overline{span(A)}$.
+	\end{itemize}
+\end{lemma}
+\begin{proof}
+	
+\end{proof}
+
+
+\begin{proposition}
+Any subspace $Y$ of a separable \textbf{metric }space $(X, d)$ is separable
+\end{proposition}
+\begin{proof}
+	Suppose $D$ is a countable dense subset. Define
+	\begin{align*}
+		\mathcal{B}:= \{ B_r(x): x \in D, r \in \mathbb{Q} \}
+	\end{align*}
+	We see $\mathcal{B}$ forms a countable base. Further define
+	\begin{align*}
+		\mathcal{B}_Y:= \{ b \cap Y: b \in \mathcal{B}, b \cap Y \neq \emptyset \}
+	\end{align*}
+	We see this is a countable dense subset.
+\end{proof}
+
+
+\subsubsection{The Baire category}
+First we review some basic laws in the topological space:
+\begin{align*}
+	\forall M \subset X: X \backslash \overset{\circ}{M} = \overline{ X \backslash M}
+\end{align*}
+\begin{definition}
+	A subset $M$ of $X$ is called \textbf{of the first category} if it's a countable union of \textbf{nowhere dense} subset. Otherwise it's called \textbf{of the second criteria}.\par 
+	A set is nowhere dense if 
+	\begin{align*}
+		\overset{\circ}{\overline{M}} = \emptyset 
+	\end{align*}
+\end{definition}
+\begin{remark}
+If $M$ is of the second category, then $M$ contains at least 1 open set. 	
+\end{remark}
+
+\begin{theorem}[Baire's theorem ]
+	In a complete metric space, countable intersection of dense subsets is a dense subset, i.e. given $(X, d)$ complete, $O_n \subset X$ dense, $\bigcap_{n \in \mathbb{N}} O_n$ is dense, then it's either empty or closed. 
+\end{theorem}
+\begin{proof}
+	To show $D:= \bigcap_{n \in \mathbb{N}} O_n$ is dense, it's equivalent to show:
+	\begin{align*}
+		\forall x_0 \in X, r > 0, B_r(x_0) \subset X \text{ open}: B_r(x_0) \cap D \neq \emptyset 
+	\end{align*}
+	(Use Cantor-diagonal argument).\\
+	For $O_1$, since $O_1$ is dense in $X$ we know 
+	\begin{align*}
+		O_1 \cap B_r(x_0) \neq \emptyset
+	\end{align*}
+	(Otherwise $(O_1 \cap U_r(x_0))^C = O_1^C \cup U_r(x_0)^C = \emptyset \cup B_r(x_0)^C = X$).\\
+	And we also know $O_1 \cap B_r(x_0)$ is open since it's intersection of open sets.\\
+	We can then choose $B_{\frac{r}{2}}(x_1)$ with
+	\begin{align*}
+		\overline{B_{\frac{r}{2}}(x_1)} \subset O_1 \cap B_r(x_0)
+	\end{align*}
+	(It's convenient to take the closure such that at the end we know the limits the in the initial intersection).\\
+	By the same argument we have
+	\begin{align*}
+		B_{\frac{1}{2} r}(x_1) \cap O_1 \neq \emptyset \Rightarrow B_r(x_0) \cap \bigg( \cup_{i= 1}^2 O_i \bigg) \neq \emptyset
+	\end{align*}
+	Follow the procedure inductively we get the Cauchy sequence and by the completeness of $X$ we know it admits a limit, and in the intersection of every $O_i$. Therefore
+	\begin{align*}
+		B_r(x_0) \cap \bigg( \cup_{i = 0}^\infty O_i \bigg) \neq \emptyset
+	\end{align*}
+\end{proof}
+
+\begin{corollary}
+	In a complete metric space $(X, d)$, if a subset $M$ is of the first category, then $M^C$ is dense in $X$.
+\end{corollary}
+\begin{proof}
+	Assuming $M$ is of the first category, then 
+	\begin{align*}
+		M = \cup_{i = 1}^\infty O_i, \quad \overset{\circ}{\overline{O}} = \emptyset
+	\end{align*}
+	By de Morgan we know the complement of nowhere dense subset is dense, therefore
+	\begin{align*}
+		M^C &= \cap_{ i= 1}^\infty O_i^C, \quad O_i \texttt{ dense }\\
+		\texttt{ (by lemma above) } 
+		& \overset{dense}{\subset} X 
+	\end{align*}
+\end{proof}
+
+Or we have the alternative statement.
+\begin{corollary}
+	Every non-empty open set in a complete metric space is of the second category.
+\end{corollary}
+\begin{proof}
+\end{proof}
+
+
+
+
+\subsection{Open Mapping}
+\begin{definition}[open mapping]
+	Given 2 metric space $X, Y$, a mapping from $X$ to $Y$ is called open, if it projects open sets to open sets.
+\end{definition}
+\begin{remark}
+\quad\\
+\textbf{1.) }If a mapping is \textbf{linear} between 2 NLS, than openness of the mapping is equivalent to that the mapping maps balls around the origin to open balls around the origin.\\
+\textbf{2.) An open linear mapping between 2 $NLS$ is always surjective.} $\forall y \in Y: \frac{y}{\|y\|} \in B_1(0) \subset T(B_r(0))$ for some $r > 0$. Blowing up both side by a scalar of $\|y\|$ we see the result (since any element can be contracted to the $r$-ball by scalar multiplication.\\
+\textbf{3.)} other than the continuous mapping, for which the preimage of closed set is closed, the open mapping maps closed set in general \textbf{not} into closed set.  
+\end{remark}
+
+\begin{example}[Bounded but not open mapping]
+\quad\\
+\textbf{1.) }Define
+	\begin{align*}
+		T: l^\infty \rightarrow \mathbb{R}, (t_n)_{n \in \mathbb{N}} \mapsto \frac{1}{n} t_n
+	\end{align*}
+\quad\\
+\textbf{2.)}
+	The projection map is in general a bounded but not open map.
+\end{example}
+
+\begin{example}[Embedding i.g. not open]
+	The canonical embedding $X \hookrightarrow Y$ is in general not open since $X$ is both open and closed and it cannot maps to a non-trivial open and closed subset of $Y$ (unless it maps to the whole $Y$).  
+\end{example}
+
+\begin{lemma}[characterization]
+	Given $X, Y$ NLS and the linear mapping $T \in L(X, Y)$, the followings are equivalent:
+	\begin{enumerate}
+		\item $L$ is open, 
+		\item $L$ maps open ball around origin to open neighbourhood around origin, i.e., 
+		\begin{align*}
+			\forall B^X_r(0) \subset X \quad \exists c>0: \quad B^Y_c(0) \subset T(B_r(0)). 
+		\end{align*}
+		\item It holds
+		\begin{align*}
+			\exists \epsilon > 0: B_\epsilon^Y(0) \subset T(B_1^X(0)).
+		\end{align*}
+	\end{enumerate}
+\end{lemma}
+
+\begin{theorem}[The open mapping theorem]
+	Given $X$, $Y$ Banach space and $T\in L(X,Y)$ surjective, then $T$ is an open mapping.
+\end{theorem}
+\begin{proof}\quad\\
+\textbf{1.} Define $V_\epsilon:= \{y \in Y: \|y\| < \epsilon\}$, $U_n := \{x \in X| \|x\| < n\}$.  To show there exists an $\epsilon > 0, N \in \mathbb{N}:$
+\begin{align*}
+	V_\epsilon \subset T(U_N)
+\end{align*}
+By the linearity of $T$ this would prove that $T^{-1}$ is continuous at 0. 
+Since $Y$ is Banach, we apply Baire, since $T$ is surjective:
+\begin{align*}
+	Y = \bigcup_{n = 1}^\infty T(U_n)
+\end{align*}
+Since $Y$ is of second category, there exists an $N \in \mathbb{N}$, such that $T(U_N)$ contain an open ball around a $z \in T(U_N)$, we write as $B_r(z) \subset T(U_N)$.\par
+We now show $B_r(0) \subset T(U_N)$, indeed $\forall y$ with $\|y\| < r$, $z+y \in B_r(z) \subset T(U_N)$. By symmetry of $T(U_N)$, if $B_r(z) \subset T(U_N)$ then $B_r(-z) \subset T(U_N)$, also $-z + y \in T(U_N)$. By the convexity of $T(U_N)$:
+\begin{align*}
+	y= \frac{1}{2}(z + y) + \frac{1}{2}(-z + y) \in T(U_N)
+\end{align*}
+	This shows for there exists a $U_N$ that maps to an open ball. 
+\end{proof}
+
+\begin{corollary}[Inverse mapping]
+Given 2 Banach space $X, Y$, $A \in L(X, Y)$. If $T$ is bijective, then there exists continuous linear inverse $T^{-1} \in L(Y, X)$ such that 
+\begin{align*}
+	\|A\| \ge \beta = \frac{1}{\|A^{-1}\|}
+\end{align*}
+\end{corollary}
+\begin{proof}\quad\\
+\textbf{1)}. Since the map $T$ is bijective, the inverse is well defined and surjective.\\
+\textbf{2)}. The boundedness i
+s trivial, apply open mapping theorem we observe for $A^{-1}$ the preimage of open balls around 0 is an open ball, therefore the mapping the continuous therefore bounded. \\
+	For the estimate observe:
+	\begin{align*}
+		0< \beta &\overset{(1)}{=} \inf_{\|x\| = 1} \| Ax\|_Y \\
+	(2)	&= \frac{1}{\|A^{-1}\|} \\
+	(3)	&= \sup \{ \delta > 0| Y(\delta) \subset A(X(1))\}\\
+		&\le \|A\|
+	\end{align*}
+	For \textbf{1).} Since the $A$ is injective, $A$ has the trivial kernel, the non-zero element can't be mapped to 0. \\
+	For \textbf{2).} 
+	\begin{align*}
+		\frac{1}{\|A^{-1}\|}
+		&=\frac{1}{\sup_{\|y\| = 1} \|A^{-1}y\|} \\
+		&= \inf_{\|y \| = 1} \frac{\|y\|}{\|A^{-1}y\|}\\
+		&= \inf_{x \in A^{-1}(B_1(0))} \frac{\|Ax\|}{\|x\|}
+	\end{align*}
+	For \textbf{3).}
+	\begin{align*}
+		\|A^{-1}\|_{op} = \frac{1}{\beta}
+		&\Leftrightarrow A^{-1}(Y(1)) \subset X(\frac{1}{\beta})\\
+		&\Leftrightarrow A^{-1}(Y(\beta)) \subset X(1)\\
+		&\Leftrightarrow Y(\beta) \subset A(X(1))
+	\end{align*}
+\end{proof}
+
+\begin{corollary}[bounded inverse]
+	Given $X, Y$ Banach space, $T \in L(X, Y)$ surjective, then there exists a constant $C > 0$ satisfying:
+	\begin{align*}
+		\forall y \in Y \exists x \in X, Tx = y: \|x\|_X \le C \|Tx\|_Y
+	\end{align*}
+\end{corollary}
+\begin{remark}\quad\\
+1. The condition implies continuous open mapping is injective.  
+\end{remark}
+\begin{proof}
+Recall the quotient space: $q : X \rightarrow X \slash \ker(T)$ with the norm
+\begin{align*}
+	\|y\|_{X\slash ker(T)} := \dist(y, \ker(T))
+\end{align*}
+notice that the quotient mapping is surjective and continuous. Observe the induced map $\hat{T}$:
+\begin{align*}
+	\hat{T}:\quad X\slash \ker(T) \rightarrow Y, \hat{T}(x + \ker(T)) = T(x)
+\end{align*}
+the mapping is bijective by definition. Since both spaces are Banach the inverse is bounded:
+\begin{align*}
+	\|x\|_{X\slash\ker(T)} \le C \|y\|_Y\\
+	\|x\|_X \le \hat{C} \|y\|_Y
+\end{align*}
+\end{proof}
+
+\begin{corollary}[closed range]
+		We have the following equivalence:
+	\begin{enumerate}
+		\item $\ran T$ is closed
+		\item $\forall y \in \ran T \exists x \in X, Tx = y: \|x\|_X \le C \|Tx\|_Y$
+	\end{enumerate}
+\end{corollary}
+\begin{proof}
+	\quad\\
+	$"\Rightarrow" $: $\ran T$ closed$\Rightarrow \ran T$ induced with the norm of $Y$ is Banach, $\bar{T}: X \rightarrow \ran T$ is surjective. By the corollary above we have the inequality of the bounded inverse. \\
+	$"\Leftarrow":$ Given $y_n \in \ran T$ Cauchy sequence there exists by definition $Tx_n = y_n$. By the inequality of bounded inverse we know $x_n$ is also a Cauchy sequence in $X$ and admits a limit $x$. By continuity and completeness we know $\lim_n y_n \in \ran T$. 
+\end{proof}
+
+\begin{corollary}
+	Given a Banach space $X$ with 2 norms $\|\cdot\|_1$ and $\|\cdot\|_2$, if we have
+	\begin{align*}
+		\forall x \in X: \|x\|_1 \le M \|x\|_2
+	\end{align*}
+	then $\|\|_1, \|\|_2$ are equivalent.
+\end{corollary}
+
+
+
+
+ 
+
+\subsection{Adjoint Operator}
+The adjoint operator is the infinite dimensional generalisation of the transpose operator in the context of bilinear mapping. Although the dual space is in general a much larger space, we observe there exists an isometric isomorphism between 
+\begin{align*}
+	L(X, Y) \approxeq L(Y^*, X^*). 
+\end{align*}
+\begin{definition}[adjoint operator]
+	Given $X, Y$ NLS and $A \in L(X,Y)$, we call $A^* \in L(Y', X') $ the adjoint (or the dual) of $A$, if
+	\begin{align*}
+		\forall g \in Y', x \in X: (A^*g)x = g(Ax)
+	\end{align*}
+	To use the notation of , we may write:
+	\begin{align*}
+		\langle A^*g, x\rangle_{X^*,X} = \langle g, Ax\rangle_{Y^*, Y} \qquad \forall g \in Y^*, x \in X
+	\end{align*}
+\end{definition}
+
+\begin{example}
+Let $A: \mathbb{R}^n \rightarrow \mathbb{R}^m$ be a linear operator associate with matrix $A$, then we have
+\begin{align*}
+	(u, Av)_{\mathbb{R}^m} = (A^Tv, u)_{\mathbb{R}^n},\quad \forall u, \in \mathbb{R}^n, v \in \mathbb{R}^m
+\end{align*}	
+therefore the dual operator of $A$ is $A^T$. 
+\end{example}
+
+
+\begin{example}[the $L^p$ space]
+	Define $T_p: L^p \rightarrow L^p, f \rightarrow hf$ with $h \in L^\infty$. Notice $T_p \in L(L^p, L^p)$. Denote the inner product of integral operator as $\langle, \rangle$. We have:
+	\begin{align*}
+		\langle T_pf, g\rangle = \langle hf, g\rangle = \langle f, gh\rangle = \langle f, T_qg\rangle
+	\end{align*}
+\end{example}
+
+
+In the following we prove the adjoint operator is canonically and uniquely defined. 
+\begin{theorem}[Existence and uniqueness of the adjoint]
+	Let $A \in L(X, Y)$ for $X, Y$ NLS, there exists a unique adjoint of $A$ and we have
+	\begin{align*}
+		\|A\| = \|A^*\|
+	\end{align*}
+\end{theorem}
+\begin{proof}\quad\\
+\textbf{1. Existence}: $\forall g \in Y^*$, we define
+\begin{align*}
+	\langle A^*(g), x \rangle_{X^*, X} := \langle g \circ A,  x \rangle_{X^*, X}
+\end{align*}
+Notice it is well defined and linear.\\
+\textbf{2. uniqueness}: Assume there exists $\hat{A}^*$ with $\langle \hat{A}^*g, x \rangle_{X^*, X} = \langle g, Ax\rangle = \langle A^*g, x\rangle.$ Then we have :
+\begin{align*}
+	\forall x \in X: &\quad \langle \hat{A^*}g, x\rangle = \langle A^*g, x \rangle\\
+	\Leftrightarrow
+	\forall g \in Y^*: &\quad \hat{A^*} g = A^* g\\
+	\Leftrightarrow A^* = \hat{A^*} 
+\end{align*} 
+3. \textbf{boundedness}
+\begin{align*}
+	\|A^*\| &= \sup_{\|g\|_{Y^*} = 1} \|A^* g\|_{X^*}\\
+	&= \sup_g \sup_{\|x\| = 1}|\langle A^*g, x \rangle|\\
+	&= \sup_g \sup_x |\langle g, Ax\rangle|\\
+	&\le \sup_x |Ax|\\
+	&= \|A\|
+\end{align*}
+4.$\|A\| = \|A^*\|$: Already proved $\|A^*\| \le \|A\|$. For a converse, recall by Hahn-Banach, $\forall Ax \in Y \exists g \in Y^*: g(Ax) = Ax, \|g\|_{Y^*} = 1$. Therefore
+\begin{align*}
+	\|A\| &= \sup_x \frac{\|Ax\|}{\|x\|}\\
+	&= \sup_x\frac{g(Ax)}{\|x\|}\\
+	&= \sup_x \frac{|\langle A^*g , x\rangle |}{\|x\|}\\
+	&\le \|A^*\|
+\end{align*}
+\end{proof}
+
+\begin{definition}[The annihilator]
+Given a NLS $X$ and $M \subset X$, $N \subset X^*$ we define
+\begin{itemize}
+	\item $M^\perp := \{f \in X^*| \forall m \in M: f(m) = 0\}$
+	\item ${}^\perp N:= \{x \in X| \forall f \in N: f(x) = 0\} = \bigcap_{f \in N} \ker (f)$
+\end{itemize}
+\end{definition}
+
+
+\subsection{Closed Range And The Inverse Problems}
+This section refers to \texttt{Dirk Werner}. \par 
+ We proved in the section of adjoint operator that for an bounded linear operator with closed range, the existence of a solution for $Tx = y$ has the necessary and sufficient condition:
+\begin{align*}
+	y^* \in \ker T^* \Rightarrow y^*(y) = 0
+\end{align*}
+This section provides a tool to prove the assumption that $\ran T$ is closed. As a consequence, the BNB theorem will be proved.
+
+ We introduce the adjoint operator to discuss the existence of solution of an operator equality. We know the kernel of a continuous map is always closed. But the range in general is not(consider the embedding $C[0, 1] \hookrightarrow L^1[0, 1]$).
+ 
+
+ 
+\begin{lemma}
+Given $T \in L(X, Y)$,
+	\begin{align*}
+		\overline{\ran T} = {}^\perp (\ker T^*)
+	\end{align*}
+\end{lemma}
+\begin{proof}
+\quad\\
+$"\subseteqq"$: suppose $y \in \ran T$, we have
+\begin{align*}
+	y^*(y) = \langle y^*, T x \rangle = \langle T^* y ^*, x\rangle
+\end{align*}
+For $y^* \in \ker T^*$ we have $\langle A^* y^*, x \rangle = \langle \textbf{0}, x \rangle = 0$. therefore $y \in {}^\perp \ker T^*$ and since the annihilator is closed we have $\overline{\ran(T)} \subset {}^\perp (\ker T^*)$. \\
+$"\supseteqq":$ w.t.s. $y_0 \notin \ran T \Rightarrow y_0 \notin {}^\perp \ker T^*$: Since $\overline{\ran T}$ closed in $Y$, by Hahn-Banach there exists $y^* \in Y^*$ such that $y^*|_{\overline{\ran T}} = 0$ and $y^*(y_0) \neq 0$. Therefore for all $y \in \ran T$:
+\begin{align*}
+	&\langle y^*, y\rangle =  \langle y^*, Tx \rangle = 0 \quad \forall x \in X \\
+	\Rightarrow & \langle T^* y^*, x \rangle = 0  \quad \forall x \in X\\
+	\Rightarrow & y^* \in \ker T^*
+\end{align*}
+however $y^*(y_0) = \langle y^*, Tx_0 \rangle = \langle T^* y^*, x_0 \rangle  \neq 0 $, i.e., $y^* \notin \ker T^*$. \Lightning
+\end{proof}
+
+We will see in the corollary that for the operator with closed range, the existence of a solution for $Tx = y$ is related to the annihilator of $\ker T^*$.
+\begin{corollary}[A non-degenerate condition]
+Given the operator equation
+\begin{align*}
+	Tx = y.
+\end{align*}
+If the operator $T$ admits a closed range, the $y$ has an inverse $x = T^{-1}y$ if and only if
+	\begin{align*}
+		\forall y^* \in \ker T^* : y^*(y) = 0
+	\end{align*}
+	in particular, \textbf{surjectivity of $T$ is equivalent to trivial kernel of $T^*$.}. 
+\end{corollary}
+
+\begin{corollary}
+	Given $X, Y$ Banach space and $T \in L(X, Y)$, $T^*$ is injective if and only if  $\ran(A)$ is dense in $Y$.
+\end{corollary}
+
+\begin{lemma}[Observability Inequality]
+	Given $X$ and $Y$ Banach space, $T\in L(X,Y)$, if there exists $c > 0$ with 
+	\begin{align*}
+		c\|y^*\|_{Y^*} \le \|T^*(y^*)\|_{X^*} \quad \forall y^* \in Y^*
+	\end{align*}
+	then $T$ is open, in particular, $T$ is surjective. 
+\end{lemma}
+\begin{proof}
+Define
+\begin{align*}
+	U_\epsilon = \{x \in X: \|x\| \le \epsilon \}\\
+	V_\epsilon = \{y \in Y: \|y\| \le \epsilon \}
+\end{align*}
+	To show $T$ is open, recall that we need to show $V_c \subset T(U_1)$, i.e., the image of open unit ball contains some open ball in $Y$ .\par 
+	Assume $c >0$ arbitrary, $y_0 \in V_c$. Assuming by contradiction $y_0 \notin \overline{T(U_1)}$. By the separation theorem (since the set is convex and closed),  there exists $y^* \in Y^*$, such that
+	\begin{align*}
+		y^*(\overline{T(U_1)}) \le \alpha < y^*(y_0)
+	\end{align*}
+	On the other hand for all $x \in U_1$ 
+	\begin{align*}
+		\|T^*y^*\| = \sup_{x \in U_1} \langle T^*y^*, x\rangle = \sup_{x \in U_1} \langle y^*, Tx\rangle  \overset{above}{< } y^*(y_0) \le \|y^*\|c
+	\end{align*}
+	which contradicts to the assumption.
+\end{proof}
+\begin{remark}
+If $T^*$ is injective the range of $T$ is only dense in $Y$, however if the observability inequality is satisfied, we have the surjectivity, in particular, the original mapping $T$ is open. 	
+\end{remark}
+
+
+
+
+
+\begin{lemma}\quad
+	\begin{enumerate}
+		\item ${}^\perp(M^\perp) = \overline{M}$.
+		\item $M^\perp = X' \Leftrightarrow M = \{0\}$.
+		\item $N \subset X'$ dense $\Rightarrow {}^\perp N = \{0\}$, in particular if $X$ reflexiv, the inverse holds.
+	\end{enumerate}
+\end{lemma}
+\begin{example}[${}^\perp(M^\perp) \neq M$]
+	$X$ a Banach space, $M\subset X$ open subset. $M^\perp := \{f \in X': f|_M  = 0 \}$. And ${}^\perp (M^\perp) = \{x \in X: f(x) = 0 \quad \forall f \in M^\perp \}$. Since arbitrary intersection of closed sets are closed we know it's closed. However $M$ is open 
+\end{example}
+\begin{remark}
+if $M$ is already closed, we get the identity, which provides us with a criteria to identify the closed set	
+\end{remark}
+
+\begin{proof}
+	\quad\\
+	1).$"\supset":$ $\forall m \in M, f \in M^\perp: f(m) = 0 \Rightarrow M \in {}^\perp (M^\perp)$. Also since the annihilator is intersection of closed set therefore closed, we have $\overline{M} \subset {}^\perp (M^\perp)$.\\
+	$"\subset"$:For the inverse direction we only need to find $\forall x  \in X\slash \overline{M}$ a $f$ with $f(x) \neq 0$ and $f(\overline{M}) = 0$. Indeed, by the 2.corollary of Hahn-Banach we may find such $f$. Therefore $x \notin {}^\perp (M^\perp)$\\
+\end{proof}
+
+
+	
+
+
+\begin{theorem}[The closed range theorem]
+	Given $X, Y$ Banach space and $A \in L(X,Y)$, the followings are equivalent
+	\begin{enumerate}
+		\item $\ran(A)$ is closed
+		\item $\ran(A^*)$ is closed
+		\item $\ran(A^*) = \ker(A)^\perp$
+		\item $\ran(A) = {}^\perp\ker(A^*)$ 
+	\end{enumerate}
+\end{theorem}
+\begin{proof}\quad\\
+$2)\Rightarrow 1)$: Define $Z:= ran(A)$ and define $B \in L(X,Z)$ with $Bx = Ax$. First we show $ran(A^*) = ran(B^*)$, indeed for all $y \in Y^*:$
+\begin{align*}
+	\langle A^*y^*, x\rangle &= \langle y^*, Ax\rangle\\
+	&= \langle y^*|_Z, Bx\rangle\\
+	&= \langle B^* y^*|_Z, x \rangle \\
+	\Rightarrow \ran(A^*) &\subset \ran(B^*)
+\end{align*}
+On the other hand $\forall z^* \in Z$, we can find $y^* \in Y^*$ such that 
+\begin{align*}
+	A^* y^* &= B^* z^*\\
+	\Rightarrow \ran(B^*) &\subset \ran(A^*)
+\end{align*}
+($\langle B^* z^*, x\rangle = \langle z^*, Bx\rangle = \langle z^*, Ax\rangle = \langle A^* z^*, x\rangle$)
+\end{proof}
+
+Recall the important theorem we prove in the section of adjoint operator about the observability inequality:
+\begin{align*}
+	T\texttt{ surjective } \Leftrightarrow \|T^* y^*\| \ge c \|y^*\|
+\end{align*}
+Together with the closed range theorem we may prove the following result. 
+
+\begin{corollary}
+	Given $X, Y$ Banach space and $A \in L(X, Y)$, $A$ is bijective iff $A^*$ is bijective.
+\end{corollary}
+\begin{proof}
+Surjective is clear by the observability inequality. For the injectivity:\\
+$\Rightarrow$: $\ran T = Y \Rightarrow {}_\perp \ker T^* = Y \Rightarrow \ker T^* = \{0 \}$ \\
+$\Leftarrow$: Analoge.  
+\end{proof}
+
+\begin{corollary}
+	Given a linear form $T \in L(X, Y)$, the following statements are equivalent
+	\begin{enumerate}
+		\item $T$ is bijective
+		\item 
+		\begin{itemize}
+			\item $\exists c > 0: \|Tx \|_Y \ge  c \|x\|_X$.
+			\item $T^* y^* = 0 \Rightarrow y^* = 0$
+		\end{itemize}
+		\item
+		\begin{itemize}
+			\item There exists a constant $\alpha$, such that
+			\begin{align*}
+			\inf_{\|x\| = 1} \sup_{\|y^*\| = 1} \langle y^*, Tx \rangle \ge \alpha
+			\end{align*}
+			\item $\forall x \in X: \langle y^*, Tx \rangle = 0 \Rightarrow y^* = 0$
+		\end{itemize}
+	\end{enumerate}
+\end{corollary}
+\begin{proof}\quad\\
+	$\textbf{1)} \Leftrightarrow \textbf{2)}$: The inequality of bounded inverse implies that $T$ is injective, the non-degeneracy condition implies $T$ is surjective. Conversely the surjectivity implies the inequality of bounded inverse by open mapping and the non-degeneracy condition by the closed range theorem. \\
+	$\textbf{2)} \Leftrightarrow \textbf{3)}$: Reformulation. 
+\end{proof}
+
+We now associate the linear operator $T \in L(X_1, X_2^*)$ with some bilinear form $a \in L(X_1 \times X_2, \mathbb{R})$ such that 
+\begin{align*}
+	a(x_1, x_2 ) = \langle T x_1, x_2 \rangle_{X_2^*, X_2} 
+\end{align*}
+and prove that $T$ is bijective. 
+
+\begin{theorem}[the BNB theorem]
+	If $X_2$ is reflexive, $X_1$ is Banach, then the following statements are equivalent:
+	\begin{enumerate}
+		\item $\forall f \in X^*_2 \exists ! u \in X_1: a(u, x_2) = f(x_2)$ for all $x_2$. 
+		\item \begin{itemize}
+			\item There exists a $\alpha > 0$, such that
+			\begin{align*}
+				\inf_{\|x_1\| = 1} \sup_{\|x_2\| = 1} a(x_1, x_2) \ge \alpha
+			\end{align*}
+			\item $\forall x_1: a(x_1, x_2) = 0 \Rightarrow x_2 = 0$
+		\end{itemize}
+	\end{enumerate}
+\end{theorem}
+\begin{proof}\quad\\
+1. \\
+2. Observe $a(x_1,  \cdot)$ as $Ax_1$, then the surjectivity condition above is equivalent to for $x_2 \in X_2^* \approx X_2^*$ 
+\begin{align*}
+	\langle x_2, Ax_1 \rangle \quad \forall x_1 \Rightarrow 
+\end{align*}
+\end{proof}
+
+
+
+
+\subsection{Closed graphs}
+\begin{definition}[closed graph]
+	Given a normed space $X$ and $Y$, a mapping $T: X \rightarrow Y$ is called closed if $\forall x_n \rightarrow x \in X:$
+	\begin{align*}
+		 Tx_n \text{ converges} \Rightarrow Tx_n \rightarrow Tx
+	\end{align*}
+\end{definition}
+\begin{remark}
+For the continuity we drop the condition $Tx_n$ converges. Namely for a closed graph, there could be $x_n \rightarrow x$ with $Tx_n \nrightarrow Tx$. 	
+\end{remark}
+
+\begin{example}[DUIS]
+	Given $X = C[-1, 1]$, $D = C^1[-1, 1]$. The differential operator $T D \rightarrow X$ with $Tx = \dot{x}$ 
+\end{example}
+
+\begin{lemma}
+	Given $X$ and $Y$ Banach space and $D \subset X$ a subspace, $T: X \supset D \rightarrow Y$ closed, then we have:
+	\begin{itemize}
+		\item $(D, \| \cdot \|_G)$ with $\|x\|_G:= \|x\| + \|Tx\|$ is a Banach space.
+		\item $T: (D, \|\|_G) \rightarrow Y$ is continuous.
+	\end{itemize}
+	$\|\dot\|_G$ is called the graph norm.
+\end{lemma}
+\begin{proof}
+\quad\\
+1)By the closeness of $T$, $x_n \rightarrow x \Rightarrow Tx_n \rightarrow Tx$. 
+\end{proof}
+
+\begin{theorem}[closed graph theorem]
+	Given $X$, $Y$ Banach space, if a linear mapping $T: X \rightarrow Y$ is closed, then $T$ is continuous(bounded)
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+
+
+\newpage
+\section{Weak Convergence}
+\subsection{Weak and weak* topology}
+\begin{definition}[seminorm]
+	Given a vector space $X$, a seminorm is defined as $s: X \rightarrow \mathbb{R}$ that satisfies all the properties of a norm except the positive-definiteness, i.e. it's non-negative, homogeneous, and satisfies the triangular inequality.
+\end{definition}
+
+\begin{definition}[locally convex space(LCS)]
+	Given a vector space and a family of semi-norm, the space is locally convex if it admits the smallest topology formed by the \textbf{subbasis}:
+	\begin{equation*}
+		\bigg\{B^\alpha_R(x_0)\bigg|B^\alpha_R(x_0):= \{ x \in X : \|x - x_0\|_\alpha < R \} \quad \forall \alpha, R>0 \bigg\}
+	\end{equation*}
+	and $\|x\|_\alpha = 0, \forall \alpha \Rightarrow x = 0$
+\end{definition}
+
+\begin{theorem}[Properties of LCS]
+	The locally convex space has the following properties:
+	\begin{enumerate}
+		\item The LCS is a topological vector space
+		\item $x_n \rightarrow x$ in X $\Leftrightarrow$ $\|x - x_n\|_\alpha \rightarrow 0,  \forall \alpha \in I$
+		\item  $U \subset X$ open $\Leftrightarrow$ $\forall x_0 \in U \exists  I_0 < \infty: \bigcap_{\alpha \in  I_0} B_{\epsilon_i}^\alpha(x_0) \subset U$
+	\end{enumerate}
+\end{theorem}
+\begin{proof}
+First keep in mind that a set is open iff it is finite intersection of balls.
+\begin{enumerate}
+	\item trivial
+	\item trivial
+	\item $\forall x_0 \in U$ open: $U = \cap B_{\alpha_i}^{R_i}(x_i)$, by the triangular inequality we know there exists $\cap B_{\alpha_i}^{\tilde{R}_i}(x_0) \subset \cap B_{\alpha_i}^{R_i}(x_i)$
+\end{enumerate}
+\end{proof}
+
+
+
+
+
+\begin{definition}[weak topology and weakly convergence]
+	 The weak topology on a space $E$ is the locally convex topology generated by the family of seminorm $\|x\|_1 := |\Lambda(x)|$ for $\Lambda \in E^*$. It is the smallest topology that contains all the open balls of the form:
+	 \begin{equation*}
+	 	B_\epsilon^\Lambda (x_0) = \{x \in E | |\Lambda(x_0) - \Lambda(x)| < \epsilon \}
+	 \end{equation*}
+	 After defining the open balls in $E$ we can define the \textbf{weak-convergence} $ x_n \rightharpoonup x$ in $E$:
+	 \begin{align*}
+	 	\forall \epsilon > 0 \forall \Lambda \in E^*: 
+	 	x_n \in B^\Lambda_\epsilon(x) \qquad \text{for $n$ sufficiently large}
+	 \end{align*} 
+	In a \textbf{Hilbert space} $H$, 
+	\begin{align*}
+		x_k \rightharpoonup x \Leftrightarrow \forall \Lambda \in H^*: \Lambda(x_k) \rightarrow \Lambda(x)
+	\end{align*}
+\end{definition}
+\begin{remark}[locally convex topology]
+when we talk about convergent, the related topology should always be in the background. For 	the metric space it's natural. The topology would be the induced \textbf{norm topology.} However for weak convergence we generally don't have a norm but only \textbf{family of seminorms}. A open ball of this topology has the form $B_\Lambda(x_0) = \{x | |\Lambda(x) - \Lambda(x_0) < \epsilon\}$. The \textbf{weak} convergence is therefore defined as convergence in \textbf{all} of the open balls. Topology of this kind is called the \textbf{locally convex topology.}
+\end{remark}
+
+\begin{example}[Weak convergent but not strong convergent sequence]	
+\end{example}
+
+\begin{remark}\quad
+\begin{enumerate}
+	\item Strong  convergence implies weak convergence. In finite dimension, weak convergence implies strong convergence. If $\dim X = \infty$ normally (2) does not hold.
+	\item Weak topology is in general not metrizable.
+	\item weak topology on $E$ is the smallest topology, such that every bounded linear functional in $E^*$ is continuous.
+	\item The norm of $E$ is in general not a continuous function with respect to the weak topology. 
+\end{enumerate}
+\end{remark}
+
+
+\begin{definition}[weak* topology(Bidual space and Evaluation map)]
+For the space $E$ equipped with weak topology there is a natural topology on its dual space $E^*$, defined by the family of \textbf{seminorms}, $\forall x \in E$:
+\begin{align*}
+	  \| \cdot\|_x: E^* \rightarrow \mathbb{R},\Lambda \mapsto |\Lambda(x)| 
+\end{align*}
+we call it the \textbf{weak* topology}. In a word, it is the evaluation norm of a bounded linear function. We may define accordingly the \textbf{weak* convergent} sequence in $E^*$:
+\begin{align*}
+	T_n \overset{*}{\rightharpoonup} T: \forall x \in E: T_nx \rightarrow Tx
+\end{align*}
+\end{definition}
+\begin{remark}
+\textbf{The bidual space $E^{**}$ is always bigger than $E$.} We can see every $\varphi \in E$ defines a linear functional on the dual space $E^*$, namely we have the natural inclusion $E \nearrow E^{**}$(by the evaluation map). If the Space is reflexive the inclusion is also surjective.		
+\end{remark}
+
+
+\begin{example}[Heat kernel]	
+In the dual space, perhaps the most frequently used functional is:
+\begin{align*}
+	\delta_0^* : \forall \varphi \in H: \delta_0^*(\varphi) =  \langle \delta_0, \varphi \rangle = \varphi(0)
+\end{align*}
+In this case we can see the semi-norm 
+\begin{align*}
+	\|\delta_0^*\|_{\varphi} = \varphi(0)
+\end{align*}
+\end{example}
+
+\begin{theorem}[Mazur's lemma]
+	Given a NLS $X$ and $x_n \overset{w}{\rightarrow} x$, then there exists $y_j \in \overline{\texttt{conv}(x_i, \dots, x_i \dots)}$, such that 
+	\begin{align*}
+		y_j \overset{strong}{\rightarrow} x
+	\end{align*}
+\end{theorem}
+
+\subsection{The weak compactness}
+\begin{definition}[Weakly compact]
+	A NLS $X$ is weakly compact if every bounded sequence admits a \textbf{weakly} convergent subsequence.
+\end{definition}
+
+\begin{theorem}[Banach-Alaoglu theorem(seperable case)]
+	Assume $E$ is a separable normed vector Banach space, then bounded linear sequence in $E^*$ have $weak^*$ convergent subsequence.
+\end{theorem}
+\begin{proof}
+	Use Cantor-diagonal and $\frac{\epsilon}{3}$ argument. Given $T_n \in E^*$,$\|T_n\| < \infty$ and $F \subset E$ a countable dense subset, since $\|T_n\| < \infty$, we know for $x_1 \in F$,  $(T_n x_1)_n < \infty $. We can therefore find a convergent subsequence:
+	\begin{align*}
+		&T_n^1: T_n^1(x_1) \rightarrow T_n^1(x_1)
+	\end{align*} 
+	from $T_n^1$ we construct further $T_n^2$, such that $T_n^2$ converges pointwise for $x_1, x_2$, inductively we construct:
+	\begin{align*}
+		T_n^m: T_n^m(y) \rightarrow T_n^m(y) \quad \forall y \in \{x_1, \dots, x_m\}
+	\end{align*}
+	we show that $(T_n^m)_{m\in \mathbb{N}}$ is the convergent subsequence we are looking for, indeed, $\forall x \in E \exists y \in F: \|x - y\|\le \epsilon$:
+	\begin{align*}
+		\|T_n^m(x) - T_n^l(x)\| &\le \|T_n^m(x) - T_n^m(y)\| + \|T_n^m(y) - T_n^l(y)\| + \|T_n^l(y) - T_n^l(x)\|\\
+		&\le \epsilon
+	\end{align*}
+	we see we defined a Cauchy sequence in $E^*$ w.r.t. the weak* topology. By the completeness of the dual space we know this Cauchy sequence is convergent, we may also define the limit explicitly:
+	\begin{align*}
+		Tx := \lim_{n \in \mathbb{N}} T_n x
+	\end{align*}
+\end{proof}
+
+\begin{corollary}
+	A reflexive Banach space $X$ is weakly compact. i.e. every bounded sequence $x_n$ in $X$ admits a weakly convergent subsequence $x_{n_k}$.
+\end{corollary}
+\begin{proof}
+	By Banach-Alaoglu 
+\end{proof}
+
+\begin{theorem}
+	If $E$ is a uniformly convex Banach space and $x_n \in E$ is a sequence with  and , then 
+	\begin{equation*}
+		\|x_n\| \rightarrow \|x\| \quad and \quad x_n \rightharpoonup x \Rightarrow \|x - x_n\| \rightarrow 0
+	\end{equation*}
+\end{theorem}
+
+
+
+\subsection{Convexity And Direct Method of Calculus Variation}
+\subsubsection{convex analysis}
+\begin{theorem}
+	Given $X$ a NLS and $M\subset X$ a \textbf{closed and convex}, then $M$ is closed with respect to the weak topology
+\end{theorem}
+\begin{proof}
+	
+\end{proof}
+
+\begin{corollary}[Mazur]
+	Given $x_n \rightharpoonup x$, then there exists a sequence $y_n$ in $convex\{x_1, \dots, x_n, \dots \}$ with 
+	\begin{align*}
+		\lim_{n \in \mathbb{N}} y_n = x
+	\end{align*}
+\end{corollary}
+
+\begin{definition}[weak convergence in $L^p$ space]
+For a measure space $1 \leq p < \infty$ such that either $p>1$ or $X$ is $\sigma-$finite. $\frac{1}{p} + \frac{1}{q} = 1$, for $f_n, f \in L^p(X)$, we say
+\begin{equation*}
+	f_n \rightharpoonup f \Leftrightarrow \forall g \in L^q :   \int \langle f_n, g \rangle d\mu \rightarrow \int \langle f, g \rangle d\mu 
+\end{equation*}
+\end{definition}
+\begin{remark}
+For $p = \infty$ the weak convergence is well-defined but can't be called weak convergence since $L^1 \subsetneq (L^\infty)^*$	
+\end{remark}
+
+
+
+\newpage
+\section{Absolute Continuity}
+\subsection{AC functions and Differentiation}
+\textbf{Question: What is the largest class of functions on a compact interval $[a, b]$ such that }
+\begin{align*}
+	f(b) = \int_a^b f'd\mu + f(a)
+\end{align*}
+holds? Is it enough that $f$ is a.e. differentiable?
+
+\begin{definition}[bounded variation]
+    Given a function $f : [a, b] \to \mathbb{R}$, define its \textbf{total variation} by
+    \begin{align*}
+        TV(f) := \sup\left\{ \sum_{i=1}^N |f(x_i) - f(x_{i-1})| \;\middle|\; N \geq 1,\ a = x_0 \leq x_1 \leq \cdots \leq x_N = b \right\} \in [0, \infty].
+    \end{align*}
+    We say $f$ is of \textbf{bounded variation} if $TV(f) < \infty$.
+\end{definition}
+
+
+\begin{example}
+Cantor function is a counter example where the fundamental theorem:
+\begin{align*}
+	F(a) = \int_0^a f(t) dt
+\end{align*}	
+doesn't hold, despite the fact that $F$ is continuous and a.s. differentiable.
+\end{example}
+
+\begin{definition}[Locally integrable functions $L^p_{loc}$]
+	The locally $p-$integrable space is defined as the vector space:
+	\begin{align*}
+		L^p_{loc}(\Omega):= 
+		\bigg\{ f : \Omega \rightarrow V: f \in L^p(K) \quad \forall K \subset \subset \Omega \bigg\} \slash \sim
+	\end{align*}
+	where "$\subset\subset$" means compactly supported and "$\sim$" means the equivalent class of $f = g$ a.e..
+\end{definition}
+
+\begin{example}[$W^{1,1} \subsetneqq L^1_{loc}$]
+\quad\\
+\textbf{1).} The locally integral functions includes for instance the constant functions, which are not integrable unless $m(\Omega)< \infty$.\\
+\textbf{2).}
+	$f:= |x|$ admits the weak derivative $f'= \frac{x}{|x|}$, show that $f'$ is not weak differentiable. 
+\end{example}
+
+\begin{lemma}[non-concentration argument]
+	Given $(\Omega, \mu)$ a measurable space, $f \in L^1(\Omega)$:
+	\begin{align*}
+		\forall \epsilon > 0 \exists \delta > 0 \forall A \text{ measurable with } \mu(A) < \delta : \int_A |f|d\mu \le \epsilon
+	\end{align*}
+\end{lemma}
+\begin{proof}
+	Assuming otherwise for the dyadic cube $A_n$:
+	\begin{align*}
+		\mu(A_n) \le \frac{1}{2^n} \quad
+		\text{but} 
+		\quad
+		\int_{A_n}|f| d\mu > \epsilon
+	\end{align*}
+	define the onion sets
+	\begin{align*}
+		B_n := \bigcup_{k = n}^\infty A_n
+	\end{align*}
+	we see $\mu(B_n) = \frac{1}{2^{n-1}} \downarrow 0$ , we have therefore
+	\begin{align*}
+		\int_{B_n} |f| d\mu \rightarrow 0
+	\end{align*}
+	However
+	\begin{align*}
+		\int_{B_n} |f|d\mu \geq \int_{A_n}|f|d\mu \ge \epsilon 
+	\end{align*}
+\end{proof}
+
+\quad\\
+\textbf{Relation to the differentiation:}\\
+In the spirit of the last lemma, if we were to define
+\begin{align*}
+	F(x) = \int_a^x f d\mu
+\end{align*}
+then for $A \subset \Omega$ with $m(A) < \delta$, we must have:
+\begin{align*}
+	\sum_{j = 1}^N |F(b_j) - F(a_j)| &= \sum_{j = 1}^N \bigg|\int_{a^j}^{b_j}fdm\bigg|\\
+	&\le \sum_{j = 1}^N\int_{a_j}^{b_j}|f|dm\\
+	&\le \int_A|f|dm \\
+	&\le \epsilon
+\end{align*}
+That motivates the following definition. 
+
+\begin{definition}[absolutely continuous functions]
+	A function $F$ on the interval is called \textbf{absolutely continuous} if:
+	\begin{align*}
+		\forall \epsilon > 0 \exists \delta > 0 \forall P_I  \textbf{  finite partition of $I$}: \sum_{j = 1}^N (b_j - a_j) \leq \delta \Rightarrow \sum_{j = 1}^N |F(b_j) - F(a_j)| \leq \epsilon
+	\end{align*}
+\end{definition}
+
+\begin{theorem}
+For a function $f$ defined on a non-trivial compact interval $[a, b]$. The followings are equivalent:
+\begin{enumerate}
+	\item $f$ is absolutely continuous
+	\item $f$ is a.e. differentiable and $f(x) = f(a) + \int_a^x gdm$ for some $g \in L^1([a, b])$. 
+\end{enumerate}
+\end{theorem}
+\begin{proof}\quad\\
+\textbf{2) $\rightarrow$ 1)}
+Given $P_I$ an arbitrary finite partition of $I$ with , we have
+\begin{align*}
+	\sum_{i \in I} |f(b_i) - f(a_i)| &= \sum_{i \in I}|\int_{a_i}^{b_i} f'dm|\quad(\texttt{condition (2)})\\
+	&= \int_If'dm \quad \texttt{(finite additivity of integral)}  \\
+	&
+\end{align*}
+\textbf{1) $\rightarrow$ 2)} we prove this direction in 2 steps:
+\begin{enumerate}
+	\item Every absolutely continuous function could be written as 
+		\begin{align*}
+			F(x) = F(a) + \int_a^x gdm 
+		\end{align*}
+		for some $g \in L^1([a, b])$. \texttt{(Radom-Nikodym)}
+	\item The absolute continuous function of the form given above is a.e. differentiable. \texttt{(Lebesgue differentiation theorem)}
+\end{enumerate}
+\end{proof}
+
+
+\subsection{Lebesgue Differentiation theorem}
+\begin{definition}[Lebesgue point]
+	For $f \in L_{loc}^1(\mathbb{R}^n$), $ x \in \mathbb{R}^n$ is a Lebesgue point if:
+	\begin{align*}
+		\lim_{r \rightarrow 0^+}\frac{1}{m(B_r(x))} \int_{B_r(x)}|f(y) - f(x)|dy = 0
+	\end{align*}
+	whenever we have a Lebesgue point $x$, we have
+	\begin{align*}
+		\lim_{r \rightarrow 0^+}\frac{1}{m(B_r(x))} \int_{B_r(x)} f(y) dy = f(x)
+	\end{align*}
+\end{definition}
+\begin{remark}[Relation between differentiation and Lebesgue point]
+\quad\\
+1. To see the relation above holds, observe:
+\begin{align*}
+	\bigg|\frac{1}{B_r(x))}\int_{B_r(x)} f dm - f(x)\bigg| &\le 
+	\frac{1}{B_r(x)} \int_{B_r(x)} |f(y) - f(x)|dy\\
+	&\rightarrow 0
+\end{align*}
+2. To see the relation to the differentiation, observe if $x$ is a Lebesgue point, then:
+\begin{align*}
+	\frac{F(x + h) - F(x)}{h} - f(x) &= \frac{1}{h} \int_x^{x + h}f(y) dy - f(x)\texttt{(Form given by the a.c.functions)}\\
+	&\le \frac{1}{2h}\int_x^{x + h} |f(y) - f(x)| dy \\
+	& \rightarrow 0 \texttt{ (Lebesgue point)}
+\end{align*}
+\end{remark}
+
+\begin{lemma}[Continuous approximation to prove Lebesgue point]
+	For $f \in L^1(\mathbb{R}^n)$. Observe:
+	\begin{align*}
+		f^r(x)&:= \frac{1}{m(B_r(x))} \int_{B_r(x)} |f - f(x)|dm\\ f^0(x)&:= \limsup_{r \rightarrow 0}f^r(x) 
+	\end{align*}
+	For every $N \in \mathbb{N}$, define
+	\begin{align*}
+		A_N:= \bigg\{x \in \mathbb{R}^n| f^0(x) > \frac{1}{N}\bigg\}
+	\end{align*}
+	For every $N \in \mathbb{N}$, $A_N$ is contained in a Lebesgue  
+\end{lemma}
+\begin{remark}
+Observe for $f \in C(\mathbb{R}^n)$, $f^0(x)$ is always 0 and every point is a Lebesgue point(\texttt{fundamental theorem of calculas}). We may use the continuous function to approximate the $L^1$ function to get the result	
+\end{remark}
+
+\begin{proof}
+Choose $f_k \in C(\mathbb{R}^n)$ such that $f_k \overset{L^1}{\longrightarrow} f$ 
+	\begin{align*}
+		f^r(x) &= \frac{1}{m(B_r(x))} \int_{B_r(x)}|f - f(x)|dm\\
+		&= \frac{1}{m(B_r(x))}\int_{B_r(x)} |f - f_k| + |f_k - f_k(x)| + |f_k(x) - f(x)|dm\\
+		&= \frac{1}{m(B_r(x))}\bigg( \int_{B_r(x)} |f-f_k|dm + f^r_k(x) + |f_k(x) - f(x)|\bigg) \\
+		&\le M(|f - f_k| + f^r_k + |f_k(x) - f(x)|
+	\end{align*}
+	1. For the third term, by \textbf{Markov inequality} we have
+	\begin{align*}
+		m(x \in \mathbb{R}^n| |f(x) - f_k(x)| > \frac{1}{2N}) &\le 2N \|f - f_k\|_{L^1}\\
+		(\texttt{choose $k$ large enough)}
+		&\le \frac{1}{2N}
+	\end{align*}
+	2. For the second term, we know $f^0_k \overset{r \rightarrow 0}{\longrightarrow} 0$ by the continuity of $f_k$. \\
+	3. For the first term, we apply \textbf{Hardy-Littewood}, 
+	\begin{align*}
+		\{x \in \mathbb{R}^n| M|f_k - f| > \frac{1}{2N}\} \le 3^n\cdot 2N\|f - f_k\|_{L^1}\le \frac{1}{2N}
+	\end{align*}
+	by choose $k$ large enough. 
+\end{proof}
+
+
+\begin{theorem}[Lebesgue differentiation theorem]
+	For any $f \in L^1_{loc}(\mathbb{R}^n)$, almost every point is a Lebesgue point. 
+\end{theorem}
+\begin{proof}
+	
+\end{proof}
+
+\begin{corollary}	
+	For $f \in L^1([a, b])$, the function $F(x) := \int_a^x fdm$ is a.e. differentiable and satisfies 
+	\begin{align*}
+		F' = f
+	\end{align*}
+\end{corollary}
+
+
+\subsection{Maximal function and weak \texorpdfstring{$L^1$}{L\textasciicircum{}1}}
+\begin{definition}[maximal function]
+	For $f \in L_{loc}^1(\mathbb{R}^n)$, the maximal function is defined as :
+	\begin{align*}
+		Mf(x):= \sup_{r > 0}\frac{1}{B_r(x)}\int_{B_r(x)}|f|dm
+	\end{align*}
+\end{definition}
+\begin{remark}
+$Mf$ is a measurable function. It's not possible that the function is bounded pointwise. But with Markov inequality we can get an a.e. bound.
+\end{remark}
+
+\begin{definition}[Weakly integrable function]
+	A measurable function is called weakly integrable if there exists a constant $C > 0$, such that
+	\begin{align*}
+		\mu\{ x \in \Omega| |f(x) > t\} \le \frac{C}{t} \quad \forall t >0
+	\end{align*}
+	we denote this by $L^1_{weak}(\Omega)$. The functional space $L^1_{weak}(\Omega)$ is a metric space, however not a normed vector space with:
+	\begin{align*}
+		\|f\|_{L^1_{weak}}:= \sup_{t >0} t\mu\{x \in \Omega| |f(x)>t\}
+	\end{align*}
+\end{definition}
+
+\begin{lemma}[Vitali Covering lemma]
+	For every finite collection of open balls $B_{r_1}(x_1), B_{r_2}(x_2), \dots, B_{r_N}(x_N)$, there exists a subset $I \subset \{1, \dots, N\}$, such that 
+	\begin{enumerate}
+		\item $\forall i \neq j: B_{r_i}(x_i) \cap B_{r_j}(x_j) = \emptyset$
+		\item $\bigcup_{i \in N} B_{r_1}(x_i) \subset \bigcup_{j \in I} B_{3r_j}(x_j)$
+	\end{enumerate} 
+	In particular:
+	\begin{align*}
+		m(\bigcup_{i \in N} B_{r_1}(x_i)) \le 3^n m(\bigcup_{j \in I} B_{r_j}(x_j))
+	\end{align*}
+\end{lemma}
+
+\begin{theorem}[Hardy-Littewood]
+	There exists a constant $C > 0$ depending only on the dimension $n$ such that the estimate:
+	\begin{align*}
+		\|M f\|_{L^1_{weak}} \le C\|f\|_{L^1}
+	\end{align*} 
+\end{theorem}
+\begin{proof}
+Define:
+\begin{align*}
+	A_t:= \{x \in \mathbb{R}^n| f(x) > t\}, \qquad \|Mf\| = \sup_{t >0} t m(A_t)
+\end{align*}
+we would like to prove $\forall t > 0$:
+\begin{align*}
+	m(A_t) \le \frac{C\|f\|_{L^1}}{t}, \quad  C:= 3^n
+\end{align*}
+By the regularity of Lebesgue measure we only need to show $\forall K \subset A^t$ compact, the inequality above holds. By the compactness of $K$ we have an open cover of $K$ $\{B_1, \dots, B_N\}$, we have:
+\begin{align*}
+	m(K) &\le m(\bigcup_{i = 1}^N B_i)\texttt{(subadditivity)}\\
+	&\le 3^n \sum_{j = 1}^l m(B_j) (\texttt{lemma above}) \\
+	&\le 3^n \sum_{j = 1}^l \frac{\|f\|_{L^1}}{t}(\texttt{Markov inequlity)} \\
+	&\le 3^n \frac{\|f\|_{L^1}}{t}(\texttt{disjointness of $B_i$)}
+\end{align*}
+\end{proof}
+
+\subsection{The bounded variation}	
+\begin{definition}[norm of total variation $\&$ function of bounded variation]
+\begin{equation}
+	TV(f):= \sup \bigg\{ \sum_{i = 1}^N |f(x_i) - f(x_{i -1})| : \quad N \ge 1, a = x_0< x_1< \dots<x_N = b \bigg\}. 
+\end{equation}
+\end{definition}
+
+\begin{theorem}
+	Every monotone function $f:[a, b] \rightarrow \mathbb{R}$ is differentiable almost everywhere.
+\end{theorem}
+
+\begin{theorem}[Vitali's convergence theorem]
+\end{theorem}
+
+
+\newpage
+\section{Mollification}
+The central result of this section is the following:
+\begin{theorem}
+	$\forall p \in [1, \infty)$, $C^\infty(\mathbb{R}^n) \cap L^p(\mathbb{R}^n)$ is a dense subspace of $L^p(\mathbb{R}^n)$.
+\end{theorem}
+\begin{proof}
+see later. 
+\end{proof}
+
+\begin{remark}
+Bounded continuous function is \textbf{NOT} dense in $L^\infty(\mathbb{R}^n)$.	
+\begin{proof}
+	The continuous functions are closed under $L^\infty$ norm. Therefore some $L^\infty$ function can not approximated by the continuous functions.
+\end{proof}
+This Remark shows that the density is in the context of the \textbf{norm.} 
+\end{remark}
+
+\begin{corollary}
+	For every $p \in [1, \infty)$, and every open set $\Omega \subset \mathbb{R}^n$, $C_0^\infty(\Omega)$ is dense in $L^p(\Omega)$. 
+\end{corollary}
+\begin{proof}
+\quad\\
+\textbf{1.} Observe the  $\tilde{f} \in L^p(\mathbb{R}^n)$ defined as the trivial extension of $f$ to $\mathbb{R}^n$: 
+\begin{equation*}
+\tilde{f}:=\left\{ 
+\begin{aligned}
+	& f \texttt{ on } \Omega\\
+	& 0 \texttt{ on } \mathbb{R}^n \backslash\Omega
+\end{aligned}
+\right.
+\end{equation*}
+By mollification we have $f_\epsilon \in C^\infty(\mathbb{R}^n) \cap L^p(\mathbb{R}^n)$ approximating $\tilde{f}$. 
+\quad\\
+\textbf{2.} Define $\beta_N \in C^\infty_0( \Omega, [0, 1])$ with $\beta|_{\mathcal{U}_N} = 1$, it holds for $\mathcal{U}_N$ large enough, 
+\begin{align*}
+	\|f_\epsilon - \beta_N f_\epsilon \| \le \frac{\epsilon}{2}. 
+\end{align*} 
+By choose $f_\epsilon$ such that $\|f - f_\epsilon \|_{L^p} \le \frac{\epsilon}{2}$ we get the result. 
+\end{proof}
+\begin{remark}
+For bounded closed domain similar result might be able to achieved with $C_0^\infty(\overset{\circ}{\Omega}, \mathbb{R}^n)$. 	
+\end{remark}
+
+\subsection{The Convolution}
+\begin{definition}[the translation operator]
+	For $\nu \in \mathbb{R}^n$ and a function $f :\mathbb{R}^n \rightarrow V$, the translation operator $\tau_\nu$ produce a new function defined as:
+	\begin{equation*}
+		(\tau_\nu f) (x) = f(x + \nu)
+	\end{equation*}
+\end{definition}
+
+\begin{theorem}[Continuity under translation in $L^p(\mathbb{R}^n)$]
+For $1 \leq p < \infty$ and $f \in L^p(\mathbb{R}^n)$, the map
+\begin{equation*}
+	\mathbb{R}^n \rightarrow L^p(\mathbb{R}^n), \nu \rightarrowtail \tau_\nu(f)
+\end{equation*}
+is continuous.
+\end{theorem}
+\begin{remark}
+	Recall that pointwise convergence $x_n \rightarrow x_\infty \Rightarrow f(x_n) \rightarrow f(x_\infty)$ is the necessary and sufficient condition for the continuity of $f$. Naturally the condition is not true for general function in $L^p$. 
+	This theorem shows that $x_n \rightarrow x_\infty \Rightarrow f(x_n) \overset{L^p}{\rightarrow} f(x_\infty)$ is a necessary condition for the $L^p$ functions.
+\end{remark}
+\begin{proof}
+	Steps:
+	\begin{enumerate}
+		\item w.l.o.g. we only need to prove as $\nu \rightarrow 0, \|\tau_v f - f\| \rightarrow 0$. (By the property of semi-group operator $\tau_v$)
+		\item Since the set of characteristic function of  \textbf{dyadic cubes} is dense in $L^p(\mathbb{R}^n)$. We only need to prove the continuity at 0 in the dense subset. 
+		\item $\forall f \in \sum_j f_j \chi_{Q_j}$, 
+			\begin{equation*}
+				\|\tau_\nu f - f\|_p \leq \sum_j |f_j| \| \tau_\nu  \chi_{Q_j} - \chi_{Q_j}\|_p \rightarrow 0
+			\end{equation*}
+	\end{enumerate}
+\end{proof}
+
+\begin{definition}[Convolution]
+	The convolution of 2 scalar-valued function $f, g$ is defined as 
+	\begin{align*}
+		f*g(x) := \int_{\mathbb{R}^n}f(x-y)g(y)dy
+	\end{align*}
+\end{definition}
+\begin{remark}
+The assumption that $\Omega = \mathbb{R}^n$ can be relaxed by $f \in \Omega_r \rightarrow \mathbb{R}^n$, $g \in B_r(0) \rightarrow \mathbb{R}^n$ with 
+\begin{align*}
+	\Omega_r:= \{ x \in \mathbb{R}^n:\quad \dist(x, \Omega) < r \}. 
+\end{align*}	
+\end{remark}
+
+
+
+
+\begin{theorem}[DUIS of Convolution]
+	For any $f \in C_0^\infty(\mathbb{R}^n), g \in L^1_{loc}(\mathbb{R}^n)$, $f*g$ is smooth and for any multi-index $\alpha$:
+	\begin{align*}
+		\partial^\alpha(f*g) = (\partial^\alpha f) * g
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	Apply the DUIS:
+	\begin{enumerate}
+		\item $y \mapsto f(x)g(x-y)$ is integrable since the function for all $x$ since $f$ is compactly supported and continuous therefore uniformly continuous, hence uniformly bounded. $f(x - y)g(y)$ is supported on the translation of a compact set therefore is compactly supported. The integrabiliry follows from that $g \in L_{loc}^1(\mathbb{R}^n)$. 
+		\item $x \mapsto f(x)g(x-y)$ is continuous since $\forall y$ the function this function is smooth. 
+	\end{enumerate}
+\end{proof}
+\begin{remark}
+An application in the PDE would be taking $g$ the the fundamental solution and $f$ the data of $\Delta u$.	Notice it's a existence result regarding the differentiability of the convolution, which is dependant on the highest differentiability of $f$, under the assumption that $g$ is locally integrability.
+\end{remark}
+	
+
+Following an elegant application of Fubini and H\"older inequality. It shows the integrability of $f*g$ is at least the same as the highest of $f$ and $g$. 
+\begin{theorem}[Young's Inequality]
+For a arbitrary function $f\in L^1(\mathbb{R}^n)$ and $g \in L^p(\mathbb{R}^n)$. $1 \leq p \leq \infty$, We know $f*g$ is defined almost everywhere and
+	\begin{equation*}
+		\|f * g\|_{L^p} \leq \|f\|_{L^1} \|g\|_{L^p}
+	\end{equation*}
+\end{theorem}
+\begin{proof}\quad\\
+	1. The case where $p = \infty$ is straightforward.\\ 
+	2. Otherwise choose $q \in \mathbb{N}$ with $\frac{1}{p} + \frac{1}{q}= 1$. Then we decompose:
+	\begin{align*}
+		|f(x - y)g(y)| = |f(x-y)|^{\frac{1}{p}}|g(y)||f(x-y)|^{\frac{1}{q}}
+	\end{align*} 
+	Define for $x \in \mathbb{R}^n$
+	\begin{align*}
+		\varphi(x):= \int_{\mathbb{R}^n} |f(x - y) g(y)| dy. 
+	\end{align*}
+	Apply H\"older's inequality we have:
+	\begin{align*}
+		\varphi(x) 
+		&\leq \bigg(\int_{\mathbb{R}^n} |f(x-y)||g(y)|^p dy\bigg)^{\frac{1}{p}} \bigg(\int_{\mathbb{R}^n} |f(x - y)| dy \bigg)^\frac{1}{q}\\
+		&= \bigg(\int_{\mathbb{R}^n} |f(x-y)||g(y)|^p dy\bigg)^{\frac{1}{p}} \|f\|^{\frac{1}{q}}_{L^1}
+	\end{align*}
+	And apply Fubini
+	\begin{align*}
+		\|\varphi\|^p_p 
+		&\leq \int_{\mathbb{R}^n} \|f\|^{\frac{p}{q}}_{L^1} \bigg(\int_Y |f(x-y)||g(y)|^p dy\bigg) dx\\
+		&= \|f\|^\frac{p}{q}_{L^1} \int_{\mathbb{R}^n} |g(y)|^p dy \int_{\mathbb{R}^n} |f(x-y)|dx\\
+		&\leq \|f\|^{\frac{p+q}{q}}_{L^1} \|g\|_{L^p}^p\\
+		&= \|f\|^p_{L^1} \|g\|_{L^p}^p
+	\end{align*}
+\end{proof}
+\begin{remark}
+Implication of the theorem is that the convolution defines a continuous bilinear form:
+\begin{align*}
+	L^1(\mathbb{R}^n) \times L^p(\mathbb{R}^n) &\rightarrow L^p(\mathbb{R}^n)\\
+	(f, g) &\mapsto f * g
+\end{align*}	
+\end{remark}
+
+
+\subsection{Approximate identity}
+The object under consideration is the so called Dirac-$\delta$ function:
+\begin{align*}
+	\int_{\mathbb{R}^n} \delta(x) \varphi(x) dx \overset{j \rightarrow \infty}{\longrightarrow} \varphi(0),
+\end{align*}
+For any $\varphi$ in reasonable function class in $\mathbb{R}^n$. The function does the \textbf{point landing}. While $\delta$ is not an actual function it can be easily approximated by smooth functions---such an approximation is sometimes called a \textbf{mollifier.}
+
+\begin{definition}
+	A sequence of functions is called $\rho_j$ on $\mathbb{R}^n$ is said to have \textbf{shrinking support} if 
+	\begin{align*}
+		\forall \epsilon > 0 \exists N \in \mathbb{N} \forall j > N: \support\{\rho_j\} \subset B_\epsilon(0). 
+	\end{align*}
+\end{definition}
+
+\begin{definition}[Approximate Identity]
+$\rho_j: \mathbb{R}^n \rightarrow [0, \infty)$, is an approximation of identity if
+	\begin{equation}
+	 	\forall \varphi \in C^\infty_C(\mathbb{R}^n):\quad	\int \varphi(x) \rho_j(x) dx \rightarrow \varphi(0) \quad as \quad j \rightarrow \infty 
+	\end{equation}
+	(for every smooth compactly supported function $\varphi$.) 
+\end{definition}
+
+
+\begin{example}[Poisson Kernel]
+The fundamental solution $\Delta \Psi_d$ for the Laplace equation:
+\begin{equation*}
+	\forall \varphi \in C^\infty_C(\Omega):  \int \Psi_d \Delta \varphi dx = \int \delta_0 \varphi dx = \varphi(0)
+\end{equation*} 	
+The Poisson kernel is the function whose Laplacian is the Dirac-$\delta$ function in the weak sense.
+\end{example}
+
+\begin{example}[Heat Kernel]
+	In the time-dependence PDE, we have:
+	\begin{align*}
+		\lim_{t \rightarrow 0} H_d(t, x) \overset{weak}{\rightarrow} \delta_0 \quad \text{in } BC((0, \infty) \times \mathbb{R}^d)
+	\end{align*}
+\end{example}
+
+\begin{lemma}
+	A sequence of smooth functions with \textbf{shrinking support}$(\forall \epsilon \exists N \in \mathbb{N} \forall j > N: supp(\rho_j) \subset B_\epsilon(0))$ is an approximation of identity if and only if
+	\begin{equation*}
+		\int \rho_j dm \rightarrow 1 \quad as \quad j \rightarrow \infty
+	\end{equation*}
+	And in this case. the condition in the last definition holds not only for all smooth but also measurable $\varphi$ that are continuous at the origin.
+\end{lemma}
+\begin{proof}\quad\\
+$\Rightarrow$: Suppose $\rho_j$ is a mollifier with shrinking support, choose $\varphi$ that is $1$ on $B_j$:
+\begin{align*}
+	\int_{\mathbb{R}^n} \rho_j dm &= \int_{B_j} \rho_j \varphi dm\\
+	&\rightarrow \varphi(0) \\
+	&= 1
+\end{align*}
+$\Leftarrow$: Suppose $\int_{\mathbb{R}^n} \rho_j dm \rightarrow 1$:
+	
+\end{proof}
+
+The next theorem demonstrate: if this kind of approximate identity exists, then we are able to construct a sequence of pointwise convergent functions.
+
+\begin{theorem}
+	Let $\rho_j$ be approximate identity with shrinking support,  define:
+	\begin{equation*}
+		f_j: \mathbb{R}^n \rightarrow V, f_j(x) = f * \rho_j = \int f(x-y)\rho_j(y) dy
+	\end{equation*}
+	If $f \in L^p(\mathbb{R}^n)$ for some $p \in [1, \infty)$. Then 
+	\begin{enumerate}
+		\item $f_j \in C^\infty (\mathbb{R}^n) \quad \forall j \in \mathbb{N}$ 
+		\item and $\|f_j\|_p \leq C \|f\|_p \quad \forall j \in \mathbb{N} $
+		\item  $f_j \overset{L^p}{\rightarrow} f$ as $j \rightarrow \infty$ 
+	\end{enumerate}
+\end{theorem}
+\begin{proof}\quad\\
+(1) follows form DUIS of convolution \\
+(2) follows from the Young inequality.\\ 
+(3) by the definition of approximate identity we know $f_n$ converges pointwise to $f$, therefore $f_n \overset{i.m. locally}{\longrightarrow}f$ . Also $f_n$ is uniformly integrable since it admits the shrinking support. By the Vitali's theorem we conclude $f_n \overset{L^p}{\longrightarrow} f$.
+\end{proof}
+
+
+\begin{example}
+Observe
+\begin{align}
+	u_t - \Delta u &= 0 \quad (\mathbb{R}^n \times (0, \infty)) \\
+	u &= g \quad \quad (\mathbb{R}^n \times \{t = 0\})
+\end{align}	
+For the PDE (1) we have the fundamental solution $\Phi(x, t)$. Since $\int \Phi dx = 1$ we have the approximate identity. By the theorem we know
+\begin{equation*}
+	\Phi_t * g \overset{t \rightarrow 0}{\longrightarrow} g 
+\end{equation*}
+\end{example}
+
+\begin{example}[The case where $\Omega \neq \mathbb{R}$]
+\end{example}
+
+
+\newpage
+\section{The Fourier Transform}
+It is worth noticing we consider in the following the complex scalar product:
+\begin{align*}
+	\langle i\nu, \omega \rangle &= - i\langle \nu, \omega \rangle \\
+	\langle \nu, i \omega \rangle &= i \langle \nu, \omega \rangle 
+\end{align*}
+In the case of Fourier basis, the scalar product is defined as
+\begin{align*}
+	\langle e^{ik \cdot x}, e^{ij \cdot x} \rangle:=  \int_{\mathbb{R}^n} e^{ik\cdot x} \overline{e^{ij \cdot x}} dx. 
+\end{align*}
+
+
+\subsection{The Fourier series over fully periodic functions}
+
+\subsubsection{space of the periodic functions}
+\begin{definition}[1-periodic functions]
+	the function $f:\mathbb{R}^n \rightarrow V$, to a Hilbert space $(V,\langle, \rangle)$ is $1$-$periodic$ if 
+	\begin{align*}
+		f(x_1, \dots, x_j + 1, \dots, x_n) = f(x_1, \dots, x_j, \dots, x_n) \quad \forall j = 1, \dots, n. 
+	\end{align*}
+Since it's algebraically much easier to work with exponential than trigonometrical functions we work with the complex scalar product. 
+\end{definition}
+
+We define the torus:
+\begin{align*}
+	\mathbb{T}^n =  \mathbb{R}^n \slash \mathbb{Z}^n
+\end{align*}
+since $\mathbb{Z}$ is a normal subgroup of the abelian group $\mathbb{R}^n$, we know $\mathbb{T}^n$ defines a abelian group. Moreover, we observe the bijection:
+\begin{align*}
+	 \mathbb{T}^1 \approxeq \mathbb{R} \backslash \mathbb{Z} &\rightarrow S^1 \subset {\mathbb{R}^2}\\
+	 [t] & \mapsto (\sin2 \pi t, \cos 2\pi t) 
+\end{align*}
+we can identify $\mathbb{T}^n$ as $n$-fold product of $S^1$. Observe the norm on $\mathbb{T}^n$:
+	\begin{align*}
+		\dist([x], [y]) = \inf_{(x, y)\in ([x], [y])} |x - y|
+	\end{align*}
+	where $|\cdot|$ is the Euclidean norm. Convince yourself it defines a norm. Observe the projection
+	\begin{align*}
+		\pi: \mathbb{R}^n \rightarrow \mathbb{T}^n, x \rightarrow [x]
+	\end{align*}
+	Notice $\mathbb{T}^n$ is the image of $[0, 1]^n \subset \mathbb{R}^n$ of the continuous projection. Therefore $\mathbb{T}^n$ is a \textbf{compact subset} of $\mathbb{R}^n$. \par 
+	
+\begin{remark}
+Notice the function $f: \mathbb{T}^n \rightarrow \mathbb{R}$ is integrable even if $f |_{[0, 1]^n}$ is not. Since on the torus we only integrate over $[0, 1)^n$. 
+\end{remark}
+
+
+\subsubsection{back to mollification}
+The density of smooth compactly supported functions in $L^p(\mathbb{R}^n)$ is proved in the last section. In application the support of a function is usually bounded. We use the truncation in the following proposition and prove the compactly support condition can be dropped for the interpolating functions. 
+\begin{proposition}
+	$\forall p \in [1, \infty)$, $C^\infty(\mathbb{T}^n)$ is a linear subspace of $L^p(\mathbb{T}^n)$.
+\end{proposition}
+\begin{proof}
+For $f \in L^p(\mathbb{T}^n) \subset L^p(\mathbb{R}^n)$ we know by mollification there exists $F_\epsilon \in C^\infty(\mathbb{R}^n)$ such that
+\begin{align*}
+	F_\epsilon \rightarrow F \quad \texttt{ in } L^p(\mathbb{R}^n)
+\end{align*}
+with:
+\begin{align*}
+	F = f \circ \chi_{[0, 1)^n} \in L^p(\mathbb{R}^n)
+\end{align*}
+Furthermore, define 
+\begin{align*}
+	\beta_\delta := \chi_{[\delta, 1 - \delta]^n} \qquad F_\epsilon^\delta := \beta_\delta F_\epsilon
+\end{align*}
+we have
+\begin{align*}
+	\int_{\mathbb{R}^n} | F - F_\epsilon^\delta|^p dm 
+	= \int_{Q^\delta} | F - F^\delta_\epsilon|^p dm + \int_{Q^\delta \backslash Q^\delta}|F - F^\delta_\epsilon|^p dm 
+\end{align*}
+For the first term
+\begin{align*}
+	\int_{Q^\delta} | F - F^\delta_\epsilon|^p dm 
+	\le \int_{\mathbb{R}^n} | F - F_\epsilon|^p dm + \int_{\mathbb{R}^m} | F_\epsilon - F_\epsilon^\delta|^p dm 
+\end{align*}
+where the first part converges to 0 by mollification and the second by dominated convergence theorem. For the second term, it converges to 0 by the non-concentration argument since the integrand is a $L^p$ bounded function on the bounded domain $[0, 1)^n \subset \mathbb{R}^n$ therefore also $L^1$. 
+\end{proof}
+
+
+
+We now define $V$ as the finite dimensional vector space in which our coefficients functions take value, in this case $V:= ( \mathbb{C}, \langle , \rangle )$. 
+Given a function $f : \mathbb{T}^n \rightarrow V$,  the collection of Fourier coefficients could be regarded as a function:
+\begin{align*}
+	\hat{f}: \mathbb{Z}^n \rightarrow V
+\end{align*}
+There is no meaningful continuity or differentiability assumption associated with $\hat{f}$. To speak of the functional space the coefficients lie in, we notice the measurable space $(\mathbb{Z}, 2^{\mathbb{Z}})$ with the counting measure $\nu$ is a suitable choice. Then we can speak of the $L^p$-integrability:
+\begin{equation}
+	l^p(\mathbb{Z}^n):= L^p(\mathbb{Z}^n, \nu)
+\end{equation}
+
+
+
+\subsubsection{The Fourier series $\mathcal{F}$ and $\mathcal{F}^*$}
+
+We define the transformation:
+\begin{align*}
+	\mathcal{F}: L^1(\mathbb{T}^n) &\rightarrow l^\infty(\mathbb{Z}^n), \\
+	f(x) &\mapsto \hat{f}(k) := \int_{\mathbb{T}^n} f(x) e^{-2 \pi i k \cdot x} dx
+\end{align*}
+and the inverse
+\begin{align*}
+	\mathcal{F}^* : l^1(\mathbb{Z}^n) \rightarrow C^0(\mathbb{T}^n),
+	\qquad \hat{g} \rightarrowtail g(x):=  \sum_{ k \in \mathbb{Z}^n} \hat{g}(k) e^{2\pi i k \cdot x} 
+\end{align*}
+
+For $\mathcal{F}$, we notice it's a bounded linear operator since $\|\hat{f}\|_\infty \leq \|f\|_{L_1}$, which is also the reason we define $l^\infty$ as the image.\par 
+For $\mathcal{F}^*$, for the series to converges we need $\hat{g} \in l^1(\mathbb{Z}^n)$, therefore the domain of $\mathcal{F}^*$ is $l^1(\mathbb{Z}^n)$. Notice the limit of the series(the image of the operator) is the limit of continuous functions. We have a uniform convergence. \par 
+We now come to the central result of the chapter: The Fourier transform defines an isometric bijection between $C^\infty(\mathbb{R}^n)$ and $\mathcal{S}(\mathbb{Z}^n)$. Before proving the theorem, we prove the following lemma.
+
+\begin{lemma}[differentiation becomes multiplication with monoid]
+	For $f \in C^m(\mathbb{R}^n)$, $\alpha$ multi-index with order $m$. Then we have:
+	\begin{align*}
+		\widehat{\partial^\alpha f (\mathbb{R}^n)} = (2\pi ki)^{\alpha} \widehat{f}
+	\end{align*}
+\end{lemma}
+\begin{proof}
+	Notice that $\varphi_k$ admits 0 boundary and we prove this using integration by parts.
+\end{proof}
+
+\begin{theorem}
+	The transformation $\mathcal{F}, \mathcal{F}^*$ have the following properties
+	\begin{enumerate}
+		\item $\mathcal{F}$ maps $C^\infty(\mathbb{T}^n)$ bijectively onto $\mathcal{S}(\mathbb{Z}^n)$.
+		\item $\mathcal{F}^*$ maps $\mathcal{S}(\mathbb{Z}^n)$  bijectively onto $C^\infty(\mathbb{T}^n)$.
+		\item The bijection $\mathcal{F}^*$ and $\mathcal{F}^*$ are inverse to each other.
+		\item $\forall f \in C^\infty(\mathbb{T}^n)$, $\sum_{k \in \mathbb{Z}^n} e^{2\pi i k \cdot x} \hat{f}_k$ converges absolutely and uniformly with all derivatives to $f$.
+	\end{enumerate}
+\end{theorem}
+\begin{proof}
+	The orthonormality of $\varphi_k(x):= e^{-2\pi i k x}$ has been established. In 1) we need to prove that $\hat{f}(k) \in \mathcal{S}(\mathbb{Z}^n)$\par 
+	\begin{enumerate}
+		\item Notice:
+		\begin{align*}
+			f \in C^\infty(\mathbb{T}^n) &\Rightarrow \forall \alpha \in \mathbb{N}^n:  \partial^\alpha f \in C(\mathbb{T}^n)\\
+			&\Rightarrow \widehat{\partial^\alpha f}_k:=  \mathcal{F} (\partial^\alpha f)[k]  < \infty
+		\end{align*}
+		on the other hand:
+		\begin{align*}
+			\widehat{\partial^\alpha f} = (2 \pi i )^{|\alpha|} k^\alpha \hat{f}\\
+			\Rightarrow C k^\alpha \hat{f} < \infty
+		\end{align*}
+		which is precisely the definition of Schwartz space.
+		\begin{align*}
+			\mathcal{F}(C^\infty(\mathbb{T}^n))\subset \mathcal{S}(\mathbb{Z}^n)
+		\end{align*}
+		\item
+		Analog we prove the part 2)
+		\item $\mathcal{F} \mathcal{F}^* = Id_{l^\infty}$ is trivial by the orthonormality of $(\varphi_k)_{k \in \mathbb{Z}}$ in $L^2$(therefore $C^\infty$ with $L^2$ norm) . We have not yet proved the completeness of $(\varphi_k)_{k \in \mathbb{Z}}$, so $(\varphi_k)_{k \in \mathbb{Z}}$ has not been proved to be a basis. Therefore 
+		\begin{align*}
+			\mathcal{F}^* \mathcal{F} = Id_{C^\infty}
+		\end{align*}
+		can not yet been proven.
+	\end{enumerate}
+\end{proof}
+
+\subsubsection{Completeness via approximate identity}
+\begin{lemma}
+	Suppose $\rho: \mathbb{T} \rightarrow [0, \infty)$ is a smooth function satisfying
+	\begin{itemize}
+		\item $\rho(0) = 1$
+		\item $\forall x \neq 0: \rho(x) < 1$
+		\item For each $j \in \mathbb{N}$, $c_j := \int_{\mathbb{T}^n} \rho(x)^j dx$, $\rho_j(x):= \frac{\rho(x)^j}{c_j}$ 
+	\end{itemize}
+	Then this sequence is an approximate identity.
+\end{lemma}
+
+
+
+\begin{lemma}
+	For any approximate identity $\rho_j: \mathbb{T} \rightarrow [0, \infty)$, the Fourier coefficient $(\widehat{\rho_j})_k \in \mathbb{C}$ satisfy an uniform bound $(\hat{\rho_j})_k \leq C$ for some constant $C$, independent of $j \in \mathbb{N}$ and $k \in \mathbb{Z}^n$. \par
+	And
+	\begin{align*}
+		\forall k \in \mathbb{Z}^n: \lim_{j \rightarrow \infty} (\widehat{\rho_j})_k = 1
+	\end{align*} 
+\end{lemma}
+\begin{proof}
+	The second result follows from the definition of approximate identity.\\
+	As for the uniform boundedness, we have:
+	\begin{align*}
+		\widehat{(\rho_j)}_k &:= \int_{\mathbb{T}^n} \rho_j(x) e^{-ikx}dx\\
+		&\leq \int_{\mathbb{T}^n} \rho_j(x) dx
+	\end{align*}
+	which is the 0-order Fourier coefficient of $\rho_j$. By the last result we know there are at most finite $(\widehat{\rho_j})_k$ deviating large enough from 1. Therefore the boundedness.
+\end{proof}
+
+\begin{lemma}
+	There exists an approximate identity $\rho_j: \mathbb{T}^n \rightarrow     \mathbb{C}$ satisfying
+	\begin{align*}
+		\mathcal{F}^*  \rho_j = \rho_j
+	\end{align*}
+\end{lemma}
+
+\subsubsection{Parseval's Identity}
+\begin{lemma}
+	For $f \in C^\infty(\mathbb{T}^n), g \in \mathcal{S}(\mathbb{T}^n)$, we have:
+	\begin{align*}
+		\langle g, \mathcal{F} f \rangle_{l^2(\mathbb{Z}^n)} = \langle F^* g, f \rangle_{L^2(\mathbb{R}^n)}
+	\end{align*}
+\end{lemma}
+\begin{proof}
+	Apply Fubini and notice the scalar product of the complex term. The sign should be reversed.
+\end{proof}
+
+\begin{theorem}[Parseval's Identity]
+	For $f, g \in C^\infty(\mathbb{T}^n)$, 
+	\begin{align*}
+		\langle \hat{f}, \hat{g} \rangle_{l^2} := \langle \mathcal{F} f, \mathcal{F} g \rangle_{l^2} = \langle  f, g \rangle_{L^2}
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	We apply the last lemma:
+	\begin{align*}
+		\langle \hat{f}, \hat{g} \rangle_{l^2} &= \langle \mathcal{F} f, \hat{g} \rangle_{l^2}\\
+		&= \langle f, \mathcal{F}^* \hat{g} \rangle_{L^2}\\
+		&= \langle f, \mathcal{F}^* \mathcal{F} g \rangle_{L^2}
+	\end{align*}
+\end{proof}
+
+
+\subsection{Fourier transform on Schwarz space}
+Now we drop the assumption of periodicity and now the functions are defined on $\mathbb{R}^n$. 
+\begin{definition}[Fourier transformation]
+	For $f \in L^1(\mathbb{R}^n)$ we define the \textbf{Fourier transform} of $f$:
+	\begin{align*}
+		&\mathcal{F}: L^1(\mathbb{R}^n) \rightarrow C^0_b(\mathbb{R}^n),\\
+		&\mathcal{F}(f)(\xi) = \int_{\mathbb{R}^n} e^{-i 2 \pi \xi \cdot  x} f(x) dx:= \hat{f}(\xi)
+	\end{align*}
+	and the inverse \textbf{Inverse Fourier transform}
+	\begin{align*}
+		&\mathcal{F}^*: L^1(\mathbb{R}^n) \rightarrow C^0_b(\mathbb{R}^n), \\
+		&\mathcal{F}^*(g)(x) = \int_{\mathbb{R}^n} e^{i 2 \pi\xi \cdot x} \hat{f}(\xi) d\xi := \check{g}(x)
+	\end{align*}
+\end{definition}
+
+\begin{definition}[The Schwartz space]
+\begin{align*}
+	\mathcal{S}(\mathbb{R}^n):= \{ f \in C^\infty(\mathbb{R}^n, V): \forall \alpha , \beta \in \mathbb{N}^m_0, m \in \mathbb{N}_0: x^\alpha \partial^\beta f < \infty\}
+\end{align*}
+the smooth and rapidly decreasing function. The Schwartz space \textbf{contains} the space of compactly supported smooth functions. 
+\end{definition}
+
+\begin{definition}[Tempered mollifier on Schwartz space]
+	
+\end{definition}
+
+\begin{lemma}
+Show that $\mathcal{F}$ is a bounded linear operator with the image of continuous functions vanishing at infinity.	
+\end{lemma}
+\begin{proof}
+	Boundedness in $L^\infty$ is trivial, to see it's continuous, apply dominated convergence theorem.
+\end{proof}
+
+\begin{theorem}[Plancherel's theorem]
+$F$ and $F^*$ map $\mathcal{S}(\mathbb{R}^n)$ bijectively and are inverse to each other. Moreover, we have the isometric property: 
+	$\forall f, g \in \mathcal{S}(\mathbb{R}^n)$:
+	\begin{align*}
+		\langle f, g \rangle_{L^2} = \langle \hat{f}, \hat{g} \rangle_{L^2}
+	\end{align*}
+\end{theorem}
+\begin{proof}\quad\\
+\textbf{1. Bijectivity:}    \\
+\textbf{2. Inversion:} Given $f \in \mathcal{S}(\mathbb{R}^n)$, to show:
+\begin{align*}
+	 F^*(\hat{f}) = f
+\end{align*}
+Define:
+\begin{align*}
+	F(p, y):= e^{2\pi i p\cdot x} e^{-2\pi i p \cdot y} \hat{\rho}_j f(y)
+\end{align*}
+since $\mathcal{F}^*(\hat{\rho}_j) =\rho_j$ we know $F$ is integrable and we can therefore apply Fubini
+\begin{align*}
+	F(p, y) &= \int_{\mathbb{R}^n} e^{2\pi i p \cdot x} dp \int_{\mathbb{R}^n} e^{-2\pi i p \cdot y} f(y)dy\\
+	&= \int_{\mathbb{R}^n} e^{2\pi i p \cdot x} \hat{\rho}_j \hat{f}(p) dp\\
+	&\overset{j \rightarrow \infty}{\longrightarrow}
+	\int_{\mathbb{R}^n} e^{2\pi i p \cdot x} \hat{f}(p) dp\\
+	&= f(x)
+\end{align*}
+where in the 3 equation we apply the result that $\rho_j(p)$ converges pointwise.\\
+\textbf{3. Isometric}
+\end{proof}
+
+
+\begin{proposition}[Properties of Fourier transformation]
+Given a Fourier transform $F: L^1(\mathbb{R}^d) \rightarrow L^1(\mathbb{R}^d, \mathbb{C}$, we have the properties:
+\begin{itemize}
+	\item (Plancherel): For $w \in L^1(\mathbb{R}^d) \cap L^2(\mathbb{R}^d)$, 
+	\begin{align*}
+		\|w\|_2 = \|\hat{w}\|_2
+	\end{align*}
+	\item The inverse Fourier transform:
+	\begin{align*}
+		F^{-1}[\hat{w}](x) =\frac{1}{(2\pi)^{d/2}} \int_{\mathbb{R}^d}
+		e^{i \xi x} \hat{w}(\xi) d\xi 
+	\end{align*}
+	is well defined
+	\item Multiplication rule: multiplication becomes convolution:
+	\begin{align*}
+		F[f \cdot g] = \frac{1}{(2\pi)^{d/2}} (\hat{f}* \hat{g})\\
+		F^{-1}[\hat{f} \cdot \hat{g}] = \frac{1}{(2\pi)^{d/2}} (f * g)
+	\end{align*}
+	\item Differentiation rule: 
+	\begin{align*}
+		F[D^\alpha w ] = |i \xi|^\alpha \hat{w} \qquad
+		((i\xi)^\alpha = \prod (i \xi_j)^{\alpha_j})
+	\end{align*}
+\end{itemize}
+\end{proposition}
+
+\begin{corollary}
+	The operator $\mathcal{F}, \mathcal{F}^*$: $\mathcal{S}(\mathbb{R}^n) \rightarrow \mathcal{S}(\mathbb{R}^n)$ admits an unique extension to 
+	\begin{align*}
+		\mathcal{F}, \mathcal{F}^*: L^2(\mathbb{R}^n) \rightarrow L^2(\mathbb{R}^n)
+	\end{align*}
+\end{corollary}
+
+\subsection{The Gaussian and the approximate identity}
+(Cauchy)Observe now the Fourier transform for the $\delta$-function:
+\begin{align*}
+	\hat{\delta}(x) &:= \int_{\mathbb{R}^n} e^{-2\pi p\cdot x}\delta(x)dx = 1\\
+	\Rightarrow \delta(x) &= \int_{\mathbb{R}^n} e^{2 \pi p \cdot x} dp
+\end{align*}
+The central result for Fourier transform is that it's an isometric isomorphism from the Schwartz space to itself. By performing the double Fourier transform 
+
+\begin{proposition}[Gaussian identity]
+	For a Gaussian (functions of the form $Ae^{cx}, A, c > 0$) of the form $f = e^{-a^2|x|^2}$ we have:
+	\begin{align*}
+		\hat{f}(x) = \check{f}(x) =  \frac{\pi^{\frac{2}{n}}}{a^2} e^{(\frac{\pi}{a})^2 |x|^2}
+	\end{align*}
+	Therefore for $g(x) = e^{a^2 |x|^2}$ we have $\mathcal{F}^*(\hat{g}) = g$. 
+\end{proposition}
+\begin{proof}
+Use Fubini and transform it into an ODE. 
+\end{proof}
+
+\begin{definition}[A tempered approximate identity]
+	A sequence of functions $\rho_j: \mathbb{R}^n \rightarrow [0, \infty)$ in the space $\mathcal{S}(\mathbb{R}^n)$ satisfying $\forall \varphi \in \mathcal{S}(\mathbb{R}^n)$:
+	\begin{align*}
+		\lim_{j \rightarrow \infty}\int_{\mathbb{R}^n} \rho_j(x) \varphi(x)dx = \varphi(0)
+	\end{align*}
+	is called a \textbf{tempered approximate identity. }Notice the convolution satisfies:
+	\begin{align*}
+		\rho_j * f = \int_\Omega f(x - y)\rho_j(y) dy = f(x)
+	\end{align*}
+\end{definition}
+
+\begin{lemma}[From $\mathcal{S}(\mathbb{R}^n)$ to $C_b(\mathbb{R}^n)$]
+	Suppose $\rho \in C^\infty(\mathbb{R}^n, [0, \infty))$. If $\rho$ satisfies:
+	\begin{align*}
+		\int_{\mathbb{R}^n} \rho(x) dx = 1
+	\end{align*}
+	Then the function defined by
+	\begin{align*}
+		\rho_j(x) := j^n \rho(jx)
+	\end{align*}
+	is an approximate identity defined for $\varphi \in C_b(\mathbb{R}^n, \mathbb{R})$. 
+\end{lemma}
+\begin{proof}
+	Define $y = jx$, observe:
+	\begin{align*}
+		\int_{\mathbb{R}^n} \rho_j(x) \varphi(x) dx &= \int_{\mathbb{R}^n} j^n \rho(jx) \varphi(x) x\\
+		&= \int_{\mathbb{R}^n}\rho(y) \varphi(\frac{y}{j})dy\\
+		(\texttt{$\varphi$ bounded and continuous)}
+		&\overset{j \rightarrow \infty}{\longrightarrow}
+		\int \rho(y) \varphi(0) dy \\
+		\texttt{(assumption)}
+		&= \varphi(0)
+	\end{align*}
+\end{proof}
+
+\begin{lemma}[Gaussian as approximate identity]
+	Define
+	\begin{align*}
+		\rho:= \frac{1}{\sqrt{\pi}} e^{-|x|^2}, \rho_j:= j^n \rho(jx)
+	\end{align*}
+	we have
+	\begin{enumerate}
+		\item $\forall j: \mathcal {F}^*(\hat{\rho_j}) = \rho_j$
+		\item $\hat{\rho}_j$ uniformly bounded ($\forall j:|\rho_j| \le C$ and $\rho_j(p)$ converges pointwise to $1$. 
+	\end{enumerate}
+\end{lemma}
+\begin{proof}
+\end{proof}
+
+
+
+
+\subsection{Sobolev Space via Fourier analysis}
+\subsubsection{The general idea of Sobolev space and $H^m(\mathbb{R}^n)$, $H^m(\mathbb{T}^n)$})
+To study PDE with analytic tools, we need functional space on which the differential can be defined as bounded linear operator(with some nice properties). For the continuous functions:  
+\begin{equation*}
+	\|f\|_{C_m} := \sum_{0 \leq |\alpha| \leq m} \sup_x \partial^\alpha f(x)
+\end{equation*}
+\begin{remark}
+the dual space of $C^m$ is Not reflexive and the dual space is not easy to describe.	
+\end{remark}
+
+$L^p$ space are much nicer, but the function in the space is not continuous, much less differentiable. It raises the question as how we define the differentiation(a bounded linear operator).
+
+\begin{definition}
+	\begin{equation*}
+		\|f\|_{W_{m, p}} := \sum_{|\alpha| \leq m } \|\partial^\alpha f\|_{L_p}
+	\end{equation*}
+\end{definition}
+
+\begin{theorem}
+	For every $m \geq 0$, $H^m(\mathbb{R}^n)$ is a Hilbert space with respect to inner product:
+	\begin{align*}
+		\langle f, g \rangle_{H^m} = \int_{\mathbb{R}^n}( 1 + |p|^2)^m
+		\langle \hat{f}(p), \hat{g}(p) \rangle dp
+	\end{align*}
+\end{theorem}
+
+\subsubsection{The Sobolev embedding theorem}
+\begin{example}
+	
+\end{example}
+
+\begin{theorem}[The Sobolev embedding theorem]
+Assume $n \in \mathbb{N}$ and $s > 0$ satisfies $2s > n$, then there exists a continuous inclusion:
+\begin{align*}
+	H^{s + m}(\mathbb{R}^m) \hookrightarrow C^m(\mathbb{R}^n)
+\end{align*}
+\end{theorem}
+\begin{proof}
+	
+\end{proof}
+
+
+\subsubsection{The compact inclusion}
+\begin{lemma}
+	$X, Y$ are Banach spaces. $A: X\rightarrow Y$ is a bounded linear operator. If $Y$ is finite-dimensional, $A$ is a compact embedding.
+\end{lemma}
+
+\begin{lemma}
+	$X, Y$ are Banach spaces, $A_n$ is a sequence bounded linear operator converging to $A$ with respect to the operator norm, then $A$ is compact.
+\end{lemma}
+\begin{remark}
+Notice that in this case, we don't need $Y$ to be finite-dimensional anymore.	
+\end{remark}
+
+
+
+
+\begin{theorem}[Rellich-Kondrachov theorem]
+	For every $t > s \geq 0$, the natural inclusion
+	\begin{align*}
+		H^t(\mathbb{T}^n) \hookrightarrow H^s(\mathbb{T}^n)
+	\end{align*}
+	is a compact embedding.
+\end{theorem}
+
+
+
+\newpage
+\section{Spectral theorem}
+\subsection{finite dimensional(linear algebra)}
+\begin{review}[Cayley-Hamilton]
+\end{review}
+
+\begin{definition}[Rayleigh quotient]
+\end{definition}
+
+
+\subsection{The theorem of Riesz}
+\begin{definition}[resolvent]
+Given $T \in L(X)$, we define
+\begin{itemize}
+	\item \textbf{resolvent set:}
+	\begin{align*}
+		\rho(T):= \{\lambda: \lambda\in \mathbb{K}, (\lambda I - T)^{-1}\ exists\}
+	\end{align*}
+	i.e. the map $(\lambda I - T)$ is bijective
+	\item \textbf{resolvent map:}
+	\begin{align*}
+		R_\lambda: \rho(T) \rightarrow L(X): \lambda \mapsto (\lambda I - T)^{-1}
+	\end{align*}
+\end{itemize}
+	
+\end{definition}
+\begin{definition}[The spectrum]
+	Given $A \in L(X, \mathbb{R})$ for $X$ Banach, the spectrum $\sigma(A)$ is defined as
+	\begin{align*}
+		\sigma(A):=  \bigg\{ \lambda \in \mathbb{R}\bigg| \ker(\lambda I - A) \neq \{0\}, \quad or \quad im(A - \lambda I) \neq X\bigg\}
+	\end{align*} 
+\end{definition}
+
+\begin{example}
+Given $X = C[0, 1]$, $T(x)(s): x \rightarrowtail \int_0^s x(t)dt, X \rightarrow X$. Observe for $T(X)$, $T(x)(0) = 0$, therefore the image is not dense.
+\end{example}
+
+\begin{theorem}[the theorem of Riesz-Schrauder]\quad
+Given $(X, \|\|)$ a Banach space, $T \in K(X)$, $S:= I - T$.
+\begin{enumerate}
+	\item $\dim\ker(S) < \infty$ 
+	\item $\ran(S)$ is closed in $X$ 
+	\item $\dim(X\slash \ran S) = \dim(\ker(S)) = \dim(X'\slash \ran S') = \dim(\ker(S'))$ and $\dim(X\slash \ran(S))< \infty$
+\end{enumerate}
+\end{theorem}
+\begin{proof}
+\textbf{1):} Given $x_n \in \ker(S)$ with $\|x_n\|_X < \infty$, by $Tx_n - x_n = 0$ we have $\|Tx_n\|_X = \|x_n\| < \infty$. Since $T$ compact we know $(Tx_n)_{n \in \mathbb{N}}$ admits a convergent subsequence, i.e. $(x_n)_{n \in \mathbb{N}}$ admits a convergent subsequence. By Heine-Borel $\dim \ker(S) < \infty$.\\\\
+\textbf{2):} We know the quotient space $X\slash \ker S$ is complete. Observe:
+\begin{align*}
+	\hat{S}: X\slash \ker(S) \rightarrow \ran S
+\end{align*}
+In order to show $ran S$ is complete we need to show $\hat{S}$ is an isomorphism. By construction $\hat{S}$ is bijective, by inverse mapping we only need to show $\hat{S}^{-1}$ is continuous, assuming $\hat{S}^{-1}$ is not continuous. Then there exists
+\begin{align*}
+	Sx_n \rightarrow 0, \quad \|[x_n]\|_{X\slash \ker S} \geq \epsilon,\quad \|[x_n]\|_{X\slash \ker S} < M  ??
+\end{align*}
+	By the compactness of $T$, for $\|x_n\|< \infty$, there exists $x_{n_k}$ such that $\|T x_{n_k}\|_X $ converges. From $Sx_n \rightarrow 0$ we have $\|T x_{n_k}\|_X \rightarrow \|Tx\|_X$ for some $x \in \ker S$. Therefore
+\begin{align*}
+	\|x_n\|_{X\slash \ker S} \rightarrow 0
+\end{align*}
+Since complete subspace of a Banach space is closed, $ran S$ is closed.\\
+\\
+\textbf{3)}Since $ran S$ is closed, by the lemma of the closed range theorem we have $(\ran S)^\perp = \ker(S')$.
+And by the theorem in section of dual space we have:
+\begin{align*}
+	X'\slash ranS' \cong (ranS)^\perp \overset{ranS\text{ closed}}{=} \ker S'
+\end{align*}
+by a) we know $\dim \ker S < \infty$, therefore
+\begin{align*}
+	\dim \ker S = \dim \ker S'
+\end{align*}
+Combined we have:
+\begin{align*}
+	\dim (X\slash \ran S) = \dim (X\slash \ran S)' = \dim \ker( S') = \dim \ker S \
+\end{align*}
+\end{proof}
+
+We introduce the following notation:
+\begin{align*}
+	N_0 = \{0\}, N_m = \ker S^m\\
+	R_0 = X, R_m = \ran S^m
+\end{align*}
+
+\begin{lemma}
+	Given $X$ a NLS and $T \in L(X)$ a compact operator. $S$ defined as before, we have
+	\begin{enumerate}
+		\item There exists a smallest $p \in \mathbb{N}$, such that $N_p = N_{p+1}$. 
+		\item For such $p$ as in \textbf{1.}, we have $N_{p} = N_{p + r}$ for all $r >0$.
+		\item $N_p \bigcap R_p = \{0\}$.
+	\end{enumerate}
+\end{lemma}
+\begin{proof}
+	\quad\\
+\textbf{1.} Assuming by contradiction:
+\begin{align*}
+	N_1 \subsetneqq \dots N_{p} \subsetneqq \dots
+\end{align*}
+by Riesz lemma we can construct inductively a sequence $(x_n)_{n \in \mathbb{N}}$, $\|x_n\| = 1$, such that
+\begin{align*}
+	\| x_n - x_{n-1}\| \geq \frac{1}{2}
+\end{align*}
+Observe for $n > m+1>0$:
+\begin{align*}
+	\|Tx_n - Tx_m \|  &= \|x_n - (x_n -Tx_n) + (x_m - Tx_m) + x_m\|\\
+	&=  \|x_n - (S x_n + Sx_m + x_m) \|
+\end{align*}
+We have $S^{m-1}(Sx_m) = 0 \Rightarrow Sx_m \in N_{m -1}$ and analog $Sx_n \in N_{n-1}$, combined we have $(Sx_n + Sx_m + x_m) \in N_{n-1}$. Thus $\forall n > m+1 >0:$
+\begin{align*}
+	\|Tx_n - Tx_m\| \geq \frac{1}{2}
+\end{align*} 
+for the bounded sequence $x_n$, which contradicts to the fact that $T$ is compact.\\
+\textbf{2.} For $x \in N_{p+ r}$, we have $S^{r -1}x \in N_{p+1} = N_p$, therefore $x \in N_{p+r -1}$. Proceeds inductively we have the assumption. \\
+\textbf{3.} Assume $x \in N_p \bigcap R_p$, we have $S^p x = 0, x = S^p y $ for some $y \in X$. Thus $S^{2p}y = 0 \Rightarrow y \in N_{2p} = N_p$ by (2). Therefore $S^py = 0 = x$.
+\end{proof}
+
+\begin{corollary}
+	Given $X$ a Banach space and $T \in K(X)$, $S$ defined as above, then there exists 2 closed subspace $\hat{N}$ and $\hat{R}$, such that
+	\begin{enumerate}
+		\item $X = \hat{N} \oplus \hat{R}$ (topological)
+		\item $\dim \hat{N} < \infty$.
+		\item $S_{|\hat{R}}: \hat{R} \rightarrow \hat{R}$ is an isomorphism
+	\end{enumerate}
+\end{corollary}
+\begin{proof}
+\quad \\\textbf{1)}
+	By the lemma above we have $X = \hat{N} \cup \hat{R}$, $\hat{N} \cup \hat{R} = \{0\}$. By the projective complement we have
+	\begin{align*}
+		X\slash \hat{N} \cong \hat{R}, \quad X = \hat{N} \oplus \hat{R}
+	\end{align*}
+\textbf{2)}
+Observe
+\begin{align*}
+	S^p = \textbf{Id} + \sum_{k = 1}^p \binom{p}{k} T^k
+\end{align*}
+the latter is a compact operator we denote as $\hat{S}$. By the theorem above we have
+\begin{align*}
+	\dim \hat{N} = \dim \ker \hat{S} < \infty
+\end{align*}
+\textbf{3)} surjectivity: 
+\begin{align*}
+	S(\hat{R}) = S^{q+1}x = S^{q}x = \hat{R}  
+\end{align*}
+injectivity: Assuming $y \in \hat{R}, Sy = 0$, then we have:
+\begin{align*}
+	S(S^px) = 0 &\Rightarrow S^{p+1}x = 0 \\
+	&\Rightarrow S^p x = 0\\
+	&\Rightarrow y = 0
+\end{align*}
+$S_{|\hat{R}}$ is an isomorphism.
+\end{proof}
+
+
+\begin{theorem}
+	$(X, \|\cdot\|)$ a Banach space, $T \in K(X)$, $S = T - \lambda I$ for $\lambda \in \mathbb{K} \slash 0$. Then we have
+	\begin{enumerate}
+		\item If $\dim X = \infty$, then $0 \in \sigma(A)$
+		\item $\lambda \in \sigma (T)\slash \{0\}$ is a eigenvalue of $T$ and its eigenspace is finite-dimensional; There exists a direct decomposition $X = N(\lambda) \oplus R(\lambda)$; $T\big(N(\lambda)\big) \subset N(\lambda)$, $T\big(R(\lambda)\big) \subset R(\lambda)$.
+		\item $\sigma(T)$ is at most countable and admits no cluster point other than $0$
+	\end{enumerate}
+\end{theorem}
+\begin{proof}\quad\\
+\textbf{1)}	$0 \notin \sigma(A) \Rightarrow$ $T$ is bijective
+	 $\overset{open\ mapping}{\Rightarrow}$ continuous inverse exists. 
+	 $\overset{8.4}{\Rightarrow}$	$Id= T^{-1} \circ T$ compact. There for the closed set $X = Id(X)$ is relative compact in $X$ therefore compact. By Heine-Borel it's finite dimensional.\\
+\textbf{2)}
+Observe $S = \lambda(Id + \frac{T}{\lambda})$ and apply the theorem of Riesz we have $\dim \ker s < \infty$. By the lemma above we can prove the existence of the decomposition $X = N(\lambda) \oplus R(\lambda)$.  And by $S\big(N(\lambda)\big) \subset N(\lambda)$ we know
+\begin{align*}
+	\lambda(Id - \hat{T})N(\lambda) \subset N(\lambda) & \Rightarrow T\big(N(\lambda)\big) \subset N(\lambda)
+\end{align*}
+\textbf{3}. We show $\forall \epsilon > 0$:
+\begin{align*}
+	\{\lambda_n : |\lambda_n| > \epsilon \} \quad \text{is finite}
+\end{align*}
+Assuming the contradiction that there exists $\epsilon$ such that 
+\begin{align*}
+	M_\epsilon := \{\lambda_n: \lambda_n > \epsilon\} \quad \text{is countable}, \quad Tx_n = \lambda_n x_n
+\end{align*}
+by the definition of eigenvalue we know $x_n$ are linear independent. For $m \in \mathbb{N}$, observe the closed linear span:
+\begin{align*}
+	span\{x_1, \dots, x_m\}
+\end{align*}
+$\forall n > m \exists y_n, \|y_n\| = 1: $ 
+\begin{align*}
+	\|Ty_n - Ty_m\| = \|\lambda_n y_n - \lambda_m y_m\| \geq |\lambda_n|\|y_n - z_m\| > \lambda_n \delta \quad \forall \delta \in (0, 1)
+\end{align*}
+for $z_n \in span\{x_1, \dots, x_{n-1}\}$ by the Riesz lemma. But the compactness of $T$ implies that $Ty_n$ admits a convergent subsequence. We have a contradiction. $M_\epsilon$ is therefore mostly finite and the countable union of finite sets is finite.
+\end{proof}
+
+
+
+\subsection{Symmetric operators in separable real Hilbert space}
+\begin{theorem}
+	Given $T \in K(H)$ compact and symmetric, there exists a countable orthonormal basis of $e_1, e_2, \dots$ and a vanishing sequence $\lambda_1, \lambda_2, \dots \in \sigma(T)\slash 0 $ such that 
+	\begin{align*}
+		H = \ker T \oplus span\{e_1, e_2 \dots \}
+	\end{align*}
+	and 
+	\begin{align*}
+		Tx = \sum_k \lambda_k \langle x, e_k\rangle e_k \quad \forall x \in H
+	\end{align*}
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+\subsection{Compact embedding}
+\begin{theorem}[Rellich-Kondrachov $p = 2$]
+	For every $t > s \geq 0$, the natural inclusion $H^t(\mathbb{T}^n) \hookrightarrow H^2(\mathbb{T}^n)$ is compact. 
+\end{theorem}
+
+
+
+
+
+
+\newpage
+\section{Distributions}
+\subsection{Weak derivative}
+\begin{definition}[weak(distributional) partial derivative]
+	A function $w \in L^p_{loc}(\Omega)$ is called a weak the weak derivative with respect to $x_j$ to $u \in L^p_{loc}(\Omega)$ if :
+	\begin{equation*}
+		\forall \varphi \in C^\infty_C(\Omega): \int w \varphi d\mu = -\int u \partial_{x_j} \varphi d\mu  
+	\end{equation*}
+	more generally, $w \in L^p(\Omega)$ is $\alpha$ order derivative of $u$, if
+	\begin{equation*}
+		\forall \varphi \in C^\infty_C(\Omega): \int w \varphi d\mu = |-1|^\alpha \int u D^\alpha \varphi d\mu
+	\end{equation*}
+\end{definition}
+
+\begin{theorem}[The fundamental lemma of calculus variation]
+	Given $\Omega \subset \mathbb{R}^d$  bounded $f \in L^1_{loc}$, then if 
+	\begin{align*}
+		\forall \varphi \in C_c^\infty(\Omega): \quad 
+		\int_\Omega f \varphi dx = 0
+	\end{align*}
+	then $f = 0$ a.e. 
+\end{theorem}
+\begin{proof}
+	$\forall \varphi \in C_c^\infty(\Omega)$ we know $\varphi * \rho_j \in C_c^\infty(\Omega)$:
+	\begin{align*}
+		 0 &= \int_\Omega f (\varphi *\rho_j) dx \\
+		 &= \int_\Omega (f * \rho_j) \varphi dx \\
+		 &\le \|\varphi\|_\infty \int_\Omega f_j dx \\
+		 &\Rightarrow 
+		 \|f\|_1 \geq 0
+	\end{align*}
+	interchanging $f$ with $-f$ we get
+	\begin{align*}
+		\|f\|_1 \le 0
+	\end{align*}
+\end{proof}
+
+\begin{definition}[distribution]
+	A linear mapping $\Lambda: L( \mathcal{D}(\Omega), \mathbb{R})$ is a distribution if
+	\begin{align*}
+		\forall \varphi \in \mathcal{D}(\Omega) \texttt{ with } \texttt{supp}(\varphi) = K \quad \exists C(K), m(K):  \Lambda(\varphi) \le C\|\varphi\|_{C^m} 
+	\end{align*}
+\end{definition}
+
+
+
+\section{\texorpdfstring{$C_0$}{C\_0} semigroups}
+\subsection{Definition and Properties}
+\begin{definition}[properties of linear operator]
+	Given a linear operator $A$ with $A: X \supset \mathcal{D} \rightarrow Y$, we say that the linear operator is 
+	\begin{enumerate}
+		\item \textbf{densely defined in $X$} if $\mathcal{D}(A) \overset{dense}{\subset} X$.
+		\item \textbf{closed}: if the graph $\mathcal{G} \overset{dense}{\subset} X \times Y$. 
+		\item \textbf{closable:} if there exists a closed linear operator $\bar{A}$ with 
+		\begin{align*}
+			\mathcal{D}(A) \subset \mathcal{D}(\bar{A}), \quad \forall x \in \mathcal{D}(A): A(x) = \bar{A}(x)
+		\end{align*}
+	\end{enumerate}
+\end{definition}
+
+\begin{definition}[$C_0$ semigroup]
+	Let $\{T(t) : t \ge 0 \} \subset L(X)$, we call $T(\cdot)$ a $C_0$ semigroup on $X$ if the following holds:
+	\begin{align*}
+		&\textbf{1): } T(0) = I \\
+		&\textbf{2) semigroup property: } T(t + s) = T(t)T(s) \quad s,t \ge 0 \\
+		&\textbf{3)strong continuity: } \lim_{ s \rightarrow 0} |T(s)x - x| = 0 \quad \forall x \in X
+	\end{align*}
+\end{definition}
+
+\begin{definition}[The infinitesimal generator of a semigroup]
+	 Given a $C_0$ semigroup $T$ on $X$, if a linear operator $A: X \rightarrow X$ satisfies 
+	 \begin{align*}
+	 	&\textbf{1):} \{ x \in X: \lim_{ t \rightarrow 0} \frac{T(t) - I}{t}x \texttt{ exists} \} = \mathcal{D}(A)\\
+	 	& \textbf{2):} \lim_{t \rightarrow 0} \frac{T(t) - I}{t}x = Ax
+	 \end{align*}
+	 we write 
+	 \begin{align*}
+	 	T(t) = e^{t A} \sum_{n = 0}^\infty \frac{t^n}{n!} A^n 
+	 \end{align*}
+\end{definition}
+
+\begin{theorem}
+	Given $A$ an infinitesimal generator of the $C_0$ semigroup $T(t)$. Then we have:
+	\begin{enumerate}
+		\item For $x \in X$:
+		\begin{align*}
+			\lim_{h \rightarrow 0} \frac{1}{h} \int_{t}^{t + h} T(\tau) x d\tau = T(t) x 
+		\end{align*}
+		\item For $x \in X$, we have $ \int_0^t T(s) xds \in D(A)$ and
+		\begin{align*}
+			A\bigg(\int_0^tT(s)xds\bigg) = T(t)x - x
+		\end{align*}
+		\item
+		For $x \in D(A)$, we have $T(t)x \in D(A)$, and 
+		\begin{align*}
+			\frac{d}{dt} T(t) x = AT(t) x  = T(t) Ax
+		\end{align*}
+		\item for $x \in D(A)$:
+		\begin{align*}
+			T(t)x - T(s)x = \int_s^t T(\tau)A x d\tau
+		\end{align*}
+	\end{enumerate}
+\end{theorem}
+\begin{proof}
+\quad\\
+\textbf{1):} Follows from the continuity of $T$\\
+\textbf{2):} Follows from \textbf{1):}
+\begin{align*}
+	A(\int_0^t T(s)x ds ) &= \lim_{h \rightarrow 0} \frac{T(h) - I}{h}(\int_0^t T(s) x ds)\\
+	&= \lim \frac{1}{h} \bigg( \int_0^tT(h + s) x ds  - \int_0^t T(s)x ds \bigg)\\
+	&= \lim \bigg( \frac{1}{h} \int_h^{h + t} T(s) x ds  - \frac{1}{h} \int_0^t T(s) xds \bigg)\\
+	&= T(t)x - x 
+\end{align*}
+\textbf{3).} Observe
+\begin{align*}
+	\frac{T(t + h) - T(t)}{h} x = \frac{T(h) - I}{h} T(t)x \overset{h \rightarrow 0}{\longrightarrow} AT(t)x
+\end{align*}
+\end{proof}
+
+
+\begin{corollary}
+	If $A$ is an infinitesimal generator of an $C_0$ semigroup, then $D(A)$ is dense in $X$ and $A$ is a closed linear operator.
+\end{corollary}
+
+\begin{definition}[resolvent and resolvent set]
+	Given $A$ a linear operator(not necessarily bounded), we define the 
+	\begin{enumerate}
+		\item \textbf{resolvent set:} $\rho(A):= \{ \lambda \in \mathbb{C}: (\lambda I - A)^{-1} \texttt{ bounded linear} \}$
+		\item \textbf{resolvent:} $R(\lambda; A):= \{ (\lambda I - A)^{-1}: \lambda \in \rho(A)\}$.
+	\end{enumerate}
+\end{definition}
+
+
+\subsection{The Hille-Yosida theorem}
+\begin{theorem}[Hille-Yosida]
+	$A$ is the infinitesimal generator of the $C_0$ semigroup $T(t)$ if
+	\begin{enumerate}
+		\item $A$ is closed and densely defined in $X$. 
+		\item $\mathbb{R}^+ \subset \rho(A)$ and $\forall \lambda >0$:
+		\begin{align*}
+			\|R(\lambda, A)\| \le \frac{1}{\lambda} 
+		\end{align*}
+	\end{enumerate}
+\end{theorem}
+
+\subsection{The Lumer Phillips Theorem}
+Given a Banach space $X$, we define the map of sets:
+\begin{align*}
+	& F: X \rightrightarrows X^*, x \mapsto F(x)\\
+	& \texttt{with}\\
+	& F(x):= \{x^* \in X^*: \langle x^*, x\rangle = \|x\|_X \}
+\end{align*}
+
+\begin{definition}
+	A linear operator $A$ on $X$ is dissipative if $\forall x \in \mathcal{D}(A) \exists x^* \in F(x):$
+	\begin{align*}
+		\textbf{Re} \langle x^*,   Ax \rangle \le 0
+	\end{align*}
+\end{definition}
+
+\begin{theorem}
+	A linear operator is \textbf{dissipative} iff
+	\begin{align*}
+		\forall \lambda > 0 \forall x \in \mathcal{D}(A): \|\lambda I - A\| \ge \lambda
+	\end{align*}
+\end{theorem}
+ 
+ 
+ \begin{theorem}
+	$A$ densely defined and closed, $A^*$ and $A$ dissipative. $\forall x_0 \in D(A) \forall T \in [0, \infty) \forall f \in C^1([0, T], H)$, there exists \textbf{a unique} 
+	\begin{align*}
+		x \in C^1([0, \infty), H) \cap C^0([0, \infty), D(A))
+	\end{align*}
+	such that
+	\begin{align*}
+		&\frac{dx}{dt} = Ax + f(x) \\
+		&x(0) = x^0
+	\end{align*}
+	One has
+	\begin{align*}
+		x(t) = S(t) x^0 + \int_0^t S(t - \tau) f(\tau) d\tau , \forall t \in [0, T]
+	\end{align*}
+\end{theorem}
+
+\end{document}

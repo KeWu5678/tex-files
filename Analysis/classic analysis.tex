@@ -1,0 +1,718 @@
+\documentclass[12pt,fleqn]{book}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage[colorlinks = true, linkcolor = blue]{hyperref}
+\usepackage{url}
+
+%Reset the mathcal
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+
+\usepackage{amsmath,amssymb,amsthm,textcomp}
+\usepackage{multicol}
+\usepackage{tikz}
+\usepackage[normalem]{ulem}
+\usepackage{bbm} % using for the characteristic function
+
+\usepackage{geometry}
+\geometry{left=5mm,right=5mm,%
+bindingoffset=0mm, top=10mm,bottom=10mm}
+
+\linespread{1.3}
+\newcommand{\linia}{\rule{\linewidth}{0.5pt}}
+
+\usepackage[normalem]{ulem}
+% delete line
+
+\usepackage[open,openlevel=1]{bookmark}
+\usepackage{bookmark}
+\usepackage{hyperref}
+
+%\newtheorem{theorem}{Theorem}
+\newtheorem{theorem}{Theorem}[section]
+\renewcommand{\thetheorem}{\arabic{section}.\arabic{theorem}}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\renewcommand{\thedefinition}{\arabic{section}.\arabic{definition}}
+\newtheorem*{example}{Example}
+\newtheorem*{remark}{Remark}
+\allowdisplaybreaks
+\newtheorem{proposition}[theorem]{Proposition}
+
+
+
+%% SYMBOLS
+%divergence
+\AtBeginDocument{
+  \let\div\relax
+  \DeclareMathOperator{\div}{div}
+}
+%contradiction
+\usepackage{stmaryrd}
+\usepackage{marvosym}
+%symbol
+\AtBeginDocument{
+  \let\div\relax
+  \DeclareMathOperator{\div}{div}
+}
+%range
+\AtBeginDocument{
+  \let\ran\relax
+  \DeclareMathOperator{\ran}{ran}
+}
+%ess span dist
+\DeclareMathOperator*{\esssup}{ess\, sup}
+\DeclareMathOperator*{\spa}{span}
+\DeclareMathOperator*{\dist}{dist}
+\DeclareMathOperator*{\diam}{diam}
+
+
+\begin{document}
+
+
+\chapter{Analysis}
+\section{Numbers}
+\begin{theorem}
+	There exists a bijection between $\mathbb{N} \times \mathbb{N}$ to $\mathbb{N}$
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+\begin{theorem}
+	There exists a bijection between $\mathbb{R}^n \rightarrow \mathbb{R}$.
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+
+\section{Convergence}
+The $\epsilon-\delta$ notation of convergence is introduced by Cauchy. It is essential to understand the value that the index $n$ controls.\par 
+Whenever working with convergence, determine what $\epsilon$ and $n$(or $\delta$) represent. It would to some extend clarify the implication of the specific definition.
+
+
+\subsection{Infinite Limits}
+
+\begin{definition}[Order complete]
+	A totally ordered set $X$ is order complete if every non-empty subset of $X$ which is bounded above admits a supremum.
+\end{definition}
+
+\begin{definition}[supremum and infimum]
+	
+\end{definition}
+
+\begin{theorem}[Supremum axiome]
+	Every bounded subset in $\mathbb{R}$ admits a supremum
+\end{theorem}
+\begin{proof}
+	This is due to the fact that the real number is a complete ordered set and maybe we would use the axiom of choice.
+\end{proof}
+
+
+
+
+\begin{definition}[Limes supremum and Limes infimum]
+\end{definition}
+
+\begin{theorem}[Existence and uniqueness of Limes]
+For a sequence in $\mathbb{R}^n$, the limes supremum and limes infimum always exists and it's \textbf{unique}.
+\end{theorem}
+
+
+\subsection{Series}
+Notice that the addition is not communicative when there are infinitely many summands. The alternating geometric series could have 2 sums if we sum them up in different order. The reason lies in that the group of real number is defined with the \textbf{finitely} executable operation $"+"$. However, if the series converges \textbf{absolutely}, then it's communicative over addition.
+
+\begin{theorem}[Rearrangement theorem]
+	Every rearrangement of an absolute convergent series is absolute convergent and has the same limit.
+\end{theorem}
+\begin{proof}
+	$\sum |a_n|$ converges, therefore $\forall \epsilon \exists N \forall
+	n \geq N:$
+	\begin{equation*}
+		\sum_{n > N} |a_n| < \epsilon
+	\end{equation*}
+	Suppose $\varphi: \mathbb{N} \rightarrow \mathbb{N}$ an arbitrary rearrangement, then there exists $\tilde{N}$, such that:
+	\begin{equation*}
+		\{1, \dots, N \} \subset \{\varphi(1), \dots, \varphi(\tilde{N})\}
+	\end{equation*}
+	So for the rearranged series $\sum a_{\varphi(n)}$, there exists $\tilde{N}$, such that
+	\begin{equation*}
+		\sum_{n > \varphi(\tilde{N})} |a_{\varphi(n)}| < \epsilon
+	\end{equation*}
+\end{proof}
+
+\begin{theorem}
+	Every summable double series converges absolutely and is independent of the ordering. The row sum and column sum converges absolutely and the sum sign is interchangeable.
+\end{theorem}
+
+
+\subsection{Continuity}
+\begin{theorem}
+	Function that is continuous in every direction is not necessarily continuous. 
+\end{theorem}
+
+
+
+
+\section{Family of Functions}
+\subsection{The exponential function}
+\begin{theorem}
+	\begin{align*}
+		e^{iz} = \cos z + i \sin z \qquad \forall z \in \mathbb{Z}
+	\end{align*}
+\end{theorem}
+\begin{remark}
+We could define the exponential function on the complex domain, however, in Fourier analysis and some other applications the exponential function is defined on $\mathbb{R}^n$.	
+\end{remark}
+
+\begin{lemma}
+	$\forall t \in \mathbb{R}: |e^{it}|=1$
+\end{lemma}
+
+\begin{lemma}
+for $t \in \mathbb{R}$
+\begin{align*}
+ im(e^{it}) = S^1
+\end{align*}
+\end{lemma}
+
+\begin{definition}
+	We define:
+	\begin{align*}
+		\pi := \frac{1}{2} \min \{ e^{it} = 1| t > 0\}
+	\end{align*}
+\end{definition}
+
+\begin{proposition}
+	we have
+	\begin{itemize}
+		\item $e^z = 1 \qquad \forall z = 2\pi i\mathbb{Z}$
+		\item $e^z = -1 \quad \forall z = \pi i + 2\pi i \mathbb{Z}$
+	\end{itemize}
+\end{proposition}
+
+Till now, with the knowledge of integration on manifolds, we are able to conclude that:
+\begin{align*}
+	\int_0^{2\pi} e^{ix}  dx = m(S^1) = 2\pi
+\end{align*}
+and
+\begin{align*}
+	\int_{[0, 2\pi]^n} e^{ix} dx = (2\pi)^n \texttt{ by Fubini} 
+\end{align*}
+
+
+
+
+
+
+
+\subsection{Polynomial Approximation}
+\begin{definition}[Banach Algebra]
+	Given a Banach space $(X, \| \|)$, if the space is also an algebra and satisfies:
+	\begin{align*}
+		\forall x, y \in X: \|xy\| \leq \|x\|\|y\|
+	\end{align*} 
+	Then the algebra is called the Banach algebra.
+\end{definition}
+
+\begin{lemma}
+	Let $X$ be a compact metric space and $A$ a closed sub-algebra of $C(X, \mathbb{R})$ containing $\mathbf{1}$. If $f$, $g$ are in $A$, then 
+	\begin{align*}
+		f \wedge g, f \vee g, |f| \in A
+	\end{align*}
+	as well
+\end{lemma}
+
+\begin{theorem}[Stone-Weierstrass]
+	Let $X$ be a compact metric space, and $A$ a sub-algebra of $C(X, \mathbb{R})$ containing $\mathbf{1}$. If a separates the point in $X$, then $A$ is dense in $C(X, \mathbb{R})$.
+\end{theorem}
+\begin{proof}
+	Given $f \in C(X, \mathbb{R})$, 
+	\begin{enumerate}
+		\item For $x, y \in X, x \neq y$, since $A$ separates $X$, we can find $h_{xy}$ in $A$, with
+		\begin{align*}
+			h_{xz}(x) = f(x), \quad h_{xy}(y) = f(y)
+		\end{align*}
+		(Why?)
+		\item Define:
+		\begin{align*}
+			U_{zy}:= \bigg\{ x \in X: h_{zy}(x) < f(x) + \epsilon \bigg\}
+		\end{align*}
+		Notice $y \in U_{zy}$ and $U_{zy}$ is open, therefore for a fixed $z$, $\bigcup_{y \in X} U_{zy}$ forms an open cover of $X$. By compactness of $X$ there exists a finite subcover, namely:
+		\begin{align*}
+			X = \bigcup_{i \in \{1, \dots n\}} U_{zy_i}
+		\end{align*}
+		By the lemma above we can find $h_{z} \in A$ defined as:
+		\begin{align*}
+			h_z:= \min_{i = 1}^n h_{z y_i}
+		\end{align*}
+		\item For $z \in X$, define:
+		\begin{align*}
+			V_z&:= \bigg\{ x \in X: \bigwedge_{i = 1}^m h_{zy_i}(x) > f(x) - \epsilon \bigg\}\\
+			&= \bigg\{ x \in X: h_z > f(x) - \epsilon \bigg\}
+		\end{align*}
+		Analog since $z \in V_z$ we know $\bigcup_{z \in X} V_z$ forms a open cover of $X$. Analog we can find a finite subcover $\bigcup_{i = 1}^m V_z$ and define:
+		\begin{align*}
+			h:= \max_{i = 1}^m h_{y_i} 
+		\end{align*}
+		then we have:
+		\begin{align*}
+			\forall \epsilon > 0: f(x) - \epsilon < h(x) < f(x) + \epsilon
+		\end{align*}
+	\end{enumerate}
+\end{proof}
+
+\begin{corollary}
+	Let $M \subset \mathbb{R}^n$ be compact:
+	\begin{enumerate}
+		\item Any continuous function on $M$ can be \textbf{uniformly} approximated by a n-variable polynomial.
+		\item The Banach space $C(M, \mathbb{K})$ is separabal.
+	\end{enumerate}
+\end{corollary}
+
+
+\section{Multivariate calculus}
+\subsection{Differentiation in One variable}
+\subsubsection{Mean value theorem}
+\begin{theorem}
+	Given $f \in C([a, b], \mathbb{R})$ and differentiable on $(a, b)$, then there exists a $\xi \in (a, b)$ such that
+	\begin{align*}
+		f(a) - f(b) = f'(\xi) (b - a)
+	\end{align*}
+\end{theorem}
+
+
+
+\subsubsection{Iterative procedure}
+\begin{theorem}[Banach Fixed Point theorem]
+	Given a complete metric space $(X, d)$ and a contraction $f:X \rightarrow \mathbb{R}^n $:
+	\begin{align*}
+		\forall x, y \in X: d(f(x), f(y)) \leq d(x, y)
+	\end{align*}
+	Then:
+	\begin{enumerate}
+		\item $f$ admits an unique fixed point
+	\end{enumerate}
+\end{theorem}
+\subsection{Parameter dependant integral}
+\begin{theorem}[The fundamental theorem of Integral and Differential]
+\end{theorem}
+
+\begin{theorem}[Parameter-dependant Integral cv. Wendl]
+$(Y, \nu)$ is a measure space, $M$ is a metric space, $\varphi: M \times Y \rightarrow V$ is a function with the following properties:
+\begin{enumerate}
+	\item $\forall x \in M: \varphi(x, \cdot): Y \rightarrow V$ is measurable, and $|\varphi(x, \cdot)|\leq \psi$ for some fixed $\nu$-integrable function independent of $x$.
+	\item $\forall y \in Y: \varphi(\cdot, y): M \rightarrow V \in C(M, V)$
+\end{enumerate}
+Then the function $F: M \rightarrow V$ given by
+\begin{equation*}
+	F(x):= \int_Y \varphi(x, \cdot) d\nu(y)
+\end{equation*}
+is continuous.\par 
+Moreover, if $F$ is partial differentiable with respect to $x$ to the multi-index $\alpha$, then
+\begin{align*}
+	\partial^\alpha F(x) = \int_Y \partial^\alpha \varphi(x, \cdot)d\nu(y)
+\end{align*}
+\end{theorem}
+\begin{proof}
+	
+\end{proof}
+\begin{example}[The Fourier transform]
+The Fourier transform is defined as:
+\begin{align*}
+	&\mathcal{F}: L^1(\Omega) \rightarrow C^0(\Omega)\\
+	&\mathcal{F}f (\xi):= \frac{1}{(2\pi)^n}\int_\Omega f(x) e^{-ik\cdot x}dx 
+\end{align*}
+We verify that the image of this linear operator(with parameter $\xi$) is indeed $C^0(\Omega)$. For $x$ fixed $f e^{-ik\cdot tx}$ is a smooth function with respect to $t$ and for fixed $t$ the function is integrable with respect to $x$. 
+\end{example}
+
+
+\begin{corollary}[cv. Escher p.201]
+	Suppose the assumption of the theorem are satisfied and given:
+	\begin{align*}
+		\Psi(x) := \int^{a(x)}_{b(x)} \varphi(t, x)dt \quad x \in X
+	\end{align*}
+	$a, b \in C(X, (\alpha, \beta))$, then $\Psi \in C^p$ and 
+	\begin{align*}
+		\forall x \in X: \partial \Psi(x) 
+		= \int_{a(x)}^{b(x)} \partial_x \varphi(t, x)dt + \varphi(b(x), x) \partial b(x) - \varphi(a(x), x) \partial a(x)
+	\end{align*}
+\end{corollary}
+
+\subsection{Inverse maps}
+
+\begin{theorem}[The inverse function]
+	Suppose $f \in C^q(X, F)$, $X$ open in $E$ if 
+	\begin{align*}
+		\partial f(x_0) \in Lis(E, F)
+	\end{align*}
+	then there exists open neighborhoods $U \ni x_0, V \ni f(x_0)$ such that
+	\begin{enumerate}
+		\item  $f: U \rightarrow V$ is bijective
+		\item $f^{-1} \in C^q(V, E)$ and for all $x \in U$ we have
+			\begin{align*}
+				\partial f(x) \in Lis(E, F) \qquad 
+				\partial f^{-1} (f(x)) = [\partial f(x)]^{-1}
+			\end{align*}
+	\end{enumerate}
+\end{theorem}
+
+
+\subsection{Implicit functions}
+\begin{theorem}[The implicit function theorem]
+	Suppose $W \overset{open}{\subset} E_1 \times E_2$ and $f \in C^q(W, F)$ with $F \subset E_2$. Further, suppose $(x_0, y_0) \in W$ such that
+	\begin{align*}
+		f(x_0, y_0) = 0 \qquad \underline{ D_2 f(x_0, y_0) \in Lis(E_2, F)}
+	\end{align*}
+	then there exists an open neighborhood $U \ni (x_0, y_0)$, such that there exists a unique $g \in C^q(V, E^2)$:
+	\begin{align*}
+		f(x, y) = 0 \Leftrightarrow y = g(x) \quad \forall (x, y) \in U
+	\end{align*}
+\end{theorem}
+
+\begin{definition}[the regular value]
+	suppose $X$ is open in $\mathbb{R^n}$, $f $ 
+\end{definition}
+
+
+\section{Differential Geometry}
+\subsection{Topology basics}
+\begin{definition}[Topology]
+\end{definition}
+
+\begin{definition}[topological space]
+\end{definition}
+
+\begin{definition}[base, subbase]
+\end{definition}
+\begin{remark}
+	\quad
+	\begin{enumerate}
+		\item Every \textbf{base} is also a subbase, the inverse is not true.
+		\item The subbase generates a unique topology that's the smallest topology containing the universe.
+	\end{enumerate}
+\end{remark}
+
+
+\subsection{Manifolds}
+\subsubsection*{Definition and Properties}
+\begin{definition}[Submanifolds of $M$]
+	Let $0 \leq l \leq m$, $L$ is a \textbf{$l$-dimensional submanifold of M} if :
+	\begin{align*}
+		\forall p \in L \exists U \ni p \exists \phi: U \rightarrow \mathbb{R}^m: \phi(U \bigcap L) = \varphi(U) \bigcap 
+		(\mathbb{R}^l \times \{0\} )
+	\end{align*}
+\end{definition}
+\begin{example}[The submanifolds of $\mathbb{R}^n$]
+	A subset is a submanifold in $\mathbb{R}^n$ if and only it's open in $\mathbb{R}^n$.
+\end{example}
+
+\begin{definition}[Immersion(embedding and Submersion]
+\end{definition}
+
+
+
+
+
+\subsection{Tangent and normal}
+For the manifolds(such as $S^2$) the usual definition of differentiation in the $\mathbb{R}^n$ fail to work. For a function $f: S^2 \rightarrow \mathbb{R}^m$, $f(x + h)$ is in general not in $S^2$, therefore we cannot define the \textbf{differential}(the unique Riesz map defined on a point $x$). We need a new concept of differentiation, in particular, a new domain for the Riesz map.\par
+For the simple of $\mathbb{R}^n$, we define the tangential space $T_p \mathbb{R}^n$ as the Hilbert space $\mathbb{R}^n$ equipped with the induced Euclidean scalar product.
+
+\begin{definition}[tangent space]
+	Given $X \subset \mathbb{R}^n$ open, $p \in X$, we define
+	\begin{align*}
+		T_pX:= \{ (p, v) \in \{p\} \times \mathbb{R}^n
+	\end{align*}
+\end{definition}
+
+\begin{definition}[Tangential of $f \in C^1$]
+ Suppose $Y$ is an open space in $\mathbb{R}^n$, $f \in C^1(\mathbb{R}^n)$, we define the linear map:
+\begin{align*}
+	T_p f: T_p X \rightarrow T_{f(p)} Y,\quad 
+	(p, v) \mapsto (f(p), \partial f(p) v)
+\end{align*}
+as the \textbf{tangential} of $f$ at point $p$.	
+\end{definition}
+
+\begin{theorem}[The tangential space of a submanifold in $\mathbb{R}^n$]
+The tangential space of a submanifold of $\mathbb{R}^n$ is well defined, i.e. for 2 charts $\varphi, \tilde{\varphi}$, the space $T_p M$ is the same. 
+\end{theorem}
+
+\subsubsection*{constrained extrema}
+Recall if we have a manifold $M$ defined by a regular value defined by the function $h$, then given a point $p$, the $\nabla h(p)$ construct a basis of the orthogonal complement of the tangent space $T_p M$, i.e., $(T_p M)^T$. 
+\begin{theorem}[Lagrange multiplier]
+	Suppose $X \subset \mathbb{R}^n$, $F, h^1, \dots, h^l \in C^1(X, \mathbb{R})$, we have
+	\begin{align*}
+		F - \sum_{j = 1}^l \lambda_j h_j \in C^1(M, \mathbb{R})
+	\end{align*}
+\end{theorem}
+
+
+\subsection{Integration on manifolds}
+\begin{definition}[Total variation]
+	Given a continuous map $f : I \rightarrow E$, we define
+	\begin{align*}
+		var(f, I):= \sup \{ \sum_{k = 1}^n |f(t_k) - f(t_{k-1})|: (t_0, \dots, t_n) \textbf{is a partition of } I \}
+	\end{align*}
+\end{definition}
+
+\begin{lemma}
+	\begin{align*}
+		Var(f, [a, b]) = Var(f, [a, c]) + Var(f, [c, b])
+	\end{align*}
+\end{lemma}
+\begin{proof}.
+	\begin{itemize}
+		\item By triangular inequality we have:$ \forall c \in (a_1, b_1)$:
+		\begin{align*}
+			|f(a_1) - f(b_1)| \leq |f(a_1) - f(c)| + |f(c) - f(b_1)|
+		\end{align*}
+		Therefore the refinement of a partition increases the total variation and we have:
+		\begin{align*}
+			Var(f, [a, b]) \leq Var(f, [a, c]) + Var(f, [c, b])
+		\end{align*}
+		
+		\item $\forall \epsilon > 0 \exists \xi_1, \xi_2$ partitions of $[a, c], [b, c]$: 
+		\begin{align*}
+			L_{\xi_1} + L_{\xi_2} + \epsilon &\geq Var(f, [a, c]) + Var(f, [c, b])\\
+		\Rightarrow	
+		Var(f, [a, b]) \geq L_{\xi_1 \wedge \xi_2}  &\geq Var(f, [a, c]) + Var(f, [c, b])-\epsilon
+		\end{align*} 
+	\end{itemize}
+\end{proof}
+
+\begin{definition}[Rectifiable curve]
+	Continuous curves with bounded total variation is called rectifiable.
+\end{definition}
+\begin{remark}.
+\begin{enumerate}
+	\item There are continuous curves that are not rectifiable. Just consider the topologist's sine curve that oscillates faster and faster near the origin. Since its period becomes smaller and smaller we are able to anchor a positive value and it would appear infinitely often in a small interval near the origin.
+	\item The Lipschitz continuous curve is rectifiable.
+\end{enumerate}	
+\end{remark}
+
+\begin{theorem}
+	Suppose $\gamma \in C^1(I, E)$ then the curve is rectifiable and we have:
+	\begin{align*}
+		L(\gamma) = \int_a^b |\dot{\gamma}(t)|dt
+	\end{align*}
+\end{theorem}
+
+
+\subsection{Stoke's theorem}
+Notation:\\
+$T_pX = \{x\} \times \mathbb{R}^n:$ the tangent space\\
+$T_p^*X = L(T_pX, \mathbb{R})$: the cotangent space\\
+We introduce the notion of \textbf{1-form}:
+\begin{align*}
+	\alpha: \langle \cdot , \cdot  \rangle_p: T_p^*X \times T_pX \rightarrow \mathbb{R}
+\end{align*}
+which is the dual pairing of the space $T_pX$. such $\alpha$ is called the \textbf{1-form} \\
+$\wedge^r V^*:= \big\{\alpha \in L^r (V, \mathbb{R}), \alpha \text{ alternating}\big\}$, r-fold exterior product of $V^*$(r-form)\\
+$\Omega^r(X)$: smooth \textbf{r-form} on the dual space $X$
+
+\subsubsection*{Partition of Unity}
+\begin{definition}[Partition of Unity]
+	Given $X$ a $n$-dimensional submanifold of $\mathbb{R}^{\bar{n}}$ with or without boundary for some $n \in \mathbb{N}$. Let $\{U_\alpha, \alpha \in A\}$ be an open cover of $X$. Then we say that the family $\{\pi_\alpha, \alpha \in A\}$ is a smooth partition of unity subordinate to this cover if
+	\begin{itemize}
+		\item $\pi_\alpha \in C^\infty(X, [0, 1])$ with $supp(\pi_\alpha) \subset \subset U_\alpha$ for $\alpha \in A$.
+		\item The family $\{\pi_\alpha, \alpha \in A\}$ is locally finite. i.e. $\forall p \in X \exists V \ni p$ open :
+			\begin{align*}
+				supp(\pi_\alpha) \cap V \neq \emptyset \texttt{ for finitely many } \alpha \in A
+			\end{align*}
+		\item $\sum_{\alpha \in A} \pi_\alpha(p) = 1$ for every $p$
+	\end{itemize}
+\end{definition}
+
+
+\begin{theorem}
+	$\forall \omega \in \Omega_c^{m -1}(M): \int_M d\omega  = \int_{\partial M} \omega $
+\end{theorem}
+\begin{proof}
+	\quad\\
+	\textbf{1):} $M = \mathbb{R}^n$: 
+\end{proof}
+
+
+\section{Ordinary Differential Equation}
+\subsection{Linear equations}
+\begin{theorem}[1-d homogenous ODEs]
+	The solution of the homogeneous linear ODE
+	\begin{equation*}
+		x'(t) = f(t)x(t)
+	\end{equation*}
+	forms a 1-dim vector space and the initial value problem
+	\begin{equation*}
+	\left\{
+	\begin{aligned}
+		x'(t) &= f(t)u(t)\\
+		x(0) &= x_0
+	\end{aligned}
+	\right.
+	\end{equation*}
+	admits the solution of the form
+	\begin{equation*}
+		x(t) = x_0 e^{\int_{t_0}^{t} f(t) dt} 
+	\end{equation*}
+\end{theorem}
+
+\begin{lemma}[The Gronwall's lemma]
+Given $\alpha, \beta \ge 0$ constant, $y: J \rightarrow [0, \infty)$ continuous, where $J$ is an interval, if:
+\begin{align*}
+	y(t) \le \alpha + \beta \bigg| \int_{t_0}^t y(\tau) d\tau \bigg|
+\end{align*}
+then we have
+\begin{align*}
+	y(t) \le \alpha e^{\beta | t - t_0|} \quad \forall t \in J
+\end{align*}
+\end{lemma}
+\begin{proof}
+\end{proof}
+
+\begin{corollary}[The differential form of the Gronwall's inequality]
+	Given 
+	\begin{align*}
+		y'(t) \le \beta(t) y(t)
+	\end{align*}
+	we have
+	\begin{align*}
+		y(t) \le y(a) e^{\int_a^t u(\tau) \tau}
+	\end{align*}
+\end{corollary}
+
+\begin{theorem}[1-d inhomogeneous ODEs]
+	The solution to the inhomogeneous linear ODE
+		\begin{equation*}
+	\left\{
+	\begin{aligned}
+		x'(t) &= f(t)x(t) + g(t)\\
+		x(t_0) &= x_0
+	\end{aligned}
+	\right.
+	\end{equation*}
+	has the form:
+	\begin{align*}
+		x(t) = x_0 e^{\int_{t_0}^{t} f(s) ds } + \int_{t_0}^t g(\tau) \cdot e^{(t - \tau) \int_{t_0}^t f(s)ds} d\tau
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	We use the method: variation of constant, and assume the particular solution could be written as 
+	\begin{align*}
+		x_p = c(t) x_p(t)
+	\end{align*}
+\end{proof}
+
+\subsection{Linear System in $\mathbb{R}^n$}
+
+
+\subsubsection*{The linear ODEs system in 1st order}
+Observe
+\begin{align*}
+	A: I \rightarrow \mathbb{R}^{n \times n}, t \rightarrow A(t) ,\quad B: I \rightarrow \mathbb{R}^n, t \rightarrow B(t)
+\end{align*}
+The objective is to solve the system
+\begin{equation}
+x'(t) = A(t) x(t)	
+\end{equation}
+and the inhomogeneous system
+\begin{equation}
+	x'(t) = A(t) x(t) + b(t)
+\end{equation}
+
+\subsubsection{The general method to solve the ODE $x' = A(t) x$ }
+\begin{definition}[the Exponential of matrix]
+	Given a $A \in \mathbb{K}^{n \times n}$, we define
+	\begin{align*}
+		e^A : = \sum^{\infty}_{n = 0} \frac{A^n}{n!} 
+	\end{align*}
+\end{definition}
+
+\begin{theorem}
+	For the ODE w.r.t. $X \in \mathbb{K}^{n \times n}$:
+	\begin{align*}
+		&X' = AX\\
+		&X(0) = E_n
+	\end{align*}
+	we have the unique solution
+	\begin{align*}
+		X(t) = e^A
+	\end{align*}
+\end{theorem}
+
+\begin{theorem}[properties of the matrix exponential]
+Given $A, B \in \mathbb{K}^{n \times n}$ we have
+\begin{enumerate}
+	\item $e^0 = E_n$.
+	\item $e^A$ is invertible $(e^A)^{-1} = e^{-A}$.
+	\item If $AB = BA$, then $e^{A + B} = e^{A} e^B = e^B e^A$. 
+\end{enumerate}
+\end{theorem}
+
+
+
+\subsection{Qualitative statements}
+\subsubsection*{Existence and uniqueness}
+\subsubsection*{The extension of solution: Maximal solution}
+The Picard-Lindlof gives only a local solution. We would like to explore to what extend the solution can be extended. For this we define:
+\begin{definition}[The maximal solution]
+	Given an ODE $F: \mathbb{R}^n \times \Lambda \rightarrow \mathbb{R}$ with $F$ Lipschitz w.r.t. the second variables. Observe the non-empty family:
+	\begin{align*}
+		F:= \{ (a_i, b_i), \varphi_i(a_i, b_i) \in C^1((a_i, b_i), \mathbb{R}) | \varphi_i \texttt{ solves the IVP } \}
+	\end{align*}
+	that solves the IVP. Define:
+	\begin{align*}
+		a_0:&= \inf\{a_i| a_i \in \Lambda\}\\
+		b_0:&= \sup\{b_i| b_i \in \Lambda\}
+	\end{align*}
+	then the correspongding $\varphi: (a_0, b_0) \rightarrow \mathbb{R}$, $\varphi$is called the \textbf{maximal solution}. 
+\end{definition}
+
+\begin{theorem}
+	Given $F$ continuous and Lipschitz-continuous with respect to the 2nd variable. Then the maximal solution is either defined on the entire $\mathbb{R}$ or leaves every compact interval in finite time
+\end{theorem}
+
+\begin{corollary}
+	Given $F: U = (a, b) \times \mathbb \rightarrow \mathbb{R}$ continuous and Lipschitz continuous on the 2nd variable. And $F$ preserved such property on every compact interval 
+\end{corollary}
+
+
+\subsubsection*{ODEs of n-order in $\mathbb{R}^1$}
+We observe the 2 types of linear system:
+homogeneous system:
+\begin{align}
+	x^{n}(t) + a_{n-1}x^{n-1} \dots a_0 x(t) = 0
+\end{align}
+Inhomogeneous system:
+\begin{align}
+	x^n(t) + a_{n-1}x^{n-1} \dots a_0 x(t) = b(t)
+\end{align}
+
+\begin{theorem}[The theorem of Liouville]
+\end{theorem}
+
+
+\subsection{Stability of the linear system}
+\begin{definition}[The stability concept]
+The homogeneous linear system is \\
+\textbf{1. Lyapunov stable} in $\hat{x}$ if: 
+	$\forall \epsilon > 0 \exists \delta > 0: \|x(t) - x_0\| \le \delta$ for all $t > 0$, $x_0 \in B_\delta(\hat{x})$.\\
+\textbf{2. Asymptotically stable} in $\hat{x}$ if it'a Lyapunov stable and 
+\begin{align*}
+	\lim_{t \rightarrow} x(t) = \hat{x}
+\end{align*}
+for the initial condition $x_0$ sufficiently near $\hat{x}$. 
+\end{definition}
+\begin{remark}
+The Lyapunov stability means the uniform convergence (independent of $t$) to a constant state, given the initial value is sufficient near the constant state. 	
+\end{remark}
+
+
+\chapter{Linear Algebra}
+\section{Determinant}
+
+
+\end{document}
