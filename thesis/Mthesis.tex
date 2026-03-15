@@ -474,6 +474,9 @@ For the second inequality, we leverage that $\phi$ is  sublinear and $\phi(0)= 0
 \end{proof}
 
 The next lemma proves the weak-* l.s.c. of $\Phi$. 
+The proof follows the idea in the paper \cite{bouchitte1990new}. 
+Since the original proof is valid for $\Omega$ locally compact, the result applies to the current setting. 
+Moreover, since our functional doesn't have the singular part, the proof and assumptions can be simplified. 
 \begin{lemma}
 Given $\mu = \mu_{\cont} + \mu_{\atom}$, under Assumption \ref{pen1}, it holds 
 \begin{align*}
@@ -487,7 +490,7 @@ is weak-* sequentially l.s.c..
 	\begin{align*}
 		\Phi(\mu) \ge c |\mu|(\Omega) \quad \forall \mu \in M(\Omega).
 	\end{align*}
-	Let $\mu_h \overset{*}{\rightharpoonup} \mu$, we decompose $\Omega$ by heavy atomes and small atoms combined the continuous part. 
+	Let $\mu_h \overset{*}{\rightharpoonup} \mu$, we decompose $\Omega$ by heavy atomes and small atoms combined the continuous part:
 	\begin{align*}
 		\Omega = A_h + (\Omega - A_h), \text{ where } A_h:= \{ \omega \in \Omega: \mu_h(\omega) \ge \epsilon \}.
 	\end{align*}
@@ -632,6 +635,8 @@ it holds
 	- p(\omega) =  -\langle \bar{p}, u \rangle \le \alpha \lim_{\tau \rightarrow 0} \frac{1}{\tau} (\phi (|c + \tau|) - \phi(|c|) = \alpha \phi'(|c|) \sign(c).  
 \end{align*}
 Taking $u = \pm \delta_\omega$, we get $p(\omega) = -\alpha \phi'(|c|) \sign(c)$. 
+Since $\phi'(0) = 1$ and $\phi'$ is decreasing we have $\phi'(|c|) \in [0, 1]$, hence $|\bar{p}| \le \alpha$. 
+
 \quad\\
 \textbf{2)} For the continuous part, first observe $\omega \notin \atom \bar{\mu}$ and pertubate with $ u = \delta_\omega$, we have
 \begin{align*}
@@ -703,7 +708,22 @@ Combining the 2 parts we get
 Choose $\delta^2 \le \frac{2 \alpha \gamma_2}{(d + 1)\Lambda_1^2(D, \Gamma)}$ we get the contradiction.
 
 \quad\\
-2. $|\atom \bar{\mu}|$ is finite: By compactness of $\Omega \in \atom \bar{\mu} $, there exists a sequence $\omega_n$ (possibly passing through a subsequence) such that 
+2. $|\atom \bar{\mu}|$ is finite: 
+Without loss of generality we can assume the atomic support of $\mu$ is contained in a compact subset of $\Omega$. 
+Assume by contradition, there exists a sequence $\omega_n \rightarrow \infty $ escapes to the infinity.
+Since $\bar{\mu} \in M(\Omega)$ admits bounded variation, by passing to a subsequence, it holds $\bar{\mu}(\omega_n) \rightarrow 0$. 
+Assuming w.l.o.g. that $\bar{\mu}(\omega_n) = c_n > 0$, we have
+\begin{equation*}
+	\begin{aligned}
+		\lim_{\omega_n \rightarrow + \infty } \bar{p}(\omega_n)
+	= -\alpha \phi(|\bar{\mu}|(\omega_n)) \sign (\bar{\mu}(\omega_n))
+	= - \alpha,
+	\end{aligned}
+\end{equation*}
+which contradicts to that $\bar{p} \in C_0(\Omega)$ and $\lim_{\omega_n \rightarrow + \infty } \bar{p}(\omega_n) \rightarrow 0$.
+
+Now we observe $\atom \bar{\mu}$.
+Since it is contained in a compact subset of $\Omega$, there exists a sequence $\omega_n$ (possibly passing through a subsequence) such that 
 \begin{align*}
 	\omega_n \rightarrow \hat{\omega} \text{ in $\Omega \quad$ for some } \hat{\omega} \in \Omega.
 \end{align*}
@@ -715,7 +735,8 @@ Concentrate the measure on $\{\omega_{N}, \dots\}$ on the limits $\hat{\omega}$,
 \begin{align*}
 	\mu_N := \bar{\mu} - \sum_{i = N}^\infty \delta_{\omega_i} \bar{\mu}(\omega_i) + C_N \delta_{\hat{\omega}}, \text{ where } C_N = \sum_{i = N}^\infty c_i > 0.
 \end{align*}
-As in 1., the fidelity term of the cost can by decomposed by Taylor expansion, define $\delta_N:= \max_{i = N}^\infty |\omega_i - \hat{\omega}|$ :
+As in 1., the fidelity term of the cost can by decomposed by Taylor expansion.\\
+Define $\delta_N:= \max_{i = N}^\infty |\omega_i - \hat{\omega}|$ :
 \begin{align*}
 	L(\mu_N) \le L(\bar{\mu}) + \langle \bar{p}, \mu_N - \bar{\mu}\rangle +\frac{d +1}{2} \Lambda_1^2(D, \Lambda) \delta_N^2  C_N^2
 \end{align*}
