@@ -18,7 +18,6 @@
 \usepackage{tikz}
 \usepackage[normalem]{ulem}
 \usepackage{bbm} % using for the characteristic function
-\usepackage{ulem}
 \usepackage{cancel}
 \usepackage{esint} %integral mean
 
@@ -978,7 +977,7 @@ This is a well defined contrast.
 
 
 \subsection{The Standard Linear Model}
-\begin{definition}[the linear model]
+\begin{definition}[the linear model]\label{model: linear}
 Given the observation $Y \in \mathbb{R}^n$, feature vector $\beta \in \mathbb{R}^p$, and the design matrix $X \in \mathbb{R}^{n \times p}$  with  :
 \begin{align*}
 	Y = X \beta + \epsilon 
@@ -1491,7 +1490,7 @@ Consider the best parametric fit under MLE and the MLE estiamtor: \ref{est:BPF}.
 
 
 
-Model: Given the  linear model \ref{model: linear} and gauss error \ref{model: gausserror}
+Model: Given the  linear model (Definition \ref{model: linear}) and Gaussian error ($\epsilon \sim \mathcal{N}(0, \Sigma)$)
 \begin{theorem}
 Given the model specified, we have:
 	\begin{enumerate}
@@ -1503,7 +1502,7 @@ Given the model specified, we have:
 			\begin{equation*}
 				L(\tilde{\theta}) - L(\theta) = \frac{1}{2} \| D (L(\tilde{\theta}) - L(\theta)) \|^2 
 			\end{equation*}
-		\item if \ref{model: homogausserror}
+		\item if additionally $\Sigma = \sigma^2 I_n$ (homogeneous Gaussian error)
 			\begin{equation} 
 				L(\tilde{\theta}) - L(\theta^*) = \frac{1}{2} \| \xi \|^2 \sim \frac{1}{2} \chi^2
 			\end{equation}
@@ -1521,7 +1520,7 @@ Given the model specified, we have:
 	\end{equation*}
 	In fact, $\epsilon(\zeta)$ is an elliptic set around $\tilde{\theta}$ with the axis due to $D^2$.
 	\begin{equation*}
-		\epsilon(\zeta) = \{\theta: \| D (\tilde(\theta) - \theta) \|^2 \leq 2 \zeta \}
+		\epsilon(\zeta) = \{\theta: \| D (\tilde{\theta} - \theta) \|^2 \leq 2 \zeta \}
 	\end{equation*}
 	where the $\zeta$ is the $\alpha$-quantile of the $\chi^2$ distribution.
 \end{corollary}
@@ -1605,7 +1604,7 @@ and $dim \Theta = p$.
 \newpage
 
 
-\section{Generalised Linear Model}
+\section{Generalized Linear Model}
 \begin{lemma}
 	Given the conditions above(regularity is not required), We have:
 	\begin{equation*}
@@ -4170,7 +4169,7 @@ Recall in the previous subsection we proved another packing argument. When havin
 
 
 \chapter{Not important}
-\subsection{regression models}
+\section{regression models}
 \begin{definition}[Mean Regression model]
 	The mean regression model describes the dependance of Y on X.
 	\begin{equation}

@@ -148,8 +148,29 @@ The method is more robust compared to the open-loop method but suffers from 2 ma
 
 \subsection{theoretical review and notations}
 Throughout the paper we denote $\Omega$ as $\mathbb{R}^{d + 1}$, 
-$M(\Omega)$ the space of Radon measure on $\Omega$, 
-$C_0(\Omega)$ the space of continuous functions that vanish at infinity. 
+A finite Radon measure $\mu$ is a $\sigma$-additive $\mathbb{R}^m$-valued set function defined on the Borel sets of $\Omega$ with $\mu(\emptyset) = 0$.                                                                              
+The \emph{total-variation measure} of a finite Radon measure $\mu$ is the positive measure defined by                                                                                                                                       
+\[                                                                                                                                                                                                                                          
+|\mu|(E) = \sup \left\{ \sum_{n=1}^{\infty} |\mu(E_n)| \;:\; \bigcup_{n=1}^{\infty} E_n = E,\; \{E_n\} \text{ disjoint and measurable} \right\}.
+\]
+We denote the space of finite Radon measures by $M(\Omega, \mathbb{R}^m)$ (and $M(\Omega)$ if $m = 1$). It can be normed by the total variation norm
+\[
+\|\mu\|_{M} = |\mu|(\Omega).
+\]
+Each finite Radon measure $\mu$ possesses a \emph{polar decomposition}, \emph{i.e.}, there exists a function $\sigma \in L^1_{|\mu|}(\Omega, \mathbb{R}^m)$ with $|\sigma(x)| = 1$ for $|\mu|$-almost all $x \in \Omega$ such that
+\[
+\mu(E) = \int_E \sigma \, \mathrm{d}|\mu| \quad \text{for all measurable } E \subset \Omega.
+\]
+An important result about the space $\mathcal{M}(\Omega, \mathbb{R}^m)$, which is known as the Riesz theorem, is its characterization as a dual space. To state this theorem, introduce the space
+\[
+\mathcal{C}_0(\Omega, \mathbb{R}^m) = \overline{\{u \in \mathcal{C}(\Omega, \mathbb{R}^m) \;:\; \operatorname{supp} u \Subset \Omega\}}^{\|\cdot\|_\infty}, \quad \|u\|_\infty = \sup_{x \in \Omega} |u(x)|_*
+\]
+which is the completion of continuous compactly supported functions with respect to the supremum norm. For $m = 1$ we denote it by $\mathcal{C}_0(\Omega)$. The Riesz theorem now states that the dual space $(\mathcal{C}_0(\Omega,
+\mathbb{R}^m))^* = M(\Omega, \mathbb{R}^m)$ which also implies the completeness of the space of finite Radon measures. The corresponding dual pairing is defined by
+\[
+\langle \mu,\, u \rangle = \sum_{i=1}^{m} \int_\Omega u_i \, \mathrm{d}\mu_i
+\]
+for each $\mu \in M(\Omega, \mathbb{R}^m)$ and $u \in \mathcal{C}_0(\Omega, \mathbb{R}^m)$.
 Without further specification, we denote $\langle \cdot, \cdot\rangle$ the dual bracket $\langle \cdot, \cdot \rangle_{M(\Omega), C(\Omega)}$. 
 
 We introduce the following notation:
@@ -162,6 +183,13 @@ We decompose $\mu \in M(\Omega)$ by $\mu = \mu_{\cont} + \mu_{\atom}$, where $\m
 \begin{align*}
 	M(\Omega) = M^0(\Omega) \oplus M^\sharp(\Omega). 
 \end{align*}
+
+
+
+
+
+
+
 
 
 
@@ -270,7 +298,7 @@ The activation functions are non-decreasing and positive homogeneous of degree $
 	\item They are invariant w.r.t. the change of scale of data, which we will explain further in detail. 
 \end{itemize}
 
-In the case where $p = 1$ we have the ReLU functions, which has been extensively studied recently. For $p > 1$,  the activation function not only preserves the nice property such as homogeneity of ReLU, but also smooths the kinks. We gain 2 things from the differentiability: 1. It circumvents the non-differentiable corners of the ReLU function; 2. The gradient information of the activation function can be used to calculate the gradient-augmented loss function. More generally, we assume the activation function to satisfy the following condition:
+In the case where $p = 1$ we have the ReLU functions, which has been extensively studied. For $p > 1$,  the activation function not only preserves the nice property such as homogeneity of ReLU, but also smooths the kinks. We gain 2 things from the differentiability: 1. It circumvents the non-differentiable corners of the ReLU function; 2. The gradient information of the activation function can be used to calculate the gradient-augmented loss function. More generally, we assume the activation function to satisfy the following condition:
 
 \begin{assumption}[p-homogeneity]
 	$\sigma$ is $p$-homogeneous w.r.t. $\omega$ for some $p > 2$, i.e., for all $x \in D$, $\lambda > 0$ it holds
@@ -288,6 +316,113 @@ Define the neural network with $N$ neurons:
 \end{align*}
 
 First, we observe the optimization problem with $L^2$-constrained inner weights and nonconvex-penalized outer weights. We prove that in this setting the nice property of $p$-homogeneous active function still holds: by proportionally linearizing the outer weights we can constrain the inner weights on a unit sphere rather than a unit ball.
+
+
+\begin{proposition}[Generalization of {\cite[Proposition~3]{pieper2022nonconvex}} to $m$-homogeneous activations]
+	Let $p \geq 1$, $q \geq 1$, and let $r \colon \mathbb{R}^{d+1} \to \mathbb{R}_+$ be a positively $1$-homogeneous functional:
+	\[
+	  r(\tau\,\omega) = |\tau|\, r(\omega) \quad \text{for all } \omega \in \mathbb{R}^{d+1},\; \tau \in \mathbb{R}.
+	\]
+	Suppose the activation function $\sigma(x;\omega)$ is positively $m$-homogeneous in $\omega$, i.e.,
+	\[
+	  \sigma(x;\, \tau\,\omega) = \tau^m\, \sigma(x;\omega) \quad \text{for all } \tau > 0,\; \omega \in \mathbb{R}^{d+1},\; x \in D.
+	\]
+	Then the unconstrained problem
+	\begin{equation*}
+	  \min_{N \in \mathbb{N},\; (c_n, \omega_n) \in \mathbb{R} \times \mathbb{R}^{d+1}}
+	  \; l(\mathcal{N}_{\omega,c};\, y)
+	  + \alpha \sum_{n=1}^{N} \left[ \frac{1}{p}\,|c_n|^p + \frac{1}{q}\,r(\omega_n)^q \right],
+	\end{equation*}
+	and the sphere-constrained problem
+	\begin{equation*}
+	  \min_{N \in \mathbb{N},\; \{c_n\} \in \mathbb{R},\; \{\tilde\omega_n:\, r(\tilde\omega_n) \leq 1\}}
+	  \; l(\mathcal{N}_{\tilde\omega,c};\, y)
+	  + \frac{2\alpha}{s}\, m^{-mp/(mp+q)} \sum_{n=1}^{N} |c_n|^{s/2},
+	\end{equation*}
+	where
+	\[
+	  s \;=\; \frac{2pq}{mp + q},
+	\]
+	are equivalent.
+\end{proposition}
+  
+\begin{proof}
+	Since $\sigma$ is positively $m$-homogeneous, for any $\tau > 0$ we have
+	\[
+		c_n\,\sigma(x;\,\omega_n)
+		= c_n\,\sigma(x;\,\tau_n\,\tilde\omega_n)
+		= c_n\,\tau_n^m\,\sigma(x;\,\tilde\omega_n),
+	\]
+	so $\mathcal{N}_{\omega,c} = \mathcal{N}_{\tilde\omega,\tilde c}$ where $\tilde\omega_n = \omega_n / \tau_n$, $\tilde c_n = c_n\,\tau_n^m$, for any choice of $\tau_n > 0$. In particular, the loss term $l(\mathcal{N}_{\omega,c};\,y)$ is
+	invariant under this reparametrization. 
+	For each $\omega_n \neq 0$, write $\omega_n = \tau_n\,\tilde\omega_n$ with $\tau_n = r(\omega_n) > 0$ and $r(\tilde\omega_n) = 1$ (using the $1$-homogeneity of $r$). 
+	Then unconstrained problem is equivalent to
+	\[
+	\min_{\substack{N \in \mathbb{N},\; \{c_n\} \in \mathbb{R}^N \\
+	\{\tilde\omega_n:\, r(\tilde\omega_n) \leq 1\},\; \tau_n \geq 0}}
+	\; l(\mathcal{N}_{\tilde\omega,\tilde c};\, y)
+	+ \alpha \sum_{n=1}^{N}
+	\left[ \frac{1}{p}\,\frac{|\tilde c_n|^p}{\tau_n^{mp}} + \frac{1}{q}\,\tau_n^q \right],
+\]
+\quad\\ 
+For fixed $\tilde c_n \neq 0$, define
+\[
+	g(\tau) \;=\; \frac{1}{p}\,|\tilde c_n|^p\,\tau^{-mp} + \frac{1}{q}\,\tau^q.
+\]
+Since $g(\tau) \to +\infty$ as $\tau \to 0^+$ and $\tau \to +\infty$, the minimum exists and is unique. Differentiating:
+\[
+	g'(\tau) = -\,m\,|\tilde c_n|^p\,\tau^{-mp-1} + \tau^{q-1} = 0
+	\quad\Longleftrightarrow\quad
+	\tau^{mp+q} = m\,|\tilde c_n|^p.
+\]
+Hence
+\begin{equation*}
+	\tau_n^* = \bigl(m\,|\tilde c_n|^p\bigr)^{1/(mp+q)}.
+\end{equation*}
+
+\quad\\
+Substituting $\tau_n^*$ into $g$:
+
+\emph{First term:}
+\[
+	\frac{1}{p}\,|\tilde c_n|^p \cdot \bigl(m\,|\tilde c_n|^p\bigr)^{-mp/(mp+q)}
+	= \frac{m^{-mp/(mp+q)}}{p}\;|\tilde c_n|^{p\,-\,mp^2/(mp+q)}
+	= \frac{m^{-mp/(mp+q)}}{p}\;|\tilde c_n|^{pq/(mp+q)}.
+\]
+Here we used $p - mp^2/(mp+q) = p(mp+q-mp)/(mp+q) = pq/(mp+q)$.
+
+\emph{Second term:}
+\[
+	\frac{1}{q}\,\bigl(m\,|\tilde c_n|^p\bigr)^{q/(mp+q)}
+	= \frac{m^{q/(mp+q)}}{q}\;|\tilde c_n|^{pq/(mp+q)}.
+\]
+Adding the two terms and letting $k = pq/(mp+q) = s/2$:
+\[
+	g(\tau_n^*)
+	= \left(\frac{m^{-mp/(mp+q)}}{p} + \frac{m^{q/(mp+q)}}{q}\right) |\tilde c_n|^{k}.
+\]
+We simplify the coefficient. Factor out $m^{q/(mp+q)}$:
+\[
+	\frac{m^{-mp/(mp+q)}}{p} + \frac{m^{q/(mp+q)}}{q}
+	= m^{q/(mp+q)}\!\left(\frac{m^{-1}}{p} + \frac{1}{q}\right)
+	= m^{q/(mp+q)}\,\frac{q + mp}{mpq}.
+\]
+Since $s = 2pq/(mp+q)$, we have $(mp+q)/(mpq) = 2/(ms)$, so
+\[
+	g(\tau_n^*) = \frac{2}{s}\,m^{q/(mp+q)}\,m^{-1}\;|\tilde c_n|^{s/2}
+	= \frac{2}{s}\,m^{q/(mp+q) - 1}\;|\tilde c_n|^{s/2}
+	= \frac{2}{s}\,m^{-mp/(mp+q)}\;|\tilde c_n|^{s/2}.
+\]
+(using $q/(mp+q) - 1 = -mp/(mp+q)$).
+\end{proof}
+
+\begin{remark}\leavevmode
+	For $p = q = 2$, the exponent becomes $s/2 = 2/(m+1)$, and the constant is $(m+1)\,m^{-m/(m+1)}$, so the sphere penalty is
+	\[
+	\alpha\,(m+1)\,m^{-m/(m+1)} \sum_{n=1}^N |c_n|^{2/(m+1)}.
+	\]
+	For $m = 1$ this gives $2\sum|c_n|$; for $m = 2$ this gives $3 \cdot 2^{-2/3}\sum|c_n|^{2/3}$.
+\end{remark}
 
 For enforcing the sparsity we implement the explicit sparsity-promoting penalty term. Recently, there is the thought-provoking result in \cite{zhang2021understanding} that indicates normal explicit generalization methods including weight decay do not enhance the generalization performance for large neural network. Nevertheless, the explicit regularization still plays a central role in the sparse learning. The network training considered here is based on the following optimization problem:
 \begin{equation}
@@ -349,25 +484,31 @@ Assuming (\ref{opt_dis}) admits at least 1 global optimal solution and $\sigma$ 
 
 The proof relies essentially on the homogeneity of the activation function and the monotonicity of the penalty functions.
 
-
+\subsubsection{the $tanh$ activation function}
 
 \subsection{the nonconvex sparse learning approach}
 As introduced in the abstract, the $l^1$ penalty fails to detect the redundancy of the neurons clustering in a small neighborhood, which motivates the nonconvex penalty term. First we introduce the following assumption:
 \begin{assumption} \label{pen1}
- The penalty term $\phi: \mathbb{R}_+ \rightarrow \mathbb{R}_+$ satisfies:
- 		\begin{enumerate}
- 			\item $\phi$ is differentiable at 0 with $\phi(0) = 0$ and $\phi'(0) = 1$. 
- 			\item $\phi$ is differentiable, concave, nondecreasing and coercive($\phi(z) \rightarrow \infty$ as $z \rightarrow \infty$). 
- 		\end{enumerate} 
- \end{assumption}
+	The penalty term $\phi: \mathbb{R}_+ \rightarrow \mathbb{R}_+$ satisfies: $\phi$ is differentiable at 0 with $\phi(0) = 0$ and $\phi'(0) = 1$. 
+\end{assumption}
+
+\begin{assumption} \label{pen3}
+The penalty term $\phi: \mathbb{R}_+ \rightarrow \mathbb{R}_+$ is differentiable, concave, nondecreasing and coercive($\phi(z) \rightarrow \infty$ as $z \rightarrow \infty$).
+\end{assumption}
  
- The Assumption \ref{pen1} describe the global property of the penalty functions. By introducing the nonconvexity the coercivity of the quadratic cost is compromised. With Assumption \ref{pen1} the optimization problem stays coercive such that we can apply the direct method of calculus of variation. The Assumption \ref{pen1} (1) depends on the choice of activation functions and may be adjusted via linear transformation as long as the derivative at the given point stays bounded. The following lemma follows from the assumption. 
+The Assumption \ref{pen3} describe the global property of the penalty functions. 
+By introducing the nonconvexity the coercivity of the quadratic cost is compromised. 
+With Assumption \ref{pen1}, \ref{pen3} the optimization problem stays coercive such that we can apply the direct method of calculus of variation. 
+The following lemma follows from the assumption. 
  
- \begin{lemma} If Assumption \ref{pen1} is satisfied, then it holds
-\begin{enumerate}
-	\item subadditivity: for all $a, b$,  $\phi(a + b) \le \phi(a) + \phi(b)$.
-	\item $ \phi(|z|) \le |z|$. 
-\end{enumerate}
+\begin{lemma} If Assumption \ref{pen3} is satisfied, then it holds
+\begin{itemize}
+	\item subadditivity: for all $a, b$,  $\phi(a + b) \le \phi(a) + \phi(b)$. 
+\end{itemize}
+Furthermore, if Assumption \ref{pen1} is satisfied, it holds
+\begin{itemize}
+	\item $ \phi(|z|) \le |z|$.
+\end{itemize}
 \end{lemma}
 \begin{proof}
 	\quad\\
@@ -387,7 +528,7 @@ As introduced in the abstract, the $l^1$ penalty fails to detect the redundancy 
 \end{proof}
  
  
- Assumption \ref{pen1} serves the purpose for the nonconvex problem to admits a global minimizer. To enhance the sparsity, we need to introduce other assumption. In particular, It needs to exert strong penalizing effect on the weight on 2 neighboring neurons such that merging them would in fact reduce the cost. To this purpose, we need the strict concavity to enforce strict subadditivity, and we only need that in a neighborhood of $0$: 
+ Assumption \ref{pen1}, \ref{pen3} serves the purpose for the nonconvex problem to admits a global minimizer. To enhance the sparsity, we need to introduce other assumption. In particular, It needs to exert strong penalizing effect on the weight on 2 neighboring neurons such that merging them would in fact reduce the cost. To this purpose, we need the strict concavity to enforce strict subadditivity, and we only need that in a neighborhood of $0$: 
  
 \begin{assumption}[Local concavity]
  \label{pen2}
@@ -405,7 +546,7 @@ As introduced in the abstract, the $l^1$ penalty fails to detect the redundancy 
 
 \begin{proposition}[the second order estimate]
 \label{secondorderestimate}
-	Given $\phi$ that satisfies the Assumption \ref{pen1}, if $\phi$ satisfies further Assumption \ref{pen2}, then it holds
+	Given $\phi$ that satisfies the Assumption \ref{pen1}, \ref{pen3}, if $\phi$ satisfies further Assumption \ref{pen2}, then it holds
 	\begin{enumerate}
 		\item for all $ z \in [0, \hat{z}_1]: \phi(z) \ge z - \frac{\gamma_1}{2} z^2$, 
 		\item for all $z \in [0, \hat{z}_2]: \phi(z) \le z - \frac{\gamma_2}{2}z^2$.
@@ -439,8 +580,7 @@ We formulate now the optimization problem as following:
 
 
 \section{existence of minimizers}
-\subsection{existence of the global minimizer}
-In this subsection we prove the existence of the global minimizer. We leverage the direct method of calculus variation. Since we are working on the space of measure $M(\Omega)$ we consider the weak -* convergence. As usual, the common difficulty is to prove the weak-* l.s.c.. Furthermore, the coercivity is compromised by introducing the nonconvex penalty term $\Phi$. The next lemma address this problem. It  proves that the coercivity of $\Phi$ is preserved by the Assumption \ref{pen1} of $\phi$.  
+In this section we prove the existence of the global minimizer. We leverage the direct method of calculus variation. Since we are working on the space of measure $M(\Omega)$ we consider the weak -* convergence. As usual, the common difficulty is to prove the weak-* l.s.c.. Furthermore, the coercivity is compromised by introducing the nonconvex penalty term $\Phi$. The next lemma address this problem. It  proves that the coercivity of $\Phi$ is preserved by the Assumption \ref{pen1} of $\phi$.  
 
 \begin{lemma}[On the coercivity of $\Phi$] \label{envolop}
 Under the Assumption \ref{pen1}, for any $\mu \in M(\Omega)$, it holds
@@ -468,7 +608,7 @@ The proof follows the idea in the paper \cite{bouchitte1990new}.
 Since the original proof is valid for $\Omega$ locally compact, the result applies to the current setting. 
 Moreover, since our functional doesn't have the singular part, the proof and assumptions can be simplified. 
 \begin{lemma}
-Given $\mu = \mu_{\cont} + \mu_{\atom}$, under Assumption \ref{pen1}, it holds 
+Given $\mu = \mu_{\cont} + \mu_{\atom}$, under Assumption \ref{pen1}, \ref{pen3}, it holds 
 \begin{align*}
 	\Phi(\mu) = \int_\Omega d\mu_{\cont} + \sum_{ \omega \in \atom \mu } \phi(|\mu_{\atom}|(\{\omega\}))
 \end{align*}
@@ -552,7 +692,7 @@ Taking $\epsilon \rightarrow 0$ we get $\delta \rightarrow 0$ and the result is 
 \end{proof}
 
 \begin{theorem}[Existence of the global minimizer]
-Assuming Assumption \ref{pen1} is fulfilled, problem (\ref{int_noncon}) admits at least one global minimizer in $M(\Omega)$. 
+Assuming Assumption \ref{pen1}, \ref{pen3} is fulfilled, problem (\ref{int_noncon}) admits at least one global minimizer in $M(\Omega)$. 
 \end{theorem}
 \begin{proof}
 We apply the direct method of the calculus of variation:\\ 
@@ -572,7 +712,7 @@ hence $J$ is also coercive.  \\
 where the inequality in the second line follows from the weak-* l.s.c. of $L$ (since $L$ is convex and continuous composed with the weak-*-to-weak continuous operator $\mathcal{N}$) and the inequality in the third line follows from weak-* l.s.c. of the functional $\Phi$.
 \end{proof}
  
-\subsection{optimality condition and finite support of the solution}
+\section{optimality condition and finite support of the solution}
 Since the optimization problem is nonconvex, the global minimizer is difficult to find in general. 
 Instead, we define the local minimum: 
 \begin{definition}[local minimizer]
@@ -582,8 +722,8 @@ $\bar{\mu} \in M(\Omega)$ is a local minimizer if there exists $\epsilon > 0$ su
 \end{align*}
 \end{definition}
 
-\begin{remark}[The gradient of $J$]
-To further investigate the optimality condition of (\ref{int_noncon}) and derive the according algorithm, we calculate the first variation of $J(\mu)$,  We define the gradient information $\bar{p}(\omega) \in C(\Omega)$ as
+\begin{remark}[The gradient of $L$]
+To further investigate the optimality condition of (\ref{int_noncon}) and derive the according algorithm, we calculate the first variation of $L(\mu)$,  We define the gradient information $\bar{p}(\omega) \in C(\Omega)$ as
  \begin{equation}
  \begin{aligned}
  	\bar{p}(\omega) &:= \nabla L(\bar{\mu}) \\
@@ -601,7 +741,7 @@ To further investigate the optimality condition of (\ref{int_noncon}) and derive
  
 \begin{theorem}[the optimality condition]
 \label{opt_cdt}
-	Under the Assumption \ref{pen1}, if $\bar{\mu}$ is a local minimum of $J$, then it holds
+	Under the Assumption \ref{pen1}, \ref{pen3}, if $\bar{\mu}$ is a local minimum of $J$, then it holds
 	\begin{enumerate}
 		\item $|\bar{p}| \le \alpha \qquad \text{for all } \omega$.
 		\item $\bar{p}(\omega) = -\alpha \phi'(|\bar{\mu}|(\omega)) \sign(\bar{\mu}\{ w \}), \qquad \text{for } \bar{\mu}\text{-almost all } \omega \in \Omega.$
@@ -644,11 +784,96 @@ Taking $u = - \bar{\mu}_{\text{cont}}$ we get $-\langle \bar{p}, \bar{\mu}_{\tex
 By $|p(\omega)| \le \alpha$ we get $\bar{p} =  - \alpha *  \sign \bar{\mu}_{\cont}$ for almost all $\omega \in \cont \bar{\mu}$. 
 \end{proof}
 
+The optimality condition assures the existence of an optimizer. 
+In absence of Assumption \ref{pen1}, it is difficult to prove that a global optimizer exists. 
+For example for the penalty $ \phi(c) = |c|^q$, we have $\phi'(0) = \infty$, the weak-* l.s.c. of the cost functional breaks.
+However, assuming the local optimizer exists, we can still derive the necessary optimality condition. 
+
+\begin{corollary}[Optimality conditions for $\phi'(0^+) = +\infty$]                     
+\label{cor:singular_penalty}                                                                                                                                                                                                                
+Let $\Omega$ be compact and suppose $\phi$ satisfies Assumption~\ref{pen3} but with $\phi'(0^+) = +\infty$ in place of Assumption~\ref{pen1}                                                                                                
+(e.g., $\phi(z) = \frac{1}{q}z^q$ for $0 < q < 1$).                                                                                                                                                                                         
+If $\bar{\mu}$ is a local minimizer of \eqref{int_noncon} with atomic part                                                                                                                                                                  
+$\bar{\mu}_{\atom} = \sum_{n=1}^N \bar{c}_n\,\delta_{\bar{\omega}_n}$, $\bar{c}_n \neq 0$, then:
+\begin{itemize}
+	\item[\textbf{(N1)}] \textbf{Stationarity at each atom:}
+	\[
+		\bar{p}(\bar{\omega}_n) = -\alpha\,\phi'(|\bar{c}_n|)\,\sign(\bar{c}_n),
+		\qquad n = 1, \dots, N.
+	\]
+
+	\item[\textbf{(N2)}] \textbf{Lower bound on atom weights:}
+	Since $\bar{p} \in C(\Omega)$ and $\Omega$ is compact,
+	$\|\bar{p}\|_{C(\Omega)} < \infty$.
+	Combined with \textbf{(N1)}, this gives
+	$\phi'(|\bar{c}_n|) = |\bar{p}(\bar{\omega}_n)|/\alpha \le \|\bar{p}\|_{C(\Omega)}/\alpha$
+	for every $n$. Since $\phi'$ is decreasing with $\phi'(0^+) = +\infty$,
+	inverting yields a uniform lower bound:
+	\[
+		|\bar{c}_n| \;\ge\; (\phi')^{-1}\!\Big(\frac{\|\bar{p}\|_{C(\Omega)}}{\alpha}\Big)
+		\;>\; 0,
+		\qquad n = 1, \dots, N.
+	\]
+	In particular, $\bar{\mu}$ has at most finitely many atoms:
+	$N \le \|\bar{\mu}\|_{M(\Omega)} \big/ \min_n |\bar{c}_n| < \infty$.
+\end{itemize}
+\end{corollary}
+\begin{proof}
+\textbf{(N1)} follows by the same directional derivative argument as in Theorem~\ref{opt_cdt}.
+For $\omega_n \in \atom\bar{\mu}$ with $\bar{\mu}(\{\omega_n\}) = \bar{c}_n \neq 0$,
+perturbing with $u = \pm\delta_{\omega_n}$ gives
+\[
+	\mp\,\bar{p}(\omega_n)
+	\;\le\; \alpha\,\lim_{\tau \to 0}\frac{1}{\tau}
+	\bigl[\phi(|\bar{c}_n \pm \tau|) - \phi(|\bar{c}_n|)\bigr]
+	\;=\; \pm\,\alpha\,\phi'(|\bar{c}_n|)\,\sign(\bar{c}_n),
+\]
+which yields equality. Note that $\phi'(|\bar{c}_n|) < \infty$ for $\bar{c}_n \neq 0$,
+so this step does not require $\phi'(0) < \infty$.
+
+\medskip\noindent
+\textbf{(N2)} The dual variable $\bar{p} = \nabla L(\bar{\mu}) \in C(\Omega)$
+is continuous on the compact set $\Omega$, hence bounded:
+$\|\bar{p}\|_{C(\Omega)} < \infty$.
+By \textbf{(N1)}, $\phi'(|\bar{c}_n|) = |\bar{p}(\bar{\omega}_n)|/\alpha
+\le \|\bar{p}\|_{C(\Omega)}/\alpha$.
+Since $\phi'$ is strictly decreasing (by concavity of $\phi$) and
+$\phi'(0^+) = +\infty$, the function $\phi'$ restricted to $(0,\infty)$
+has a well-defined decreasing inverse, and
+\[
+	|\bar{c}_n| \;\ge\; (\phi')^{-1}\!\Big(\frac{\|\bar{p}\|_{C(\Omega)}}{\alpha}\Big)
+	\;=:\; c_{\min} \;>\; 0.
+\]
+The finiteness of the support then follows from the bounded total variation:
+$N \cdot c_{\min} \le \sum_{n=1}^N |\bar{c}_n| \le \|\bar{\mu}\|_{M(\Omega)} < \infty$.
+\end{proof}
+
+\begin{remark}
+Compared with Theorem~\ref{opt_cdt}:
+\begin{enumerate}
+	\item The global dual bound $|\bar{p}(\omega)| \le \alpha$ for all $\omega \in \Omega$
+	is \emph{lost}: for $\omega \notin \atom\bar{\mu}$, perturbing with
+	$u = \delta_\omega$ yields
+	$-\bar{p}(\omega) \le \alpha\,\phi'(0^+) = +\infty$, which is vacuous.
+	No constraint on $\bar{p}$ is obtained away from the support.
+	\item In exchange, the singularity $\phi'(0^+) = +\infty$ provides an
+	\emph{automatic minimum atom size} via \textbf{(N2)}, and finite support
+	follows without the merging argument of Theorem~5.2 or
+	the local strong concavity in Assumption~\ref{pen2}.
+	\item The zero measure $\mu = 0$ is always a local minimizer,
+	since adding any atom with small weight $|c| \ll 1$ incurs a
+	marginal penalty $\phi(|c|)/|c| \to +\infty$ that dominates the
+	potential decrease in the loss.
+	This means the node insertion criterion $|\bar{p}(\omega)| > \alpha$
+	of the greedy algorithm no longer applies.
+\end{enumerate}
+\end{remark}
+
 
 If the sample size is finite, then the optimal solution admits finite support by the Carath\'eodory's theorem. The following theorem proves that the optimal solution admits the finite support even though the dataset is infinitely large. 
 
 \begin{theorem}
-	If the Assumption \ref{pen1} and the Assumption \ref{pen2} are satisfied, then the optimal solution of (\ref{int_noncon}) admits at most finite nodes.
+	If the Assumption \ref{pen1}, \ref{pen3}, \ref{pen2} are satisfied, then the optimal solution of (\ref{int_noncon}) admits at most finite nodes.
 \end{theorem}
 \begin{proof}\quad\\
 1. $\cont\bar{\mu} = \emptyset$: Argue by contradiction. Assuming there exists $\hat{\omega}$ such that $\bar{\mu}(\{\hat{\omega}\}) = 0$ and $\delta > 0$ such that the open ball $B_\delta(\hat{\omega})$ on $\Omega$ satisfies $|\bar{\mu}|(B_\delta(\hat{\omega})) > 0$. 
@@ -656,6 +881,7 @@ Define $D_\delta := B_\delta(\hat{\omega})$ and $C_\delta := |\bar{\mu}|(D_\delt
 \begin{align*}
 	\mu_\delta = \bar{\mu} - \bar{\mu}|_{D_\delta} + C_\delta \delta_{\hat{\omega}}. 
 \end{align*}
+We prove that the constructed measure decrease the cost function. \par
 The cost function is quadratic, therefore the second order Taylor expansion is exact, we get:
 \begin{align*}
 	L(\mu_\delta)  &= L(\bar{\mu}) + \langle \bar{p}, \mu_\delta - \bar{\mu} \rangle_{C(\Omega), M(\Omega)} + \frac{1}{2} \|\mathcal{N}[u_\delta - \bar{\mu}]\|_{L^2(D, \nu)}^2 + \frac{1}{2}\sum_{i = 1}^d \|\partial_{x_i} \mathcal{N}[\mu_\delta - \bar{\mu}]\|_{L^2(D, \nu)}^2
@@ -677,11 +903,11 @@ Define
 \end{align*}
 Hence
 \begin{align*}
-	L(\mu_\delta) = L(\bar{\mu}) + \langle \bar{p}, \mu_\delta - \bar{\mu} \rangle + \frac{d + 1}{2}\delta^2 \Lambda_1^2 C_\delta^2. 
+	L(\mu_\delta) \le L(\bar{\mu}) + \langle \bar{p}, \mu_\delta - \bar{\mu} \rangle + \frac{d + 1}{2}\delta^2 \Lambda_1^2 C_\delta^2. 
 \end{align*}
 By the Theorem \ref{opt_cdt} $\bar{p}$ is constant for $\omega \in \cont \bar{\mu}$, therefore the first order term vanishes, it holds
 \begin{align*}
-	L(\mu_\delta) = L(\bar{\mu})  + \frac{d + 1}{2}\delta^2 \Lambda_1^2 C_\delta^2. 
+	L(\mu_\delta) \le L(\bar{\mu})  + \frac{d + 1}{2}\delta^2 \Lambda_1^2 C_\delta^2. 
 \end{align*}
 Concerning the cost term, it holds
 \begin{align*}
@@ -774,7 +1000,7 @@ is well-equipped to solve by traditional gradient-based optimization method. Now
 
 \begin{theorem}
 \label{sc_opt}
- Assuming $\phi$ satisfies the Assumption \ref{pen1} and Assumption \ref{pen2}. Let $\bar{\mu}$ be a finitely supported measure $\bar{\mu}:= \sum_{n = 1}^N \bar{c}_n \delta_{\bar{\omega}_n}$ such that 
+ Assuming $\phi$ satisfies the Assumption \ref{pen1}, \ref{pen3}, \ref{pen2}, let $\bar{\mu}$ be a finitely supported measure $\bar{\mu}:= \sum_{n = 1}^N \bar{c}_n \delta_{\bar{\omega}_n}$ such that 
 \begin{enumerate}
 	\item $\bar{c}_n \in (\mathbb{R} \backslash 0)^N$ is a local minimum of $J_{\bar{\omega}}$, 
 	\item For all $\omega \in \Omega \backslash \{\bar{\omega}_n \}_{n = 1, \dots, N}$, it holds $|\bar{p}(\omega)|  \lneqq  \alpha$, where $\bar{p} = \mathcal{N}^*(\mathcal{N}_{\bar{\omega}, \bar{c}} - y) + \sum_{i=1}^d (\partial_{x_i}\mathcal{N})^*(\partial_{x_i}\mathcal{N}_{\bar{\omega}, \bar{c}} - \partial_{x_i} V)$. 
