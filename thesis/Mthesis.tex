@@ -1240,14 +1240,61 @@ To find the global maximal is a NP-hard problem. However heuristic approaches ar
 
 
 \subsection{nonconvex penalized algorithm}
-[TBD] as in Pieper.
+We present two variants of the iterative node insertion and optimization algorithm, adapted from \cite{pieper2022nonconvex}.
+The first handles penalties $\phi$ satisfying Assumption~\ref{pen1} (in particular the log-penalty $\phi_{\log, \gamma}$),
+where the insertion criterion is the necessary optimality condition from Theorem~\ref{opt_cdt}:
+a candidate $\omega$ is accepted if $|p_t(\omega)| > \alpha$.
+The second handles the $q$-penalty $\phi_p(z) = \frac{1}{q}|z|^q$ with $q < 1$,
+where $\phi_p'(0^+) = +\infty$ renders the classical criterion vacuous (cf.\ the Remark after Corollary~\ref{cor:singular_penalty}).
+Instead, a finite-step decrease criterion is used.
 
+\begin{algorithm}[H]
+\caption{Iterative node insertion and optimization with $\phi_{\log,\gamma}$-penalty}
+\label{alg:log}
+\begin{algorithmic}[1]
+\STATE Initial network $\omega^{(0)}, c^{(0)}$ of width $N(0)$.
+\WHILE{$t < T$}
+\STATE Sample $N_{\mathrm{trial}}$ random nodes $\omega \in \mathbb{S}^d$.
+\STATE Optimize (in parallel) the dual variable $|p_t(\omega)|$ by L-BFGS starting from the initial nodes; merge near-duplicate candidates.
+\STATE Select nodes with $|p_t(\omega)| > \alpha$ and add them to the network (of width $N(t + 1/2)$). Initialize their outer weights by coordinate descent.
+\STATE Perform local training based on \eqref{opt_fixN} by semismooth Newton method.
+\STATE Remove nodes with outer weight zero (resulting in width $N(t+1)$).
+\STATE $t = t + 1$.
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
 
+For the $q$-penalty with $q < 1$, the zero measure is always a local minimizer
+(since $\phi_p'(0^+) = +\infty$ implies that adding any neuron with small outer weight $|c| \ll 1$
+incurs an infinite marginal penalty cost).
+Consequently, the classical insertion criterion $|p_t(\omega)| > \alpha$ is never violated at $\bar{\mu} = 0$,
+and more generally provides no useful information away from the support (see Remark after Corollary~\ref{cor:singular_penalty}).
+We replace it with a \emph{finite-step decrease criterion}:
+given a candidate $\omega$, we evaluate the objective decrease
+\[
+	\Delta J(c; \omega) = c \, p_t(\omega) + \tfrac{1}{2} c^2 S_t(\omega)^2 + \tfrac{\alpha}{q} |c|^q,
+\]
+where $S_t(\omega)^2 = \|\sigma(\cdot\,; \omega)\|_H^2$ is the curvature term,
+and accept $\omega$ if $\min_c \Delta J(c; \omega) < 0$.
+The minimizer $c^*$ is computed by Newton's method on the stationarity equation
+$S_t(\omega)^2 c + \alpha |c|^{q-1} = |p_t(\omega)|$,
+and is used directly as the initial outer weight.
 
-\section{generalization bound and convergence rate}
-\begin{equation}
-	L(\hat{f}) - \inf_{f \in L^2(D)} L (f) \le \bigg[ \inf_{f \in L^2(D)} L(f) - \inf_{f \in \mathcal{W}(D)} L(f) \bigg] + 2 \sup_{ f \in \mathcal{W}(D)} |l(f) - L(f)| + |l(\hat{f}) - \inf_{f \in \mathcal{W}(D)} l(f)|.
-\end{equation}
+\begin{algorithm}[H]
+\caption{Iterative node insertion and optimization with $|c|^q$-penalty}
+\label{alg:q}
+\begin{algorithmic}[1]
+\STATE Initial network $\omega^{(0)}, c^{(0)}$ of width $N(0)$.
+\WHILE{$t < T$}
+\STATE Sample $N_{\mathrm{trial}}$ random nodes $\omega \in \mathbb{S}^d$.
+\STATE Optimize (in parallel) the dual variable $|p_t(\omega)|$ by L-BFGS starting from the initial nodes; merge near-duplicate candidates.
+\STATE For each candidate $\omega$, solve $\min_c \Delta J(c; \omega)$ to obtain $c^*(\omega)$. Select nodes with $\Delta J(c^*; \omega) < 0$ and add them to the network with outer weight $c^*$ (of width $N(t + 1/2)$).
+\STATE Perform local training based on \eqref{opt_fixN} with $\phi_p(z) = \frac{1}{q}|z|^q$ by semismooth Newton method.
+\STATE Remove nodes with outer weight zero (resulting in width $N(t+1)$).
+\STATE $t = t + 1$.
+\ENDWHILE
+\end{algorithmic}
+\end{algorithm}
 
 
 \section{numerical Example}
@@ -1273,63 +1320,7 @@ The HJB equation at $t = 0$ is:
 \end{align*}
 
 
-\section{Might be useful later }
-\subsection{integral representation of convex functionals on the space of measure}
-For $f: \Omega \rightarrow  (-\infty, +\infty]$ a convex function, we define the functional
-\begin{align*}
-	F: L^1(\Omega, \lambda) &\rightarrow \mathbb{R}\\
-	 v &\mapsto \int_\Omega f(\frac{d\mu}{d\lambda}).
-\end{align*}
-The functional above admits a weak* l.s.c. envelope, i.e., 
-\begin{align*}
-	\liminf_{\mu_n \overset{*}{\rightharpoonup}\mu} F(\mu) \ge \sup_{u \in C(\Omega)} \langle \mu, u\rangle - \int_\Omega f^*(u) d\lambda.
-\end{align*} 
 
-\begin{definition}[the infimal convolution]
-\label{inficonv}
-	Let $f$ and $g$ be 2 closed proper convex function on $\mathbb{R}^n$, the infimal convolution of $f$ and $g$ is defined as 
-	\begin{align*}
-		(f \triangledown g)(v) = \inf_{x \in \mathbb{R}^n}( f(x) + g(v - x)),
-	\end{align*}
-	with $\dom(f \triangledown g) = \dom(f) + \dom(g)$. 
-\end{definition}
-
-\begin{proposition}
-Let $f$ and $g$ be 2 closed proper convex function on $\mathbb{R}^n$, it holds
-\begin{align*}
-	&f \triangledown f^\infty = f, \\
-	&g \triangledown g = g \quad\quad\quad \text{for $g$ subadditive and $g(0) = 0$}.
-\end{align*}	
-\end{proposition}
-
-We define the indicator function  $\mathbbm{1}_H(u)$ of a closed and convex set $H \subset C(\Omega) $ with nonempty interior:
-\begin{equation*}
-	\mathbbm{1}_{H}(u) =  
-	\left\{
-	\begin{aligned}
-		&0  &u \in H\\
-		&+\infty &u \notin H.
-	\end{aligned}
-	\right.
-\end{equation*} 
-The Fenchel conjugate is calculated as 
-\begin{align*}
-	\mathbbm{1}_H^*(u^*) = \sup_{u \in H} \langle u^*, u \rangle
-\end{align*}
-
- The following result transform the conjugation into infimal convolution. 
-
-\begin{theorem}[infimal convolution in the functional space]
-Let $\Omega$ be a compact subset of $\mathbb{R}^{d+ 1}$. Given $C(\Omega)$ with its dual $M(\Omega)$. Let $H \subset C(\Omega)$ closed and convex and denote $J$ the linear functional
-\begin{align*}
-	J: L^1(\Omega, m) \rightarrow \mathbb{R}, \quad u \mapsto \int_\Omega j( u(\omega)) dm(\omega). 
-\end{align*}
-If every $\mu \in M(\Omega)$ admits the Lebesgue-Nikodym decomposition $\mu = \frac{d\mu}{d\lambda} \cdot \lambda + \mu^s$. Then it holds for $m = |\lambda| + \mu^s$,
-\begin{align*}
-	[J + \mathbbm{1}_H]^*( \mu ) &= \int_\Omega [J^* \triangledown \mathbbm{1}_H^*]^{**} ( \mu ) dm = \int_\Omega j^* \nabla  \mathbbm{1}_{\Gamma}^* \bigg(\frac{d\mu}{d\lambda}(\omega)\bigg) d\mu + \int_\Omega \mathbbm{1}_{\Gamma}^*\bigg(\mu^s(\omega)\bigg)d\mu^s,
-\end{align*}
-with $\Gamma:= \cl \{ \ran(u) : u \in H\} \cap \dom(J)$.
-\end{theorem}
 
 
 \newpage
