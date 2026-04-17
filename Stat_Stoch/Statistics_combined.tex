@@ -1938,57 +1938,87 @@ Having an exponential family is like having a dream.
 If model misspecification, we apply $\tilde{\theta} = \frac{1}{n} \sum Y_i$ but $\mathcal{P} \notin (\mathcal{P}_\theta)$. The formula still applies, but $F(\theta)$ and $Var_\theta(\theta)$ change. We loose R-efficiency.	
 \end{remark}
 
-\subsection{Generalized linear Model}
-In the generalised linear the response variables do not have to be linear of the parameter, instead only the moment function $g(\mathbb{E}(Y))$. When we bring the exponential family to the canonical form, the 
+\subsection{Generalized Linear Model}
 
- model the we have the score function and Fischer-Information. The MLE could be calculated by letting the score function equals 0. The uniqueness is garanteed when the Fischer-Information is positive definite. The first step freed the assumption of the distribution of the sampling. We can have for example poisson distributed(in the case of poisson regression) and Bernoulli distributed sampling.\par 
-Second, by using the link function and dispersion parameter we are provided more freedom to fit the model. The linear model established relationship between the $\mathbb{E}[Y]$ and and $X\beta$. The expectation is typically linked with the parameter, and at the same time could be calculated w.r.t. $\eta$, while $\eta$ in the canonical link could be calculated by $\eta = X\beta$. Finally, We could write the parameter in terms of $X\beta$ and using ML method to get the $\hat{\beta}$.  
+As seen in the previous section, we focus on the expectation $\mathbb{E}[Y_i]$, which is only meaningful under a distributional assumption on $Y_i$. When Nelder and Wedderburn (1972) introduced generalized linear models, they used exponential families for this purpose.
+
 \begin{definition}[Generalized Linear Model]
-Given a sampling $Y_1, \cdots, Y_n$ and the natural exponential family:
+On a product model $(\mathcal{X}^n, \mathcal{F}^{\otimes n})$, a generalized linear model (GLM) with $n$ independent observations $Y_1, \dots, Y_n$ is given when the marginal distributions of $Y_i$ belong to a natural exponential family with densities
 \begin{equation}
-    \frac{d\mathbb{P}_\nu^{y_{i}}}{d\mu} = p(y_i)\exp(\nu y - d(\nu)), \quad i = 1, \dots, n
+	\frac{d\mathbb{P}_{\eta_i}^{Y_i}}{d\mu}(y_i) = \exp\left(\frac{\eta_i y_i - \zeta(\eta_i)}{\varphi}\right) c(y_i, \varphi), \quad i = 1, \dots, n
 \end{equation}
-In the case $\nu = \psi^T \theta$
-and the log-likelihood read:
+with respect to a dominating measure $\mu$, with dispersion parameter $\varphi > 0$,
+\begin{equation*}
+	\eta_i \in \Xi = \left\{ \eta \in \mathbb{R} : \int_{\mathcal{X}} e^{\eta y / \varphi}\, c(y, \varphi)\, \mu(dy) \in (0, \infty) \right\} \subset \mathbb{R}
+\end{equation*}
+for all $i$, and known functions $\zeta \colon \Xi \to \mathbb{R}$ and $c \colon \mathcal{X} \times \mathbb{R}_+ \to \mathbb{R}_+$ with $\zeta''(\eta) > 0$ for all interior points $\eta \in \Xi^\circ$. Define $\rho(\eta_i) := \mathbb{E}_{\eta_i}[Y_i]$.
+
+For an unknown parameter vector $\beta \in \mathbb{R}^k$, a design matrix $X \in \mathbb{R}^{n \times k}$, and a bijective, continuously differentiable function $g \colon \mathbb{R} \to \mathbb{R}$, we require
 \begin{equation}
-    l(\theta, Y) = \log L (\theta, Y) = S^T \theta + A(\theta)
+	\begin{pmatrix} g(\rho(\eta_1)) \\ \vdots \\ g(\rho(\eta_n)) \end{pmatrix} = X\beta.
 \end{equation}
-where $S = \sum Y_i \psi_i$ and $A(\theta) = \sum d(\psi_i^T \theta)$
+The function $g$ is called the \textbf{link function}. If $\rho = g^{-1}$, then $g$ is the \textbf{canonical link}, and $(\eta_1, \dots, \eta_n)^T = X\beta$.
 \end{definition}
 
-\begin{example}[Logistic regression]
+\begin{remark}[Dispersion parameter]
+While $\beta$ is the parameter of interest, $\varphi$ is treated as a nuisance parameter. For fixed $\varphi$, $Y_i$ follows a natural exponential family in $T(y) = y/\varphi$. The parameter $\varphi$ arises from the exponential family and is typically known, related to the variance of the distribution. Hence the name \emph{dispersion parameter}: dispersion measures the spread of individual values around the mean.
+\end{remark}
+
+\begin{example}[Gaussian linear model as GLM]
+The ordinary linear model $Y = X\beta + \varepsilon$ with i.i.d.\ errors $\varepsilon_i \sim \mathcal{N}(0, \sigma^2)$, known variance $\sigma^2 > 0$, and row vectors $x_1, \dots, x_n \in \mathbb{R}^k$ of the design matrix $X$, is a GLM. Indeed, $Y_i \sim \mathcal{N}(x_i\beta, \sigma^2)$ and the density can be written as
 \begin{equation*}
-	Y_i \sim Ber(\theta), \quad f(y) = \theta^y(1-\theta)^{(1-y)}
+	\frac{d\mathbb{P}_{\eta_i}^{Y_i}}{d\mu}(y_i) = \exp\!\left(\frac{x_i\beta \cdot y_i - (x_i\beta)^2/2}{\sigma^2}\right) \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{y_i^2}{2\sigma^2}\right), \quad i = 1, \dots, n.
 \end{equation*}
-Given $ y \in \{0. 1\}^n$, the exponential family:
-\begin{align*}
-	\frac{dP}{d\mu}(y) &= \exp\left( y \log \frac{\theta}{1 - \theta} + \log (1 - \theta)\right) = \exp( \nu^T y - \log (1 + e^\nu))
-	\quad (\nu = \log \frac{\theta}{1-\theta})
-\end{align*}
-Whereas we get the \textbf{sigmoid function}
-\begin{align*}
-	 \Rightarrow \mathbb{E}(Y_i) = \theta = \frac{e^\nu}{1 + e^\nu} = \frac{1}{1 + e^{-\nu}}
-\end{align*} 
-Given the data $(X_1, Y_1), \dots, (X_n, Y_n) \in \mathbb{R}^p \times \{0, 1\}$. We assume $v = c^T X$, ($c, X \in \mathbb{R}^p$). We maximize the \textbf{logistic function}
-\begin{equation*}
-	l(c) = \sum_{i= 1}^n -\log (1+ e^{-c^TX_i}) - (1- Y_i) c^TX_i
-\end{equation*}
-and get $\hat{c}$.
+The natural parameter is $\eta_i = x_i\beta$, the dispersion parameter is $\varphi = \sigma^2$, and $c(y_i, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{y_i^2}{2\sigma^2}\right)$. Since $\zeta(\eta) = \eta^2/2$, we have $\zeta''(\eta) \equiv 1 > 0$ and $\rho(\eta_i) = \mathbb{E}[Y_i] = \zeta'(\eta_i) = \eta_i = x_i\beta$. Thus $g = \mathrm{id}_{\mathbb{R}}$ is the canonical link, and $(\eta_1, \dots, \eta_n)^T = X\beta$.
 \end{example}
 
+\begin{remark}[Link function and dispersion parameter] ~
+\begin{itemize}
+	\item The link function can be freely chosen for modelling purposes, as long as it is bijective and continuously differentiable.
+	\item In the Gaussian example above, $\sigma^2$ is assumed known. If unknown, it can be calibrated from the data.
+\end{itemize}
+\end{remark}
 
-\begin{example}(Poisson regression)
-\end{example}
-
-\begin{lemma}[Fischer Information]
-In the GLM with the canonical link function we have the score function:
-
-and the Fisher Information is therefore:
-\begin{equation}
-    \mathcal{I}(\theta) =  \sum_{i = 1}^n d'' \quad \in \mathbb{R}^{p* p}
-\end{equation}
-If the Fisher information is positive definite and and the score function admits a solution, then the parameter $\beta$ has an unique MLE $\hat{\beta}$.
+\begin{lemma}[Moments in the GLM]
+In the generalized linear model,
+\begin{equation*}
+	\mathbb{E}_{\beta, \varphi}[Y_i] = \zeta'(\eta_i), \quad \mathrm{Var}_{\beta, \varphi}(Y_i) = \varphi \, \zeta''(\eta_i), \quad i = 1, \dots, n.
+\end{equation*}
 \end{lemma}
+
+\begin{proof}
+Let $\bar{\zeta}(\eta) = \zeta(\eta)/\varphi$, $T_i := Y_i / \varphi$, and $\bar{\rho}(\eta) = \rho(\eta)/\varphi$. From the properties of natural exponential families:
+\begin{equation*}
+	\mathbb{E}_{\beta, \varphi}[Y_i]/\varphi = \mathbb{E}_{\beta, \varphi}[T_i] = \bar{\rho}(\eta_i) = \bar{\zeta}'(\eta_i) = \zeta'(\eta_i)/\varphi,
+\end{equation*}
+giving $\mathbb{E}_{\beta,\varphi}[Y_i] = \zeta'(\eta_i)$. Similarly,
+\begin{equation*}
+	\mathrm{Var}_{\beta, \varphi}[Y_i]/\varphi^2 = \mathrm{Var}_{\beta, \varphi}[T_i] = \bar{\rho}'(\eta_i) = \bar{\zeta}''(\eta_i) = \zeta''(\eta_i)/\varphi,
+\end{equation*}
+giving $\mathrm{Var}_{\beta,\varphi}[Y_i] = \varphi \, \zeta''(\eta_i)$.
+\end{proof}
+
+\subsubsection*{MLE in the GLM}
+
+To estimate the unknown parameter vector $\beta$, we use the maximum likelihood approach. Since $\mathrm{Var}_{\beta,\varphi}(Y_i) = \varphi \zeta''(\eta_i) > 0$ and $\varphi > 0$, the function $\zeta'$ is strictly monotone increasing, hence $\rho$ is invertible. Since $g$ is also invertible, define $\psi := (g \circ \rho)^{-1}$. Let $x_i \in \mathbb{R}^k$ denote the $i$-th row of $X$, then
+\begin{equation*}
+	\eta_i = \rho^{-1} \circ g^{-1}(x_i^T\beta) = (g \circ \rho)^{-1}(x_i^T\beta) = \psi(x_i^T\beta).
+\end{equation*}
+The log-likelihood becomes
+\begin{equation}
+	\log L(\beta, \varphi; y) = \sum_{i=1}^n \left( \frac{\psi(x_i^T\beta)\, y_i - \zeta\big(\psi(x_i^T\beta)\big)}{\varphi} + \log c(y_i, \varphi) \right).
+\end{equation}
+Differentiating with respect to $\beta$ and using $\rho = \zeta'$, we obtain the score equation:
+\begin{equation} \label{eq:GLM_score}
+	\nabla_\beta \log L(\hat{\beta}, \varphi; y) = \frac{1}{\varphi} \sum_{i=1}^n \big(y_i - \rho(\psi(x_i^T\hat{\beta}))\big)\, \psi'(x_i^T\hat{\beta})\, x_i = 0.
+\end{equation}
+
+\begin{remark}[MLE in the GLM] ~
+\begin{enumerate}
+	\item Typically $\hat{\beta}$ has no closed-form solution and must be computed numerically. \emph{Fisher's scoring method} is one such procedure, which requires the Fisher information.
+	\item If $g$ is not the canonical link, a solution of \eqref{eq:GLM_score} is not necessarily a maximum likelihood estimator.
+\end{enumerate}
+\end{remark}
 
 \subsection{Canonical parametrisation}
 \begin{definition}
@@ -2175,7 +2205,6 @@ $\forall v$
 If Gaussian, it is symmetric , but it is the only case. In Bernoulli and other not symmetric. Especially near the edge point. The Fisher asymptotic theory suggests always symmetric confidence set.(A drawback in a vicinity of edge points)
 \end{enumerate}	
 \end{remark}
-\newpage
 
 
 

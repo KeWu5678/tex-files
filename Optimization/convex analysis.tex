@@ -1870,8 +1870,58 @@ and we have:
 
 \chapter{Nonconvex Analysis}
 
-the semiconcavity
 
 
-	
+\section{Semiconcavity}
+
+Throughout this section, let $A \subset \mathbb{R}^n$ be an open set. A function $u : A \to \mathbb{R}$ is \emph{semiconcave with modulus $\omega$} if
+\[
+	\lambda u(x) + (1 - \lambda) u(y) - u(\lambda x + (1 - \lambda)y) \leqslant \lambda(1 - \lambda)|x - y|\,\omega(|x - y|)
+\]
+for all $x, y \in A$ with $[x,y] \subset A$ and $\lambda \in [0,1]$, where $\omega : [0, \infty) \to [0, \infty)$ is nondecreasing, upper semicontinuous, and $\omega(0) = 0$. When $\omega(r) = Cr$ (linear modulus), $u$ is called \emph{$C$-semiconcave}.
+
+\begin{definition}[Upper differential / Superdifferential]
+The \emph{superdifferential} of $u$ at $x \in A$ is
+\[
+	D^+ u(x) := \left\{ p \in \mathbb{R}^n \;:\; \limsup_{y \to x} \frac{u(y) - u(x) - \langle p, y - x \rangle}{|y - x|} \leqslant 0 \right\}.
+\]
+\end{definition}
+
+The following characterization is fundamental: a vector $p \in \mathbb{R}^n$ belongs to $D^+ u(x)$ if and only if
+\begin{equation}\label{eq:superdiff-prop331}
+	u(y) - u(x) - \langle p, y - x \rangle \leqslant |y - x|\,\omega(|y - x|)
+\end{equation}
+for any $y \in A$ such that $[y, x] \subset A$ (Proposition 3.3.1 in \cite{cannarsa2004semiconcave}).
+
+\subsection{Compactness of semiconcave functions}
+
+\begin{theorem}[Cannarsa--Sinestrari, Theorem 3.3.3]\label{thm:sc-compactness}
+Let $u_n : A \to \mathbb{R}$ be a family of semiconcave functions with the same modulus $\omega$. Given an open set $B \Subset A$, suppose that the $u_n$'s are uniformly bounded in $B$. Then there exists a subsequence $u_{n_k}$ converging uniformly to a function $u : B \to \mathbb{R}$ semiconcave with modulus $\omega$. In addition, $Du_{n_k} \to Du$ a.e.\ in $B$.
+\end{theorem}
+
+\begin{proof}
+\textbf{Step 1: Uniform convergence.}
+Since the $u_n$ are semiconcave with the same modulus $\omega$ and uniformly bounded on $B \Subset A$, they are uniformly Lipschitz in $B$ (Remark 2.1.8 in \cite{cannarsa2004semiconcave}). By the Arzel\`a--Ascoli theorem, there exists a subsequence (still denoted $u_n$) converging uniformly to some $u : B \to \mathbb{R}$. The semiconcavity inequality is preserved by pointwise convergence, so $u$ is semiconcave with the same modulus $\omega$.
+
+\medskip\noindent\textbf{Step 2: A.e.\ convergence of gradients.}
+Consider a point $x_0 \in B$ such that $u$ and all $u_n$ are differentiable at $x_0$; all points of $B$ have this property except for a set of measure zero. We claim $Du_n(x_0) \to Du(x_0)$.
+
+The sequence $\{Du_n(x_0)\}$ is bounded (by the uniform Lipschitz constant). Suppose, for contradiction, that it does not converge to $Du(x_0)$: then there exists a subsequence with $Du_{n_k}(x_0) \to p_0 \neq Du(x_0)$.
+
+Since $Du_{n_k}(x_0) \in D^+ u_{n_k}(x_0)$, by \eqref{eq:superdiff-prop331} applied to each $u_{n_k}$:
+\[
+	u_{n_k}(y) - u_{n_k}(x_0) - \langle Du_{n_k}(x_0),\, y - x_0 \rangle \leqslant |y - x_0|\,\omega(|y - x_0|)
+\]
+for all $y$ with $[y, x_0] \subset B$. Passing to the limit using the uniform convergence $u_{n_k} \to u$ and $Du_{n_k}(x_0) \to p_0$:
+\[
+	u(y) - u(x_0) - \langle p_0, y - x_0 \rangle \leqslant |y - x_0|\,\omega(|y - x_0|).
+\]
+This means $p_0 \in D^+ u(x_0)$. But $u$ is differentiable at $x_0$, so $D^+ u(x_0) = \{Du(x_0)\}$ (Proposition 3.3.4(d) in \cite{cannarsa2004semiconcave}). Hence $p_0 = Du(x_0)$, a contradiction.
+\end{proof}
+
+\begin{thebibliography}{9}
+\bibitem{cannarsa2004semiconcave}
+P.~Cannarsa and C.~Sinestrari, \emph{Semiconcave Functions, Hamilton--Jacobi Equations, and Optimal Control}, Birkh\"auser, Boston, 2004.
+\end{thebibliography}
+
 \end{document}
