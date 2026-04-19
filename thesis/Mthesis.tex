@@ -12,6 +12,7 @@
 \DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
 \usepackage{amsmath,amssymb,amsthm,textcomp}
 \usepackage{multicol}
+\usepackage{multirow}
 \usepackage{tikz}
 \usepackage[normalem]{ulem}
 \usepackage{bbm} % using for the characteristic function
@@ -1149,20 +1150,7 @@ Choose $\epsilon$ such that  $\epsilon \|\mathcal{N}\|^2 + (\alpha \delta - \fra
 \section{algorithms}
 In this section, we introduce the optimization algorithm. In the first step, we generate the data for training and validation. In the second step, we insert neurons. And finally we trained the network with nonconvex penalty to get a sparse network. The process is repeated a fixed time. 
 
-Denote $\mathcal{W}(D)$ as the space of functions that can be represented by measures with bounded variation, i.e., 
-\begin{align*}
-	&\mathcal{W}(D):= \bigg\{ f \in L^2(D, \nu) :\quad f(x) = \mathcal{N}[\mu] \text{ for some } \mu \in M(\Omega) \bigg\}, \\
-	&\text{with},\\
-	&\|f\|_{W(D)}: =\min_{\mu \in M(\Omega)} \|\mu\|_{M(\Omega)}\quad \text{ such that } f = \mathcal{N}[\mu].
-\end{align*} 
-
-The algorithm is divided into 3 parts:
-\begin{enumerate}
-	\item data generation 
-	\item greedy insertion 
-	\item redundant neurons elimination
-\end{enumerate}
-\subsection{data generation}
+\subsection{generate data via open loop problem}
 We come back to the original problem (\ref{opt}), the problem can be written as 
 \begin{align*}
 	&  \inf_{u, y} J(y, u)\\
@@ -1220,7 +1208,8 @@ For the implemented data-driven approach, it is essential to have the causality-
 
 
 \subsection{greedy insertion}
-In \cite{bach2017breaking}, a conditional gradient algorithm for finitely many samples is presented. To avoid the constraint, like in \cite{pieper2022nonconvex} we implement the stereographic projection:
+In \cite{bach2017breaking}, a conditional gradient algorithm for finitely many samples is presented. 
+To avoid the constraint, like in \cite{pieper2022nonconvex} we implement the stereographic projection for the ReLU activation function:
 \begin{align*}
 	\Psi: \mathbb{S}^d \rightarrow \mathbb{R}^d, \quad z \mapsto \bigg(\frac{2z}{1 + \|z\|^2}, \frac{1- \|z\|^2}{1 + \|z\|^2} \bigg).
 \end{align*} 
@@ -1228,7 +1217,7 @@ Denote $K$ the number of the samples, the optimal neural net representation of t
 
 In each iteration $f_t$, we calculate $\bar{f}_t$ such that 
 \begin{align*}
-	\bar{f_t} \in \arg \min_{f \in \mathcal{W}(D)} \langle f, J'(f_t) \rangle_{L^2(D, \nu)}. 
+	\bar{f_t} \in \arg \min_{f } \langle f, J'(f_t) \rangle_{L^2(D, \nu)}. 
 \end{align*}
 
  Denote $g = - J'(f_t) \in L^2(D, \nu)$ for $f_t(x) = \int_{\Omega} \varphi_\omega^t(x) d\mu_{f_t}(\omega)$. The conditional gradient algorithm relies on solving at each iteration  the "Frank-Wolf step", namely, we maximize: 
@@ -1248,6 +1237,24 @@ a candidate $\omega$ is accepted if $|p_t(\omega)| > \alpha$.
 The second handles the $q$-penalty $\phi_p(z) = \frac{1}{q}|z|^q$ with $q < 1$,
 where $\phi_p'(0^+) = +\infty$ renders the classical criterion vacuous (cf.\ the Remark after Corollary~\ref{cor:singular_penalty}).
 Instead, a finite-step decrease criterion is used.
+
+Both algorithms minimize the regularized loss
+\[
+	\mathcal{L}(\omega, c) = w_1 \cdot \frac{1}{2N_x} \sum_{k=1}^K \big| V(x^k) - \mathcal{N}_{\omega,c}(x^k) \big|^2
+	+ w_2 \cdot \frac{1}{2N_x} \sum_{k=1}^K \big| \nabla V(x^k) - \nabla \mathcal{N}_{\omega,c}(x^k) \big|^2
+	+ \alpha \sum_{n=1}^N \phi(|c_n|),
+\]
+where $N_x = K \cdot d$. We consider two choices of the weights $(w_1, w_2)$:
+\begin{itemize}
+	\item $L^2$ loss: $(w_1, w_2) = (1, 0)$, fitting only the value function;
+	\item $H^1$ loss: $(w_1, w_2) = (1, 1)$, fitting both the value function and its gradient.
+\end{itemize}
+The relative errors used to evaluate the approximation quality are
+\[
+	\mathrm{Err}_{L^2} = \frac{\| \mathcal{N} - V \|_{L^2}}{\| V \|_{L^2}}, \qquad
+	\mathrm{Err}_{H^1} = \frac{\big(\| \mathcal{N} - V \|_{L^2}^2 + \| \nabla \mathcal{N} - \nabla V \|_{L^2}^2\big)^{1/2}}{\big(\| V \|_{L^2}^2 + \| \nabla V \|_{L^2}^2\big)^{1/2}},
+\]
+where the norms are computed empirically over the data set.
 
 \begin{algorithm}[H]
 \caption{Iterative node insertion and optimization with $\phi_{\log,\gamma}$-penalty}
@@ -1300,6 +1307,7 @@ and is used directly as the initial outer weight.
 
 \section{numerical Example}
 \subsection{Van der Pol  oscillator}
+In this example we consider the Van der Pol equation. 
 We consider the optimal control of the Van der Pol oscillator expressed as
 \[
 \min_{u \in L^2(0, T; \mathbb{R})} \int_0^T \big( y_1^2(t) + y_2^2(t) + \beta u^2(t) \big) \, dt
@@ -1356,82 +1364,104 @@ We solve the open-loop problem on a $30 \times 30$ grid over $[-3,3]^2$ ($K = 90
 All experiments run 10 outer iterations, inserting up to 50 neurons per iteration and pruning neurons with $|c| < 10^{-5}$.
 
 %% ---------------------------------------------------------------
-\subsubsection*{Algorithm~\ref{alg:log}: $\phi_{\log,\gamma}$-penalty with tanh activation}
+\subsubsection*{Algorithm~\ref{alg:log}: $\phi_{\log,\gamma}$-penalty with different activation functions}
 %% ---------------------------------------------------------------
 
-\paragraph{Effect of gradient augmentation.}
-Table~\ref{tab:alg1_gradient} compares $L^2$ loss (value only) and $H^1$ loss (value + gradient) at $\alpha = 10^{-5}$, $\gamma = 1$.
+\paragraph{Effect of gradient augmentation and activation function.}
+We compare three activation functions, shown together with their first and second derivatives in Figure~\ref{fig:activations}:
+tanh ($C^\infty$, bounded, saturating),
+softplus ($C^\infty$, unbounded, non-saturating),
+and Mat\'ern~5/2 ($C^2$, exponentially decaying).
+Tanh saturates for large $|z|$, causing vanishing gradients.
+Softplus grows linearly and avoids saturation.
+Mat\'ern~5/2 is localized with exponential decay and is exactly $C^2$ (the second derivative is continuous but the third is not).
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{plot/activation.png}
+\caption{Activation functions and their derivatives. Left: tanh. Center: softplus. Right: Mat\'ern~5/2.}
+\label{fig:activations}
+\end{figure}
+
+Table~\ref{tab:alg1_gradient} compares $L^2$ loss (value only) and $H^1$ loss (value + gradient) at $\alpha = 10^{-5}$, $\gamma = 1$ for all three activation functions.
 
 \begin{table}[H]
 \centering
-\caption{Algorithm~1: effect of gradient augmentation ($\alpha = 10^{-5}$, $\gamma = 1$).}
+\caption{Algorithm~1: effect of gradient augmentation and activation function ($\alpha = 10^{-5}$, $\gamma = 1$).}
 \label{tab:alg1_gradient}
-\begin{tabular}{l|ccc|ccc}
+\begin{tabular}{ll|ccc|ccc|ccc}
 \hline
- & \multicolumn{3}{c|}{Training} & \multicolumn{3}{c}{Validation} \\
-Loss & $\mathrm{Err}_{L^2}$ & $\mathrm{Err}_{H^1}$ & $N$ & $\mathrm{Err}_{L^2}$ & $\mathrm{Err}_{H^1}$ & $N$ \\
+ & & \multicolumn{3}{c|}{tanh} & \multicolumn{3}{c|}{Mat\'ern~5/2} & \multicolumn{3}{c}{softplus} \\
+ & Loss & $\mathrm{Err}_{L^2}$ & $\mathrm{Err}_{H^1}$ & $N$ & $\mathrm{Err}_{L^2}$ & $\mathrm{Err}_{H^1}$ & $N$ & $\mathrm{Err}_{L^2}$ & $\mathrm{Err}_{H^1}$ & $N$ \\
 \hline
-$L^2$ & $2.39 \times 10^{-2}$ & $3.88 \times 10^{-1}$ & 94 & $4.33 \times 10^{-2}$ & $4.38 \times 10^{-1}$ & 94 \\
-$H^1$ & $3.36 \times 10^{-1}$ & $2.98 \times 10^{-1}$ & 37 & $4.78 \times 10^{-1}$ & $3.16 \times 10^{-1}$ & 37 \\
+\multirow{2}{*}{Train} & $L^2$ & $2.39\text{e-}2$ & $3.88\text{e-}1$ & 94 & $8.60\text{e-}3$ & $3.61\text{e-}1$ & 129 & $2.12\text{e-}2$ & $3.76\text{e-}1$ & 84 \\
+ & $H^1$ & $2.91\text{e-}1$ & $3.56\text{e-}1$ & 76 & $2.48\text{e-}1$ & $1.95\text{e-}1$ & 145 & $2.68\text{e-}1$ & $2.24\text{e-}1$ & 43 \\
+\hline
+\multirow{2}{*}{Val} & $L^2$ & $4.33\text{e-}2$ & $4.38\text{e-}1$ & 94 & $2.23\text{e-}2$ & $3.79\text{e-}1$ & 129 & $3.11\text{e-}2$ & $3.90\text{e-}1$ & 84 \\
+ & $H^1$ & $4.87\text{e-}2$ & $5.51\text{e-}1$ & 76 & $2.94\text{e-}1$ & $2.14\text{e-}1$ & 145 & $3.12\text{e-}1$ & $2.39\text{e-}1$ & 43 \\
 \hline
 \end{tabular}
 \end{table}
 
-The $H^1$ loss improves gradient approximation ($\mathrm{Err}_{H^1}$: $0.30$ vs.\ $0.39$) and dramatically reduces the neuron count (37 vs.\ 94), at the cost of higher $L^2$ error.
+With the $L^2$ loss, Mat\'ern~5/2 achieves the best training error ($8.60 \times 10^{-3}$), followed by softplus ($2.12 \times 10^{-2}$) and tanh ($2.39 \times 10^{-2}$), though Mat\'ern~5/2 uses more neurons (129 vs.\ 84--94).
+With the $H^1$ loss, the gradient error $\mathrm{Err}_{H^1}$ improves substantially for Mat\'ern~5/2 ($1.95 \times 10^{-1}$) and softplus ($2.24 \times 10^{-1}$), while tanh shows no meaningful improvement ($3.56 \times 10^{-1}$) and its validation $\mathrm{Err}_{H^1}$ degrades to $5.51 \times 10^{-1}$, indicating overfitting of the gradient component.
+\par 
+Softplus achieves the most compact representation under $H^1$ loss (43 neurons) with competitive gradient accuracy.
+The $C^2$ Mat\'ern~5/2 activation yields the best gradient approximation overall.\\
 
 \paragraph{Effect of $\gamma$.}
 Table~\ref{tab:alg1_gamma} shows the effect of the nonconvex correction $\gamma$ at $\alpha = 10^{-5}$, $L^2$ loss.
 
 \begin{table}[H]
 \centering
-\caption{Algorithm~1: effect of $\gamma$ ($\alpha = 10^{-5}$, $L^2$ loss).}
+\caption{Algorithm~1: effect of $\gamma$ (softplus, $\alpha = 10^{-5}$, $L^2$ loss).}
 \label{tab:alg1_gamma}
 \begin{tabular}{c|ccc}
 \hline
 $\gamma$ & $N$ & $\mathrm{Err}_{L^2}$ & $\mathrm{Err}_{H^1}$ \\
 \hline
-0 & 104 & $2.79 \times 10^{-2}$ & $4.05 \times 10^{-1}$ \\
-$10^{-2}$ & 99 & $2.53 \times 10^{-2}$ & $3.93 \times 10^{-1}$ \\
-$10^{-1}$ & 90 & $2.36 \times 10^{-2}$ & $3.93 \times 10^{-1}$ \\
-1 & 94 & $2.39 \times 10^{-2}$ & $3.88 \times 10^{-1}$ \\
-10 & 107 & $1.79 \times 10^{-2}$ & $3.79 \times 10^{-1}$ \\
+0 & 81 & $2.27 \times 10^{-2}$ & $3.79 \times 10^{-1}$ \\
+$10^{-2}$ & 87 & $2.62 \times 10^{-2}$ & $3.85 \times 10^{-1}$ \\
+$10^{-1}$ & 81 & $2.48 \times 10^{-2}$ & $3.82 \times 10^{-1}$ \\
+1 & 84 & $2.12 \times 10^{-2}$ & $3.76 \times 10^{-1}$ \\
+10 & 80 & $2.06 \times 10^{-2}$ & $3.74 \times 10^{-1}$ \\
 \hline
 \end{tabular}
 \end{table}
 
-Moderate values of $\gamma$ reduce neuron count (104 to 90 at $\gamma = 0.1$) while slightly improving error.
-At $\gamma = 10$, the error is lowest ($1.79 \times 10^{-2}$) but the neuron count increases back to 107.
+The results are consistent across all three activation functions; we report softplus as representative.
+Increasing $\gamma$ improves $\mathrm{Err}_{L^2}$ ($2.27 \times 10^{-2}$ at $\gamma = 0$ to $2.06 \times 10^{-2}$ at $\gamma = 10$) while the neuron count remains stable (80--87).
 
 \paragraph{Effect of $\alpha$ and interaction with $\gamma$.}
-Table~\ref{tab:alg1_alpha} sweeps $\alpha$ for $\gamma = 0$ (pure $l^1$) and $\gamma = 5$ (nonconvex correction).
+Table~\ref{tab:alg1_alpha} sweeps $\alpha$ for $\gamma = 0$ (pure $l^1$) and $\gamma = 5$ (nonconvex correction) across all three activation functions.
 
 \begin{table}[H]
 \centering
-\caption{Algorithm~1: effect of $\alpha$ with $\gamma = 0$ vs.\ $\gamma = 5$ ($L^2$ loss).}
+\caption{Algorithm~1: effect of $\alpha$ with $\gamma = 0$ vs.\ $\gamma = 5$ (softplus, $L^2$ loss).}
 \label{tab:alg1_alpha}
 \begin{tabular}{c|cc|cc}
 \hline
  & \multicolumn{2}{c|}{$\gamma = 0$} & \multicolumn{2}{c}{$\gamma = 5$} \\
 $\alpha$ & $N$ & $\mathrm{Err}_{L^2}$ & $N$ & $\mathrm{Err}_{L^2}$ \\
 \hline
-$10^{-2}$ & 23 & $1.96 \times 10^{-1}$ & 23 & $1.79 \times 10^{-1}$ \\
-$10^{-3}$ & 56 & $1.06 \times 10^{-1}$ & 42 & $8.51 \times 10^{-2}$ \\
-$10^{-4}$ & 90 & $3.18 \times 10^{-2}$ & 86 & $3.74 \times 10^{-2}$ \\
-$10^{-5}$ & 104 & $2.79 \times 10^{-2}$ & 99 & $2.91 \times 10^{-2}$ \\
+$10^{-2}$ & 15 & $1.28 \times 10^{-1}$ & 15 & $1.27 \times 10^{-1}$ \\
+$10^{-3}$ & 23 & $1.09 \times 10^{-1}$ & 23 & $1.26 \times 10^{-1}$ \\
+$10^{-4}$ & 57 & $5.55 \times 10^{-2}$ & 63 & $5.95 \times 10^{-2}$ \\
+$10^{-5}$ & 81 & $2.27 \times 10^{-2}$ & 81 & $2.39 \times 10^{-2}$ \\
 \hline
 \end{tabular}
 \end{table}
 
-Smaller $\alpha$ increases accuracy at the cost of more neurons.
-The nonconvex correction ($\gamma = 5$) is most effective at intermediate $\alpha$: at $\alpha = 10^{-3}$, it reduces the neuron count from 56 to 42 while improving error from $1.06 \times 10^{-1}$ to $8.51 \times 10^{-2}$.
-At small $\alpha = 10^{-5}$, the interaction is negligible.
+Smaller $\alpha$ increases accuracy at the cost of more neurons, consistent across all activations.
+For softplus, the nonconvex correction ($\gamma = 5$) has negligible effect, with errors comparable to $\gamma = 0$.
+The same trend holds for tanh and Mat\'ern~5/2, where the nonconvex correction is most effective at intermediate $\alpha$ (e.g.\ $\alpha = 10^{-3}$), reducing neuron count while maintaining or improving accuracy.
 
 %% ---------------------------------------------------------------
 \subsubsection*{Algorithm~\ref{alg:q}: $|c|^q$-penalty with $p$-ReLU activation}
 %% ---------------------------------------------------------------
 
 \paragraph{Effect of gradient augmentation.}
-Table~\ref{tab:alg2_gradient} compares $L^2$ and $H^1$ loss for $p = 3$ ($q = 1/2$), $p = 2.01$ ($q \approx 0.66$), and $p = 2$ ($q = 2/3$) at $\alpha = 10^{-5}$, $\gamma = 0$.
+Table~\ref{tab:alg2_gradient} compares $L^2$ and $H^1$ loss for $p = 4$ ($q = 2/5$), $p = 3$ ($q = 1/2$), $p = 2.01$ ($q \approx 0.66$), and $p = 2$ ($q = 2/3$) at $\alpha = 10^{-5}$, $\gamma = 0$.
 
 \begin{table}[H]
 \centering
@@ -1442,11 +1472,14 @@ Table~\ref{tab:alg2_gradient} compares $L^2$ and $H^1$ loss for $p = 3$ ($q = 1/
  & & \multicolumn{3}{c|}{Training} & \multicolumn{3}{c}{Validation} \\
 Power & Loss & $\mathrm{Err}_{L^2}$ & $\mathrm{Err}_{H^1}$ & $N$ & $\mathrm{Err}_{L^2}$ & $\mathrm{Err}_{H^1}$ & $N$ \\
 \hline
+$p = 4$ & $L^2$ & $3.90 \times 10^{-2}$ & $3.66 \times 10^{-1}$ & 37 & $8.39 \times 10^{-3}$ & $3.65 \times 10^{-1}$ & 37 \\
+ & $H^1$ & $2.45 \times 10^{-1}$ & $1.88 \times 10^{-1}$ & 36 & $3.07 \times 10^{-1}$ & $1.97 \times 10^{-1}$ & 36 \\
+\hline
 $p = 3$ & $L^2$ & $1.46 \times 10^{-2}$ & $3.58 \times 10^{-1}$ & 29 & $1.89 \times 10^{-2}$ & $3.49 \times 10^{-1}$ & 29 \\
  & $H^1$ & $2.45 \times 10^{-1}$ & $1.88 \times 10^{-1}$ & 45 & $3.09 \times 10^{-1}$ & $1.98 \times 10^{-1}$ & 45 \\
 \hline
-$p = 2.01$ & $L^2$ & $1.99 \times 10^{-2}$ & $3.72 \times 10^{-1}$ & 65 & $1.08 \times 10^{-2}$ & $3.72 \times 10^{-1}$ & 65 \\
- & $H^1$ & $2.45 \times 10^{-1}$ & $1.88 \times 10^{-1}$ & 101 & $3.10 \times 10^{-1}$ & $2.00 \times 10^{-1}$ & 101 \\
+$p = 2.01$ & $L^2$ & $1.24 \times 10^{-2}$ & $3.61 \times 10^{-1}$ & 76 & $3.68 \times 10^{-3}$ & $3.34 \times 10^{-1}$ & 76 \\
+ & $H^1$ & $2.50 \times 10^{-1}$ & $1.88 \times 10^{-1}$ & 96 & $3.08 \times 10^{-1}$ & $1.97 \times 10^{-1}$ & 96 \\
 \hline
 $p = 2$ & $L^2$ & $1.22 \times 10^{-2}$ & $3.61 \times 10^{-1}$ & 64 & $6.19 \times 10^{-3}$ & $3.50 \times 10^{-1}$ & 64 \\
  & $H^1$ & $2.45 \times 10^{-1}$ & $1.88 \times 10^{-1}$ & 92 & $3.08 \times 10^{-1}$ & $1.97 \times 10^{-1}$ & 92 \\
@@ -1454,36 +1487,35 @@ $p = 2$ & $L^2$ & $1.22 \times 10^{-2}$ & $3.61 \times 10^{-1}$ & 64 & $6.19 \ti
 \end{tabular}
 \end{table}
 
-As in Algorithm~1, the $H^1$ loss substantially improves gradient error at the cost of $L^2$ accuracy.
+Unlike Algorithm~1, the $H^1$ loss in Algorithm~2 substantially improves gradient error ($\mathrm{Err}_{H^1}$: $1.88 \times 10^{-1}$ vs.\ $\approx 3.6 \times 10^{-1}$ with $L^2$ loss), at the cost of $L^2$ accuracy.
 The $H^1$ gradient errors are identical across powers ($1.88 \times 10^{-1}$), suggesting the gradient fitting is limited by data rather than network expressiveness.
 
-\paragraph{Effect of power $p$.}
-Higher power produces sparser networks: $p = 3$ uses 29 neurons ($L^2$ loss) vs.\ 64--65 for $p = 2$ and $p = 2.01$, with $L^2$ error $1.46 \times 10^{-2}$ vs.\ $1.22 \times 10^{-2}$.
-Notably, $p = 2.01$ and $p = 2$ use nearly the same number of neurons (65 vs.\ 64) but $p = 2$ achieves lower training error ($1.22 \times 10^{-2}$ vs.\ $1.99 \times 10^{-2}$), indicating that the boundary case $p = 2$ is not problematic in practice.
-
-\paragraph{Effect of $\alpha$ and interaction with power.}
-Table~\ref{tab:alg2_alpha} sweeps $\alpha$ for both powers ($\gamma = 0$, $L^2$ loss).
+Higher power generally produces sparser networks: $p = 3$ uses 29 neurons ($L^2$ loss) and $p = 4$ uses 37, compared to 64--76 for $p = 2$ and $p = 2.01$.
+However, $p = 3$ is the sparsest, not $p = 4$ --- the relationship between power and sparsity is non-monotone.
+In terms of training $L^2$ error, $p = 3$ achieves $1.46 \times 10^{-2}$, while $p = 4$ has higher error ($3.90 \times 10^{-2}$) despite using more neurons.
+The $p = 2.01$ and $p = 2$ variants achieve the best training errors ($1.24 \times 10^{-2}$ and $1.22 \times 10^{-2}$), with $p = 2.01$ attaining the best validation error ($3.68 \times 10^{-3}$).
 
 \begin{table}[H]
 \centering
-\caption{Algorithm~2: effect of $\alpha$ for $p = 3$, $p = 2.01$, and $p = 2$ ($\gamma = 0$, $L^2$ loss).}
+\caption{Algorithm~2: effect of $\alpha$ for $p = 4$, $p = 3$, $p = 2.01$, and $p = 2$ ($\gamma = 0$, $L^2$ loss).}
 \label{tab:alg2_alpha}
-\begin{tabular}{c|cc|cc|cc}
+\begin{tabular}{c|cc|cc|cc|cc}
 \hline
- & \multicolumn{2}{c|}{$p = 3$ ($q = 1/2$)} & \multicolumn{2}{c|}{$p = 2.01$ ($q \approx 0.66$)} & \multicolumn{2}{c}{$p = 2$ ($q = 2/3$)} \\
-$\alpha$ & $N$ & $\mathrm{Err}_{L^2}$ & $N$ & $\mathrm{Err}_{L^2}$ & $N$ & $\mathrm{Err}_{L^2}$ \\
+ & \multicolumn{2}{c|}{$p = 4$ ($q = 2/5$)} & \multicolumn{2}{c|}{$p = 3$ ($q = 1/2$)} & \multicolumn{2}{c|}{$p = 2.01$ ($q \approx 0.66$)} & \multicolumn{2}{c}{$p = 2$ ($q = 2/3$)} \\
+$\alpha$ & $N$ & $\mathrm{Err}_{L^2}$ & $N$ & $\mathrm{Err}_{L^2}$ & $N$ & $\mathrm{Err}_{L^2}$ & $N$ & $\mathrm{Err}_{L^2}$ \\
 \hline
-$10^{-2}$ & 13 & $1.94 \times 10^{-1}$ & 5 & $1.22 \times 10^{-1}$ & 5 & $1.23 \times 10^{-1}$ \\
-$10^{-3}$ & 14 & $4.27 \times 10^{-2}$ & 18 & $5.59 \times 10^{-2}$ & 14 & $5.85 \times 10^{-2}$ \\
-$10^{-4}$ & 20 & $3.49 \times 10^{-2}$ & 29 & $3.01 \times 10^{-2}$ & 34 & $3.54 \times 10^{-2}$ \\
-$10^{-5}$ & 29 & $1.46 \times 10^{-2}$ & 65 & $1.99 \times 10^{-2}$ & 64 & $1.22 \times 10^{-2}$ \\
+$10^{-2}$ & 29 & $2.29 \times 10^{-1}$ & 13 & $1.94 \times 10^{-1}$ & 5 & $1.22 \times 10^{-1}$ & 5 & $1.23 \times 10^{-1}$ \\
+$10^{-3}$ & 39 & $1.03 \times 10^{-1}$ & 14 & $4.27 \times 10^{-2}$ & 13 & $5.63 \times 10^{-2}$ & 14 & $5.85 \times 10^{-2}$ \\
+$10^{-4}$ & 39 & $8.33 \times 10^{-2}$ & 20 & $3.49 \times 10^{-2}$ & 38 & $3.59 \times 10^{-2}$ & 34 & $3.54 \times 10^{-2}$ \\
+$10^{-5}$ & 37 & $3.90 \times 10^{-2}$ & 29 & $1.46 \times 10^{-2}$ & 76 & $1.24 \times 10^{-2}$ & 64 & $1.22 \times 10^{-2}$ \\
 \hline
 \end{tabular}
 \end{table}
 
-The $p = 3$ activation is consistently sparser across all $\alpha$ values.
-The $p = 2.01$ and $p = 2$ results are nearly identical at large $\alpha$ (both use 5 neurons at $\alpha = 10^{-2}$) and diverge only at small $\alpha$, where $p = 2$ achieves lower error ($1.22 \times 10^{-2}$ vs.\ $1.99 \times 10^{-2}$) with similar neuron count (64 vs.\ 65).
-The sparsity advantage of $p = 3$ grows with decreasing $\alpha$: the neuron ratio is $29/64 \approx 0.45$ at $\alpha = 10^{-5}$.
+The $p = 3$ activation is the sparsest across all $\alpha$ values (13--29 neurons).
+The $p = 4$ activation uses more neurons than $p = 3$ at every $\alpha$ and achieves worse error, confirming that higher power does not monotonically improve sparsity or accuracy.
+Notably, $p = 4$ shows diminishing returns from reducing $\alpha$: the neuron count plateaus at $\approx 37$--$39$ for $\alpha \leqslant 10^{-3}$, while the error remains high ($3.90 \times 10^{-2}$ at $\alpha = 10^{-5}$).
+The $p = 2.01$ and $p = 2$ results are nearly identical at large $\alpha$ and diverge at small $\alpha$, where $p = 2$ achieves the lowest error ($1.22 \times 10^{-2}$).
 
 %% ---------------------------------------------------------------
 \subsubsection*{Comparison of Algorithm~1 and Algorithm~2}
@@ -1502,16 +1534,52 @@ Table~\ref{tab:comparison} compares the best results of each algorithm at $\alph
 Alg.~1 (tanh, $\gamma = 0$) & 104 & $2.79 \times 10^{-2}$ & $4.05 \times 10^{-1}$ \\
 Alg.~1 (tanh, $\gamma = 5$) & 99 & $2.91 \times 10^{-2}$ & $4.02 \times 10^{-1}$ \\
 Alg.~2 ($p = 2$) & 64 & $1.22 \times 10^{-2}$ & $3.61 \times 10^{-1}$ \\
-Alg.~2 ($p = 2.01$) & 65 & $1.99 \times 10^{-2}$ & $3.72 \times 10^{-1}$ \\
+Alg.~2 ($p = 2.01$) & 76 & $1.24 \times 10^{-2}$ & $3.61 \times 10^{-1}$ \\
 Alg.~2 ($p = 3$) & 29 & $1.46 \times 10^{-2}$ & $3.58 \times 10^{-1}$ \\
+Alg.~2 ($p = 4$) & 37 & $3.90 \times 10^{-2}$ & $3.66 \times 10^{-1}$ \\
 \hline
 \end{tabular}
 \end{table}
 
 Algorithm~2 with the $|c|^q$-penalty achieves both better accuracy and greater sparsity than Algorithm~1.
-At $p = 3$, it uses $3.6\times$ fewer neurons (29 vs.\ 104) while halving the $L^2$ error ($1.46 \times 10^{-2}$ vs.\ $2.79 \times 10^{-2}$).
-At $p = 2$, the error is further reduced to $1.22 \times 10^{-2}$ with 64 neurons, still $38\%$ fewer than Algorithm~1.
+The best sparsity-accuracy trade-off is at $p = 3$: 29 neurons with $L^2$ error $1.46 \times 10^{-2}$, a $3.6\times$ reduction in neurons and half the error compared to Algorithm~1.
+At $p = 2$, the error is further reduced to $1.22 \times 10^{-2}$ with 64 neurons.
+At $p = 4$, both accuracy ($3.90 \times 10^{-2}$) and sparsity (37 neurons) are worse than $p = 3$, confirming that $p = 3$ is the optimal power for this problem.
+
+Table~\ref{tab:comparison_h1} compares the algorithms when trained with the $H^1$ loss ($\alpha = 10^{-5}$).
+
+\begin{table}[H]
+\centering
+\caption{Comparison at $\alpha = 10^{-5}$, $H^1$ loss.}
+\label{tab:comparison_h1}
+\begin{tabular}{l|ccc}
+\hline
+ & $N$ & $\mathrm{Err}_{L^2}$ & $\mathrm{Err}_{H^1}$ \\
+\hline
+Alg.~1 (tanh, $\gamma = 1$) & 76 & $2.91 \times 10^{-1}$ & $3.56 \times 10^{-1}$ \\
+Alg.~2 ($p = 2$) & 92 & $2.45 \times 10^{-1}$ & $1.88 \times 10^{-1}$ \\
+Alg.~2 ($p = 2.01$) & 96 & $2.50 \times 10^{-1}$ & $1.88 \times 10^{-1}$ \\
+Alg.~2 ($p = 3$) & 45 & $2.45 \times 10^{-1}$ & $1.88 \times 10^{-1}$ \\
+Alg.~2 ($p = 4$) & 36 & $2.45 \times 10^{-1}$ & $1.88 \times 10^{-1}$ \\
+\hline
+\end{tabular}
+\end{table}
+
+With $H^1$ loss, all Algorithm~2 variants achieve identical gradient error ($\mathrm{Err}_{H^1} = 1.88 \times 10^{-1}$), substantially better than Algorithm~1 ($3.56 \times 10^{-1}$), a $47\%$ reduction.
+The $p = 4$ variant is the sparsest under $H^1$ loss (36 neurons), followed by $p = 3$ (45 neurons), while $p = 2$ and $p = 2.01$ use significantly more (92 and 96 neurons).
+Algorithm~1 uses 76 neurons with the worst gradient error.
 The finite-step insertion criterion of Algorithm~2, combined with the stronger sparsity-promoting $|c|^q$ penalty, is more effective than the classical $|p_t(\omega)| > \alpha$ criterion of Algorithm~1 for this problem.
+
+Figure~\ref{fig:neurons_3d} visualizes the learned neurons $(a_1, a_2, b)$ for each algorithm, with marker size proportional to $|c|$ and color indicating the outer weight $c$.
+Algorithm~1 (tanh, no sphere constraint) spreads neurons across a wide range of inner weights, while Algorithm~2 constrains them to the unit sphere $\mathbb{S}^d$.
+The $p = 3$ network achieves the sparsest representation with only 29 active neurons, and the outer weights are concentrated on a few dominant neurons.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{plot/3d-scatter.png}
+\caption{Learned neurons $(a_1, a_2, b)$ for Algorithm~1 ($p = 1$, tanh, 94 active) and Algorithm~2 ($p = 2$, 58 active; $p = 3$, 29 active). Marker size is proportional to $|c|$; color indicates the outer weight $c$.}
+\label{fig:neurons_3d}
+\end{figure}
 
 \newpage
 \bibliographystyle{plain}
