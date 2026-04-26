@@ -1,0 +1,356 @@
+\documentclass[a4paper,11pt]{book}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, linkcolor=blue]{hyperref}
+
+\usepackage{mathptmx}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{bbm}
+
+\usepackage{geometry}
+\geometry{left=15mm, right=15mm, top=20mm, bottom=20mm}
+
+% Theorem style
+\makeatletter
+\def\th@plain{%
+  \thm@notefont{}%
+  \itshape
+}
+\def\th@definition{%
+  \thm@notefont{}%
+  \normalfont
+}
+\makeatother
+
+% Numbering
+\renewcommand{\thechapter}{\Roman{chapter}}
+\renewcommand*\thesection{\arabic{section}}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\renewcommand{\thetheorem}{\arabic{section}.\arabic{theorem}}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\renewcommand{\thedefinition}{\arabic{section}.\arabic{definition}}
+\newtheorem*{example}{Example}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem{review}{Review}
+
+% Math operators
+\DeclareMathOperator{\var}{Var}
+
+\linespread{1.3}
+
+\begin{document}
+\title{Stochastic I}
+
+\chapter{Probability Theory}
+\section{Probability Distribution}
+\begin{theorem}[Transformation Formula]
+Given a random variable $X \in \mathbb{R}^n$ with joint density $f$, $g: \mathbb{R}^n \rightarrow \mathbb{R}^n$ a continuously differentiable and injective function, with non-vanishing Jacobian, then the density function of $Y = g(X)$ is:
+\begin{align*}
+	f^Y(y) = f^X(g^{-1}(y)) |\det J_{g^{-1}}(y)|
+\end{align*}
+\end{theorem}
+
+\begin{example}
+\end{example}
+
+\section{Integration with Respect to probability measure}
+\begin{theorem}[Markov Inequality]
+Given a random variable $X$ and \textbf{non-negative} monotone increasing function $f:[0, \infty) \rightarrow [0, \infty)$, then we have:
+\begin{align*}
+	\forall \epsilon > 0 \textbf{ with } f(\epsilon) > 0: \mathbb{P}(|X| \geq \epsilon) \leq \frac{\mathbb{E}f(|X|)}{f(\epsilon)}
+\end{align*}
+\end{theorem}
+\begin{proof}
+	\begin{align*}
+		\mathbb{E}[f(X)] &\geq \mathbb{E}[f(X) \mathbbm{1}_{f(X) \geq f(\epsilon)}]\\
+		&\geq \mathbb{E}[f(\epsilon)\mathbbm{1}_{f(X) \geq f(\epsilon)}]\\
+		&= f(\epsilon) \mathbb{P}(f(X) \geq f(\epsilon))\\
+	(1)	&\leq f(\epsilon)\mathbb{P}(|X| \geq \epsilon)
+	\end{align*}
+	where in (1) we use that $f$ is an increasing function.
+\end{proof}
+
+\begin{proposition}[Fubini-Tonelli]
+	Given $X$ a non-negative random variable, then:
+	\begin{align*}
+		\mathbb{E} X = \int_{\mathbb{R}} \mathbb{P}(X \geq t) \, dt
+	\end{align*}
+\end{proposition}
+\begin{proof}
+Observe:
+	\begin{align*}
+		\int_0^\infty \mathbb{P}(X(\omega) \geq x) \, dx &= \int_{\mathbb{R}^+} \int_\Omega \mathbbm{1}_{X(\omega) \geq x} \, d\omega \, dx\\
+		&= \int_\Omega \int_0^{X(\omega)} dx \, d\omega \\
+		&= \int_\Omega X(\omega) \, d\omega \\
+	 	&= \mathbb{E} X
+	\end{align*}
+\end{proof}
+
+
+\section{Terminal $\sigma$-algebra and independence}
+This chapter we refer mainly to \textbf{Klenke}.
+\subsection{Borel-Cantelli}
+\begin{definition}[Limes superior and limes inferior]
+	Given $(A_n)_{n \geq 1}$ a sequence of subsets in $X$. We define:
+	\begin{align*}
+		\limsup_n A_n &:= \{ x \in X: x \in A_n \textbf{ for infinitely many } A_n \}\\
+		&\text{(sequence is decreasing)}\\
+		\liminf_n A_n &:= \{ x \in X: \exists n_0(x) \in \mathbb{N}\,\forall n \geq n_0(x): x \in A_n ( \textbf{ x is in all but finitely many $A_n$})\}\\
+		 &\text{(sequence is increasing)}
+	\end{align*}
+	equivalently we see:
+	\begin{align*}
+		\limsup_n A_n &= \bigcap_{n = 1}^\infty \bigcup_{k = n}^\infty A_n\\
+		\liminf_n A_n &= \bigcup_{n = 1}^\infty \bigcap_{k = n}^\infty A_n
+	\end{align*}
+	We define the convergence of sets as:
+	\begin{align*}
+		\limsup_n A_n = \liminf_n A_n := \lim_n A_n
+	\end{align*}
+\end{definition}
+\begin{theorem}[The first Borel-Cantelli Lemma]
+	If $\sum_{n = 1}^\infty \mathbb{P}(A_n) < \infty$:
+	\begin{equation*}
+		\mathbb{P}(A_n \text{ i.o.}) = 0
+	\end{equation*}
+\end{theorem}
+\begin{proof}
+\begin{align*}
+	\sum \mathbb{P}(A_n) < \infty &\Rightarrow \lim_n \mathbb{P}(A_n) = 0\\
+	&\Rightarrow \mathbb{P}(\lim_n A_n) = 0\\
+	&\Rightarrow \mathbb{P}(\limsup A_n) = 0\\
+	&\Rightarrow \mathbb{P}(A_n \text{ i.o.}) = 0
+\end{align*}
+\end{proof}
+
+\begin{theorem}[The second Borel-Cantelli Lemma]
+	$A_n$ independent and $\sum P(A_n) = \infty$, then
+	\begin{equation*}
+		\mathbb{P}(A_n \text{ i.o.}) = 1
+	\end{equation*}
+\end{theorem}
+
+\begin{theorem}
+	$X_1, X_2, \dots$ i.i.d.\ with $\mathbb{E} X_i = \infty$, then
+	\begin{equation*}
+		\mathbb{P}(|X_n| \geq n \text{ i.o.}) = 1
+	\end{equation*}
+	So if $S_n = X_1 + \dots + X_n$ then:
+	\begin{equation*}
+		\mathbb{P}\!\left(\lim \frac{S_n}{n} \in (-\infty, \infty) \text{ i.o.}\right) = 0
+	\end{equation*}
+\end{theorem}
+
+
+\subsection{Kolmogorov 0-1 Law}
+\begin{definition}[Tail $\sigma$-algebra]
+Given a set of $\sigma$-fields $(\mathfrak{A}_i)_{i \in I}$. The \textbf{tail $\sigma$-field} is defined as:
+	\begin{equation*}
+		\mathfrak{T}\!\left((\mathfrak{A}_i)_{i \in I}\right) := \bigcap_{\substack{J \subset I \\ |J| < \infty}} \sigma\!\left(\bigcup_{j \in I \setminus J} \mathcal{A}_j\right)
+	\end{equation*}
+\end{definition}
+\begin{remark}
+Related to the limes superior of the sets.
+\end{remark}
+
+
+\begin{theorem}[Kolmogorov 0-1 Law]
+	$I$ countable index set, $(\mathcal{A}_i)_{i \in I}$ independent $\sigma$-fields, then
+	\begin{equation*}
+		\forall A \in \mathfrak{T}\!\left((\mathfrak{A}_i)_{i \in I}\right): \mathbb{P}(A) \in \{0, 1\}
+	\end{equation*}
+\end{theorem}
+\begin{proof}
+
+\end{proof}
+
+\begin{theorem}[Hewitt-Savage 0-1 Law]
+	Define $\mathcal{E}$ the $\sigma$-field of all events stable under finite permutation (prove it's indeed a $\sigma$-field). Given $X_1, \dots, X_n, \dots$ i.i.d.\ random variables, if $A \in \mathcal{E}$, then $\mathbb{P}(A) \in \{0, 1\}$.
+\end{theorem}
+
+
+\subsection{Independence, Distribution and Expectation}
+\begin{review}[Central limit theory]
+The regularised mean of a sequence of random variables converges in distribution to the standard normal distribution (under certain conditions).
+\begin{equation*}
+    Z := \frac{\sqrt{n}}{\sigma}(\overline{X} - \mu) \overset{d}{\longrightarrow} \mathcal{N}(0, 1)
+\end{equation*}
+\end{review}
+
+\begin{review}[Slutsky lemma]
+If a sequence of random variables converges in probability to a constant while another converges in distribution to a random variable, then the linearity holds (the linear combination converges in distribution).
+\end{review}
+
+\begin{review}[Portmanteau theorem]
+\end{review}
+
+\section{Convergence Concept of Random Variables}
+\begin{definition}[Convergence in probability]
+\end{definition}
+
+\begin{definition}[Convergence in distribution]
+\end{definition}
+
+\begin{definition}[Convergence in $L^p$]
+\end{definition}
+
+
+
+\section{Law of Large Numbers}
+\begin{theorem}[Strong law of large numbers]
+	Let $(X_n)_{n \ge 1}$ be a sequence of i.i.d.\ random variables such that $X_j \in L^2(\Omega)$ with
+	\begin{align*}
+		\mathbb{E}X_j = \mu, \quad \var X_j = \sigma^2 \qquad \forall j = 1, 2, \dots
+	\end{align*}
+	Define the running sum $S_n := \sum_{j = 1}^n X_j$, then
+	\begin{align*}
+		\frac{S_n}{n} \overset{a.s.}{\longrightarrow} \mu \quad \text{and} \quad \frac{S_n}{n} \overset{L^2}{\longrightarrow} \mu.
+	\end{align*}
+\end{theorem}
+
+
+\begin{theorem}[$L^2$ weak law]
+	$X_1, X_2, \dots$ uncorrelated with $\mathbb{E}X_i = \mu$ and $X_i \in L^2$, then:
+	\begin{equation*}
+		\frac{S_n}{n} \overset{L^2}{\longrightarrow}\mu, \qquad \frac{S_n}{n} \overset{\mathbb{P}}{\longrightarrow} \mu.
+	\end{equation*}
+\end{theorem}
+
+\begin{lemma}
+	If $Y\geq 0$ and $p >0$, then:
+	\begin{equation*}
+		\mathbb{E} Y^p = \int_{0}^\infty p y^{p-1} \mathbb{P}(Y > y) \, dy
+	\end{equation*}
+\end{lemma}
+
+
+
+\section{Central Limit Theory}
+\subsection{Characteristic functions}
+\begin{definition}[Characteristic function]
+	Given a random variable $X \in L^1(\mathbb{P})$. The characteristic function is the Fourier transform of the distribution of $X$:
+	\begin{align*}
+		\varphi(u): \mathbb{R}^n \rightarrow \mathbb{C}, \quad u \mapsto \mathbb{E}[e^{iu \cdot X}]
+	\end{align*}
+\end{definition}
+
+\begin{example}[The normal distribution]
+\end{example}
+
+
+
+\begin{theorem}[The inversion formula]
+	Let $\varphi(t)$ be the characteristic function of the probability measure $\mu$ of the random variable $X$. If $a<b$, then:
+	\begin{equation*}
+		\lim_{T \rightarrow \infty} (2\pi)^{-1} \int_{-T}^T \frac{e^{-ita} - e^{-itb}}{it} \varphi(t) \, dt = \mu(a, b) + \frac{1}{2} \mu(\{a, b\})
+	\end{equation*}
+\end{theorem}
+
+\begin{theorem}
+	If $\int |\varphi(t)| \, dt < \infty$, then $\mu$ has the bounded continuous density:
+	\begin{equation*}
+		f(y) = \frac{1}{2\pi} \int e^{-ity} \varphi(t) \, dt
+	\end{equation*}
+\end{theorem}
+
+\begin{theorem}[Continuity theorem of L\'evy]
+	Let $\mu_n$, $1\leq n \leq \infty$ be probability measures with characteristic functions $\varphi_n$, then:
+	\begin{enumerate}
+		\item $\mu_n \rightarrow \mu_\infty \quad \Rightarrow \quad \varphi_n(t) \rightarrow \varphi_\infty(t) \quad \forall t$
+		\item $\varphi_n(t) \rightarrow \varphi(t)$ for some $\varphi$ and $\varphi$ is continuous at $0$, then the associated sequence of distributions $\mu_n$ is tight and converges weakly to the measure $\mu$ with characteristic function $\varphi$.
+	\end{enumerate}
+\end{theorem}
+
+\begin{definition}
+Let $X$ be a $\mathbb{R}^n$ random variable, $k \in \mathbb{R}^n$, then we define the characteristic function of $X$ as:
+	\begin{equation*}
+		\varphi^X(k) := \int_{\mathbb{R}^n} e^{i k \cdot x} \, \mathbb{P}^X(dx)
+	\end{equation*}
+\end{definition}
+
+\begin{theorem}[Uniqueness theorem]
+
+\end{theorem}
+
+\begin{theorem}[Central limit theorem I]
+	Given $X_1, \dots, X_n, \dots$ a sequence of i.i.d.\ samples such that $X_i \in L^2(\Omega)$ with $\mathbb{E}X_i= \mu$, $\var X_i = \sigma^2$. Define the running sum $S_n:= \sum_{i = 1}^n X_i$ and $Y_n:= \frac{S_n - n \mu}{\sqrt{n} \sigma}$. Then
+	\begin{align*}
+		Y_n \overset{d}{\longrightarrow} \mathcal{N}(0, 1).
+	\end{align*}
+\end{theorem}
+
+\begin{theorem}[Central limit theorem II]
+Given $X_1, \dots, X_n, \dots$ a sequence of independent (but not necessarily identically distributed) samples such that $X_i \in L^2(\Omega)$ with $\mathbb{E}X_i= 0$, $\var X_i = \sigma^2_j$. Define the running sum $S_n:= \sum_{i = 1}^n X_i$. If
+\begin{align*}
+	&\sup_j \mathbb{E} |X_j|^{2 + \epsilon}< \infty \text{ for some } \epsilon >0, \\
+	&\sum_{j = 1}^\infty \sigma_j^2 = \infty,
+\end{align*}
+then
+\begin{align*}
+	\left(\sqrt{\sum_{j = 1}^n \sigma_j^2}\right)^{-1} S_n \overset{d}{\longrightarrow} \mathcal{N}(0, 1).
+\end{align*}
+\end{theorem}
+
+\section{The Gaussian Random Variable}
+
+
+
+\section{Weak Convergence}
+\begin{definition}[Separating Family]
+	Given $F \subset M(E)$ a subset of Radon measures (inner regular Borel measures). A family of measurable functions $C$ is a separating family for $F$ if $\forall \mu, \nu \in F$:
+	\begin{equation*}
+		\int f \, d\mu = \int f \, d\nu \quad \forall f \in C \cap \mathcal{L}^1(\mu) \cap \mathcal{L}^1(\nu) \quad \Rightarrow \quad \mu = \nu
+	\end{equation*}
+\end{definition}
+
+\begin{definition}[Weak convergence of measures]
+
+\end{definition}
+
+
+\begin{definition}
+	A sequence of random variables converges weakly or converges in distribution if its distribution function converges for all continuity points of $F$.
+\end{definition}
+
+\begin{theorem}
+	If $F_n \rightarrow F_\infty$
+\end{theorem}
+
+\begin{theorem}
+	Every probability measure on a Polish space is tight.
+\end{theorem}
+
+\begin{theorem}
+	Every probability measure on a Polish space is regular.
+\end{theorem}
+
+\begin{theorem}[Continuous Mapping theorem]
+	If $g: S \rightarrow T$ is continuous, $S$, $T$ metric spaces, then:
+	\begin{equation*}
+		X_n \overset{d}{\rightarrow} X \Rightarrow g(X_n) \overset{d}{\rightarrow} g(X)
+	\end{equation*}
+\end{theorem}
+\begin{proof}
+	Notice that $\forall f \in C_b(T, \mathbb{R})$, $f\circ g$ is also bounded continuous.
+\end{proof}
+\begin{remark}
+If $X_n \overset{a.s.}{\longrightarrow} X$, then $g(X_n) \overset{a.s.}{\longrightarrow} g(X)$.
+\end{remark}
+
+\begin{theorem}
+	Convergence in distribution implies convergence of the cdf at every \textbf{continuity} point.
+\end{theorem}
+
+\end{document}
