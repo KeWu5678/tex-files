@@ -1370,9 +1370,9 @@ All experiments run 10 outer iterations, inserting up to 50 neurons per iteratio
 
 \paragraph{\textbf{Effect of gradient augmentation and activation function.}}
 We compare three activation functions, shown together with their first and second derivatives in Figure~\ref{fig:activations}:
-tanh ($C^\infty$, bounded, saturating),
-softplus ($C^\infty$, unbounded, non-saturating),
-and Mat\'ern~5/2 ($C^2$, exponentially decaying).
+tanh ($C^\infty$),
+softplus ($C^\infty$),
+and Mat\'ern~5/2 ($C^2$).
 Tanh saturates for large $|z|$, causing vanishing gradients.
 Softplus grows linearly and avoids saturation.
 Mat\'ern~5/2 is localized with exponential decay and is exactly $C^2$ (the second derivative is continuous but the third is not).
@@ -1435,14 +1435,77 @@ With the $H^1$ loss, the gradient semi-norm $|\cdot|_{H^1}$ drops sharply for Ma
 \label{fig:h1_activation}
 \end{figure}
 
-In conclusion, the experiment reveals the following findings:
+The performance differences across activations can be understood from two angles: approximation capability and sparsity.
+
+\paragraph{\textbf{Approximation capability.}}
+The gradient kernel column for neuron~$n$ at data point~$x_k$ is $\sigma'(a_n \cdot x_k + b_n) \cdot a_n$; the diversity of these columns determines how well the network can fit the gradient field.
+Examining the distribution of $\sigma'(z)$ across all (neuron, data point) pairs separates tanh from the other two activations:
 \begin{itemize}
-	\item 	The tanh activation function doesn't perform well in fitting the gradient. 
-			One hypothesis is that: in order to fit steep local transition or jumps, the inner weights become large (300+), 
-			and the outerweight also becomes large (400+) to fit large values. The input value ($[-3, 3]^2$) is far away from the center of the activation function, therefore is always active. 
-			We observed this inaccuracy in particular on the boudary of the domain. 
-	\item 	The Mat\'ern~5/2 activation yields the best gradient approximation overall, which supports using the $C^2$ approximation.
-			However, softplus achieves the most compact representation under $H^1$ loss (43 neurons) with competitive gradient accuracy.
+	\item \textbf{tanh:} 78\% of derivative values lie near zero due to saturation. Most neurons contribute negligible gradient kernel columns regardless of their outer weight, explaining the poor gradient fit ($|\cdot|_{H^1} = 3.83 \times 10^{-1}$) despite 76~neurons.
+	\item \textbf{softplus and Mat\'ern~5/2:} both have derivative values spread away from zero, providing non-degenerate gradient kernel columns. Softplus achieves $|\cdot|_{H^1} = 2.00 \times 10^{-1}$ with 43~neurons; Mat\'ern~5/2 achieves $|\cdot|_{H^1} = 1.65 \times 10^{-1}$ with 145~neurons.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{plot/derivative_distribution.png}
+\caption{Distribution of $\sigma'(z)$ across all (neuron, data point) pairs for the $H^1$ model ($\gamma = 1$, $\alpha = 10^{-5}$). The percentage indicates the fraction with $|\sigma'| < 0.05$.}
+\label{fig:derivative_distribution}
+\end{figure}
+
+The approximation bottleneck for tanh is that saturation renders the gradient kernel rank-deficient in practice.
+
+\paragraph{\textbf{Sparsity and the dual variable landscape.}}
+Among the two well-performing activations, the neuron counts differ by a factor of~$3.4$ (145 vs.\ 43).
+Tracking per-iteration behavior reveals that Mat\'ern~5/2 inserts 15~neurons per iteration (hitting the cap), while softplus inserts only 1--6.
+The full objective $J = L(\mu) + \alpha\,\Phi(\mu)$ decreases every iteration for both activations, confirming that the inserted neurons are genuine descent directions.
+However, the descent per neuron differs dramatically: after the first 25~Mat\'ern neurons, each additional neuron reduces~$J$ by roughly $10^{-3}$, whereas each softplus neuron reduces~$J$ by roughly $10^{-2}$ to $10^{-1}$.
+
+\begin{table}[H]
+\centering
+\caption{Per-iteration insertion diagnostics ($\alpha = 10^{-5}$, $\gamma = 1$, $H^1$ loss, 50 candidates).}
+\label{tab:insertion_diag}
+\begin{tabular}{c|cccc|cccc}
+\hline
+ & \multicolumn{4}{c|}{Mat\'ern 5/2} & \multicolumn{4}{c}{Softplus} \\
+Iter & Distinct & Acc. & Surv. & $\Delta J / n$ & Distinct & Acc. & Surv. & $\Delta J / n$ \\
+\hline
+1  & 15 & 15 & 100\% & $4.7 \times 10^{-1}$ & 1 & 1 & 100\% & $1.2 \times 10^{0\phantom{-}}$  \\
+2  & 22 & 15 & 100\% & $6.8 \times 10^{-3}$ & 3 & 3 & 100\% & $1.2 \times 10^{-1}$ \\
+3  & 27 & 15 & 100\% & $4.6 \times 10^{-3}$ & 3 & 2 & 100\% & $2.4 \times 10^{-1}$ \\
+4  & 27 & 15 & 100\% & $3.7 \times 10^{-3}$ & 5 & 4 & 100\% & $2.7 \times 10^{-1}$ \\
+5  & 29 & 15 & 100\% & $1.3 \times 10^{-3}$ & 5 & 4 & 100\% & $1.3 \times 10^{-2}$ \\
+6  & 24 & 15 & 100\% & $5.0 \times 10^{-4}$ & 4 & 4 & 100\% & $3.4 \times 10^{-3}$ \\
+7  & 28 & 15 & 100\% & $3.5 \times 10^{-4}$ & 4 & 3 & 100\% & $1.5 \times 10^{-3}$ \\
+8  & 32 & 15 & 100\% & $3.4 \times 10^{-4}$ & 4 & 3 & 100\% & $9.1 \times 10^{-3}$ \\
+9  & 35 & 15 & 100\% & $1.9 \times 10^{-4}$ & 6 & 6 & 100\% & $2.8 \times 10^{-2}$ \\
+10 & 31 & 15 & 100\% & $9.0 \times 10^{-4}$ & 6 & 5 & 100\% & $1.5 \times 10^{-1}$ \\
+\hline
+Total & --- & 150 & 100\% & & --- & 35 & 100\% & \\
+\hline
+\end{tabular}
+\\[6pt]
+\small
+\raggedright
+\textit{Distinct} = unique local maxima of $|p_t(\omega)|$ on $S^d$ after L-BFGS merge;\;
+\textit{Acc.}\ = accepted with $|p_t(\omega)| > \alpha$, capped at~15;\;
+\textit{Surv.}\ = fraction receiving nonzero outer weight from SSN;\;
+$\Delta J / n$ = objective decrease per surviving neuron.
+\end{table}
+
+
+The survival rate is 100\% for both activations across all iterations: every neuron that passes $|p_t(\omega)| > \alpha$ receives a nonzero weight from SSN, ruling out Reason~1.
+The difference lies entirely in how many descent directions exist (Reason~2).
+Mat\'ern~5/2 consistently produces 15--35 distinct local maxima on~$S^d$ and always saturates the insertion cap, while softplus produces only 1--6.
+This is explained by the structure of the dual variable $p_t(\omega) = \langle \sigma(\cdot\,;\omega),\, g_t \rangle$, where $g_t$ is the current residual.
+For Mat\'ern~5/2, the activation is localized: $\sigma(x;\omega)$ is concentrated near the hyperplane $\{x : a \cdot x + b \approx 0\}$.
+Consequently, $p_t(\omega)$ is sensitive to local residual structure, and even small residual pockets produce $|p_t(\omega)| > \alpha$ for some~$\omega$.
+For softplus, the activation has global support, so $p_t(\omega)$ averages the residual over the entire domain---positive and negative contributions cancel, and fewer~$\omega$ exceed the threshold~$\alpha$.
+
+In conclusion:
+\begin{itemize}
+	\item Mat\'ern~5/2 yields the best gradient accuracy ($|\cdot|_{H^1} = 1.65 \times 10^{-1}$) but uses 145~neurons. The localized activation creates many shallow descent directions in the dictionary, causing the algorithm to insert neurons with diminishing returns.
+	\item Softplus achieves competitive gradient accuracy ($|\cdot|_{H^1} = 2.00 \times 10^{-1}$) with only 43~neurons. Each neuron reduces the global residual efficiently, so the dual variable drops below~$\alpha$ faster.
+	\item Tanh performs worst ($|\cdot|_{H^1} = 3.83 \times 10^{-1}$) because saturation degrades the gradient kernel, limiting approximation capability independently of sparsity.
 \end{itemize}
 
 \paragraph{\textbf{Effect of $\gamma$.}}
@@ -1533,7 +1596,13 @@ With $H^1$ loss, all powers $p \leqslant 4$ achieve identical gradient error ($\
 At $p = 5$, the gradient error is worse ($2.36 \times 10^{-1}$), consistent with the degradation seen under $L^2$ loss.
 Higher powers are sparser under $H^1$ loss: $p = 4$ uses only 36 neurons versus 45 for $p = 3$ and 92--96 for $p = 2$/$p = 2.01$, while $p = 5$ loses this advantage (67 neurons).
 
-In conclusion, we observe $p = 3$ is the sweat spot, supporting the use of $C^2$ approximation.
+The $p = 3$ activation is the sweet spot for the sparsity-accuracy trade-off.
+The derivative of $\mathrm{ReLU}^p$ is $\sigma'(z) = p\,\mathrm{ReLU}(z)^{p-1}$, and two effects compete as $p$ increases:
+(1)~the $(p{-}1)$ exponent amplifies differences between pre-activations, making gradient kernel columns more linearly independent;
+(2)~the same exponentiation causes extreme derivative values for large pre-activations, making some columns numerically negligible.
+At $p = 3$ these effects are balanced: the gradient kernel has condition number $7.4 \times 10^{3}$, compared to $2.1 \times 10^{4}$ for $p = 2$ and $3.0 \times 10^{9}$ for $p = 5$.
+The better conditioning means each neuron contributes more useful information, explaining why $p = 3$ achieves the same gradient accuracy as $p = 2$ with half the neurons.
+At $p = 5$, the derivative standard deviation reaches 137 (vs.\ 6.9 for $p = 3$), causing 5 of 67 neurons to become effectively rank-deficient.
 
 \begin{table}[H]
 \centering
