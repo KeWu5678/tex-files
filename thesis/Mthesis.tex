@@ -1492,10 +1492,8 @@ Total & --- & 150 & 100\% & & --- & 35 & 100\% & \\
 $\Delta J / n$ = objective decrease per surviving neuron.
 \end{table}
 
-
-The survival rate is 100\% for both activations across all iterations: every neuron that passes $|p_t(\omega)| > \alpha$ receives a nonzero weight from SSN, ruling out Reason~1.
-The difference lies entirely in how many descent directions exist (Reason~2).
-Mat\'ern~5/2 consistently produces 15--35 distinct local maxima on~$S^d$ and always saturates the insertion cap, while softplus produces only 1--6.
+The difference lies in how many descent directions exist.
+Mat\'ern~5/2 consistently produces 15--35 distinct local maxima and always saturates the insertion cap, while softplus produces only 1--6.
 This is explained by the structure of the dual variable $p_t(\omega) = \langle \sigma(\cdot\,;\omega),\, g_t \rangle$, where $g_t$ is the current residual.
 For Mat\'ern~5/2, the activation is localized: $\sigma(x;\omega)$ is concentrated near the hyperplane $\{x : a \cdot x + b \approx 0\}$.
 Consequently, $p_t(\omega)$ is sensitive to local residual structure, and even small residual pockets produce $|p_t(\omega)| > \alpha$ for some~$\omega$.
