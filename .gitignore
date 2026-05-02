@@ -4,4 +4,7 @@
 !*/
 !.gitignore
 !*.tex
+!*.md
 !thesis/Mthesis.pdf
+!thesis/ref.bib
+!thesis/plot/*.png
