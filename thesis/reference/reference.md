@@ -141,9 +141,14 @@
     - Citations: ~138
     - Link: NIPS 2005
 
+26. **Two-layer networks with the ReLU^k activation function: Barron spaces and derivative approximation**
+    - Authors: Yuanyuan Li, Shuai Lu, Peter Mathé, Sergei V. Pereverzev
+    - Citations: ~13
+    - Link: https://doi.org/10.1007/s00211-023-01384-6
+
 ## Other
 
-26. **On Sparse Sensor Placement for Parameter Identification Problems with Partial Differential Equations**
+27. **On Sparse Sensor Placement for Parameter Identification Problems with Partial Differential Equations**
     - Authors: Daniel Walter
     - Citations: ~5
     - Link: Doctoral Dissertation, Technische Universitat Munchen (2019)

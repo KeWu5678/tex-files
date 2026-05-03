@@ -1,0 +1,3620 @@
+\documentclass[a4paper,11pt]{book}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, linkcolor=blue]{hyperref}
+
+\usepackage{mathptmx}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{tikz}
+\usepackage{bbm}
+
+\usepackage{geometry}
+\geometry{left=15mm, right=15mm, top=20mm, bottom=20mm}
+
+% Reset mathcal
+\DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+
+% Theorem style
+\makeatletter
+\def\th@plain{%
+  \thm@notefont{}%
+  \itshape
+}
+\def\th@definition{%
+  \thm@notefont{}%
+  \normalfont
+}
+\makeatother
+
+% Numbering
+\renewcommand{\thechapter}{\Roman{chapter}}
+\renewcommand*\thesection{\arabic{section}}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\renewcommand{\thetheorem}{\arabic{section}.\arabic{theorem}}
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{exercise}{Exercise}[subsection]
+
+\theoremstyle{definition}
+\newtheorem{definition}{Definition}[section]
+\renewcommand{\thedefinition}{\arabic{section}.\arabic{definition}}
+\newtheorem*{example}{Example}
+
+\theoremstyle{remark}
+\newtheorem*{remark}{Remark}
+\newtheorem{review}{Review}
+
+% Math operators
+\DeclareMathOperator{\var}{Var}
+\AtBeginDocument{
+  \let\ran\relax
+  \DeclareMathOperator{\ran}{ran}
+}
+
+\linespread{1.3}
+
+\begin{document}
+\title{Stochastic Processes and Analysis}
+
+\chapter{Discrete Stochastic Process}
+\
+
+\newpage
+\section{The Conditional Expectation}
+The motivation of regular conditional expectation(probability) is that the classical definition of conditional probability $\frac{\mathbb{P}(A \cap B)}{\mathbb{P}(A)}$ fails if $\mathbb{P}(A) = 0$, which could be solved by defining the regular conditional probability.\par 
+ First we observe the regular conditional probability from the functional analysis point of view. 
+
+
+\subsection{Construction and Properties}
+Given a sub-$\sigma$-field $\mathcal{G}\subset \mathcal{F}$, we obtain the functional space $L^2(X, \mathcal{G}, \mathbb{P}) \subset L^2(X, \mathcal{F}, \mathbb{P})$. It's easy to verify the subspace is closed and convex. Given a $X \in L^2(X, \mathcal{F})$, by the approximation theorem there exists a $Y \in L^2(X, \mathcal{G})$, such that the distance $Y = \min_{ Z \in L^2(X, \mathcal{G})}\mathbb{E}|X - Z|^2$. Therefore we can define the conditional expectation in $L^2$ space.
+\begin{definition}[Conditional Expectation ($L^2$ version)]
+$X \in L^2(\Omega, \mathcal{F}, \mathbb{P})$, $Y \in L^2(\Omega, \mathcal{F}, \mathbb{P})$. The conditional expectation of $X$ given $Y$: $\mathbb{E}[X|Y]$,  is defined as the orthogonal projection of $X$ on the functional space $L^2(X, \sigma(X), \mathbb{P})$.
+\end{definition}
+
+The central result of this chapter is to extend the definition of conditional expectation in $L^2$ space to the $L^1$ space. The usual trick is to truncate the $L^1$ random variable and apply monotone convergence theorem.
+
+\begin{exercise}
+	Point out the error in this argument:\\
+	$\sigma(Z_1 = \mathbbm{1}_A) = \sigma( Z_2 = \mathbbm{1}_{A^C})$\\
+	$\Rightarrow$ the 2 random variables define the same $L^2$ subspace.\\
+	$\Rightarrow$ the conditional expectation of the 2 RVs are the same.
+\end{exercise}
+\begin{proof}
+	The error lies in the first induction. notice the $L^2$ subspace is characterised by the measure of Z.
+\end{proof}
+
+\begin{lemma}[$L^2$ properties of conditional expectation]
+	
+\end{lemma}
+
+\begin{theorem}[Existence and Uniqueness of the general conditional expectation] 
+For $Y \in \mathfrak{M}^+(\Omega, \mathcal{F})$ or $Y \in L^1(\Omega, \mathcal{F}, \mathbb{P})$. There exists an unique $\mathbb{E}[Y|\mathcal{G}]$:
+		\begin{equation*}
+			\forall G \in \mathcal{G}: \quad \mathbb{E}[\mathbb{E}[Y|\mathcal{G}] \mathbbm{1}_G] = \mathbb{E}[Y \mathbbm{1}_G]
+		\end{equation*}
+\end{theorem}
+\begin{proof}
+	1. For $Y \in \mathfrak{M}^+$: Define $Y_n: Y \wedge n$, $n \in \mathbb{N}$, notice $Y^n \uparrow$ monotone sequence of random variable. Then 
+	\begin{align*}
+		\mathbb{E}[\mathbb{E}[Y_n|\mathcal{G}] \mathbbm{1}_G] =  \mathbb{E}[Y_n \mathbbm{1}_G]
+	\end{align*}
+	taking the limit:
+	\begin{align*}
+		\mathbb{E}[Y\mathbbm{1}_G] = \mathbb{E}[\lim_{n \rightarrow \infty} Y_n \mathbbm{1}_G] = \mathbb{E}[\lim_{n \rightarrow \infty}\mathbb{E}[Y_n|\mathcal{F}] \mathbbm{1}_G]
+	\end{align*}
+	By $\mathcal{G}$ measurability of $Y$ we ensure the existence of $\mathbb{E}[Y\mathbbm{1}_G]$ therefore the existence of $\lim_{n \rightarrow} \mathbb{E}[Y_n|\mathcal{G}]$.\\
+	2. For $Y \in L^1(X, \mathcal{F})$, decompose $Y$ into $Y^+$ and $Y^-$ 
+\end{proof}
+
+
+At this stage we are able to define the $L^1$ version of the regular conditional expectation:
+\begin{definition}[Conditional expectation($L^1$)]
+	Given $(\Omega, \mathcal{F}, \mathbb{P})$, $X$ non-negative or $\in L^1$, $\mathcal{G} \subset \mathcal{F}$ a sub $\sigma$-field, we define $Y$ a version of conditional expectation of $X$ given $\mathcal{G}$ if:
+	\begin{itemize}
+		\item $\forall G \in \mathcal{G}: X \mathbb{E} \mathbbm{1}_G = \mathbb{E} Y \mathbbm{1}_G$
+		\item $Y$ is $\mathcal{G}$-measurable.
+	\end{itemize}
+\end{definition}
+
+There are many properties of conditional expectation, the most frequently used technique is to apply the definition of conditional expectation and choose the suitable test sets.
+
+\begin{theorem}[Properties of the conditional expectation]
+Let $Y \in L^1(\Omega, \mathcal{F}, \mathbb{P})$ and $\mathcal{G}$ a sub-$\sigma$-Algebra. We have:
+\begin{enumerate}
+	\item \textbf{Tower Properties: }$\mathcal{H} \subset \mathcal{G} \Rightarrow \mathbb{E}[\mathbb{E}[Y|\mathcal{G}]|\mathcal{H}] = \mathbb{E}[Y|\mathcal{H}]$ 
+	\item \textbf{Constantization of RVs.} $Z$ is $\mathcal{G}$-measurable, $ZY \in L^1$ a.s. $\Rightarrow$ $\mathbb{E}[ZY|G] = Z\mathbb{E}[Y|G]$
+\end{enumerate}
+
+\begin{enumerate}
+	\item $\mathbb{E}[\mathbb{E}[ Y|\mathcal{G}]] = \mathbb{E}Y$  
+	\item $Y$ is $\mathcal{G}$-measurable, $\mathbb{E}[Y|\mathcal{G}] = Y$ a.s.
+	\item If $Y \perp \mathcal{G}$, then $\mathbb{E}[Y|\mathcal{G}] = \mathbb{E}Y$ a.s.
+	\item(MCT) $Y_n \in M^+, Y_n \uparrow Y$ a.s $\Rightarrow \mathbb{E}[Y_n|\mathcal{G}] \uparrow \mathbb{E}[Y| \mathcal{G}]$ a.s.
+	\item(Fatou) $Y_n \in M^+ \Rightarrow \mathbb{E}[\liminf_n Y_n|\mathcal{G}] \leq \liminf_n \mathbb{E}[Y_n | \mathcal{G}]$ a.s.
+	\item(Jensen) $\varphi$ convex,  $\mathbb{E}[\varphi(Y)|\mathcal{G}] \geq \varphi(\mathbb{E}[Y|\mathcal{G}])$
+\end{enumerate}
+	Let $Y \in L^2(\Omega, \mathcal{F}, \mathbb{P})$ and $\mathcal{G}$ a sub-$\sigma$-Algebra. We have:
+	\begin{enumerate}
+		\item $\mathbb{E}[\mathbb{E}[Y|\sigma(Z)]Z] = \mathbb{E}[YZ]$
+	\end{enumerate}
+\end{theorem}
+
+\begin{theorem}
+Let $X, Y$ independent random variable on $(\Omega, \mathfrak{F}, \mathbb{P})$(taking value in respective measurable space). Given a $L^1$ or non-negative function $g$ of $X, Y$, we have:
+\begin{align*}
+	\mathbb{E}[g(X,Y)|\sigma(Y)] = \mathbb{E}[g(X, y)]|_{y = Y(\omega)}
+\end{align*}
+In a word, if $X$ and $Y$ are independent, we may treat either one as constant when we compute the expectation.
+\end{theorem}
+\begin{proof}
+	\begin{align*}
+		\mathbb{E}[g(X, Y)\mathbbm{1}_{B(Y)}] &= \int_{E_X \times E_Y} g(x, y) \mathbbm{1}_{B}(y)\mathbb{P}_{(X, Y)}(dx, dy)\\
+		&= \int_{E_X \times E_Y} g(x, y)\mathbbm{1}_{B(Y)}\mathbb{P}_X(dx)\mathbb{P}_Y(dy)
+	\end{align*}
+\end{proof}
+
+\begin{example}[Wald's identity]
+$(X_i)_{i \in \mathbb{N}}$ i.i.d.. $N$ $\mathbb{N}$-valued random variable independent of $X_i$, we have:
+\begin{align*}
+	\mathbb{E}S_N = \mathbb{E}N \mathbb{E}X_0
+\end{align*}
+\end{example}
+
+
+
+\subsection{Regular Conditional Probability}
+\begin{definition}[The stochastic kernal]
+	Let $(\Omega_i, \mathfrak{F}_i)$, $i = 1, 2$ be 2 measurable space. A mapping
+	\begin{align*}
+		\kappa: \Omega_1 \times \mathfrak{F}_2 \rightarrow [0, 1] 
+	\end{align*}
+	is called a stochastic kernel from $(\Omega_1, \mathfrak{F}_1)$ to $(\Omega_2, \mathfrak{F}_2)$ if:
+	\begin{enumerate}
+		\item $\forall B_2 \in \mathfrak{F}_2: $ $\omega \rightarrow \kappa(\omega, B_2)$ is $\mathfrak{F}_1$-measurable.
+		\item $\forall \omega \in \Omega_1$: $B_2 \rightarrow \kappa(\omega, B_2)$ is a probability measure on $(\Omega_2, \mathfrak{F}_2)$.
+	\end{enumerate}
+\end{definition}
+
+\begin{definition}[Regular Conditional Probability]
+Given a random variable $X: (\Omega, \mathfrak{F}) \rightarrow (E, \mathfrak{E})$, and a sub-$\sigma$-field $(\Omega, \mathfrak{G})$. A function $\mathbb{P}^X(\omega, B)$ is called a regular conditional probability if:
+\begin{enumerate}
+	\item $\forall \omega \in \Omega$: 
+	\begin{align*}
+		\mathbb{P}^X(\omega, B):  (E, \mathfrak{E}) \rightarrow ([0, 1], \mathfrak{B}([0, 1])
+	\end{align*}  is a probability measure.
+	\item $\mathbb{P}^X(\dot, B)$ is a version of conditional expectation of $\mathbb{E}[\mathbbm{1}_{B}|\mathfrak{G}]$ for any $B \in \mathfrak{E }$.
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}
+	Let $\mathbb{P}^X(\omega, B)$ with $\omega \in \Omega, B \in B(\mathbb{R}))$ a regular conditional distribution, then for any measurable function $f$ with $\mathbb{E}f < \infty$ we have:
+	\begin{align*}
+		\mathbb{E}[f|\mathfrak{G}] = \int_x f(x) \mathbb{P}^X(\omega, dx)
+	\end{align*}
+\end{theorem}
+
+ \begin{example}[Markov chain]
+ Given a canonical stochastic process $(X_n)_{n \in \mathbb{N}}$, $(E, \mathfrak{E})$ the state space, $X$ is a Markov chain w.r.t. $\mathbb{P}$ and $\mathfrak{F}_n$ if:
+ \begin{align*}
+ 	\mathbb{P}(X_n\in B | \mathfrak{F}_m) = \mathbb{P}(X_n \in B|X_{m}) \quad \forall m \le n, B \in \mathfrak{E}
+ \end{align*}
+ \end{example}
+
+\begin{theorem}
+	If the random variable $X$ is real-valued, i.e $(E, \mathfrak{E}) = ( \mathbb{R}, \mathcal{B}(\mathbb{R}))$, then there exists for every 
+	$\mathfrak{G} \subset \mathfrak{E}$ a regular conditional probability $\mathbb{P}^X(\omega, B)$.
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+\begin{example}[(Durret 5.1.2) Bayes]
+
+\end{example}
+
+
+\newpage
+\section{Martingale Theory}
+\subsection{Introduction}
+Need to review: \ref{Q2.1} 	
+\subsection{Definition and Properties}
+\begin{definition}[Martingale]
+Adapted not necessarily predictable.
+\begin{enumerate}
+	\item $M_n \in L^1$ $\forall n \geq 0$
+	\item adapted
+	\item $\mathbb{E}[M_{n+1}|\mathcal{F}_{n}] = M_n$
+\end{enumerate}
+\end{definition}
+
+\begin{theorem}[Properties of martingale]
+	Given $X$ a martingale, we have:
+	\begin{enumerate}
+		\item $\mathbb{E} X_n = \mathbb{E} X_0$ $ \forall n \in \mathbb{N}$
+		\item $\mathbb{E}[X_n |\mathcal{F}_m] = X_m \quad \forall m \leq n$
+		\item \textbf{Martingale transformation:}Given $H_n$ bounded \textbf{predictable} process, we have:
+		\begin{align*}
+			Y_0 = 0, Y_n = \sum_{k = 1}^n H_k(X_k - X_{k-1})
+		\end{align*}
+		is a martingale 
+	\end{enumerate}
+\end{theorem}
+\begin{remark}
+Notice \textbf{1.} does not hold for asymptotical behaviors. For $n \rightarrow \infty$, $\mathbb{E}X_\infty = \mathbb{E}X_0$ does not hold in general
+\end{remark}
+\begin{remark}[the Martingale Transform]
+$X_n$ a predictable process, $M_n$ a martingale(with respect to the implied filtration). The martingale transform, or the \textbf{discrete stochastic integral}, could be defined as:
+\begin{equation*}
+	(X\bullet M)_0 = 0, \quad (X \bullet M)_n := \sum_{k = 1}^n X_k(M_k - M_{k-1}) 
+\end{equation*}
+If $X$ is bounded, then by the theorem above we know the martingale transform is again a martingale.
+\end{remark}
+\begin{proof}
+	1) and 2) are trivial by the tower property and expectation of the conditional expectation is the expectation.\\
+	3)i) $Y_n \in L^1$
+	\begin{align*}
+		Y_n = \sum_{i = 1}^n H_i(X_i - X_{i-1}) \leq \|H_i\|_\infty \sum_{i = 1}^n(X_i - X_{i-1}) = \|H_i\|_\infty (X_n - X_0)
+	\end{align*} 
+	ii) $Y_n$ adapted.\\
+	iii) The Martingale equality:
+	\begin{align*}
+		\mathbb{E}[Y_n | \mathcal{F}_{n-1}] &= \mathbb{E}[\sum_{i = 1}^nH_i(X_i - X_{i -1})|\mathcal{F}_{n-1}]\\
+		&= \sum_{i = 1}^n \mathbb{E}[H_i(X_i - X_{i-1})|\mathcal{F}_{n-1}]\\
+		&= \sum_{i = 1}^{n-1} H_i(X_i - X_{i -1}) +  \mathbb{E}[H_n(X_n - X_{n -1})| \mathcal{F}_{n-1}]\\
+	(1)	&= \sum_{i = 1}^{n-1} H_i(X_i - X_{i -1}) + H_n\mathbb{E}[X_n - X_{n-1}|\mathcal{F}_{n-1}] \\
+		&= Y_n
+	\end{align*}
+	where in (1) the first part we used $H$ is bounded and second $H$ is predictable.
+\end{proof}
+
+\begin{theorem}[Doob's decomposition]
+	Given $(X_n)_n$ a submartingale, there exists a a.s. unique decomposition of $X_n$:
+	\begin{equation*}
+		X_n = X_0 + M_n + A_n, \quad A_0 = M_0 = 0
+	\end{equation*}
+	where $A_n$ is a increasing \textbf{predictable} process and $M_n$ is a martingale. And
+	\begin{align*}
+		A_n := \sum_{k= 1}^n \mathbb{E}[X_k - X_{k-1}|\mathcal{F}_{k-1}]
+	\end{align*} 
+\end{theorem}
+\begin{remark}
+A predictable martingale is a.s. constant.	
+\end{remark}
+\begin{proof}
+	1)Show $A_n$ is a predictable process. (Also $A_{n+1}$ a submartingale?)It's trivial to see that $\mathbb{E}[A_n|\mathcal{F}_{n-1}] = \mathbb{E}[X_n - X_{n-1}|\mathcal{F}_{n-1}] + A_{n-1}$. Notice the conditional expectation on the right-hand side is non-negative, therefore $A_{n-1} \leq  \mathbb{E}[A_n|\mathcal{F}_{n-1}]$ a.s.\\
+	\quad\\
+	2)Show that $M_n:= X_n - X_0 - A_n$ is a martingale:\\
+	i)adeptness and integrability is trivial.\\
+	ii) The martingale equality:
+	\begin{align*}
+		\mathbb{E}[M_n | \mathcal{F}_{n-1}] - M_{n-1} &= A_n - A_{n-1} + \mathbb{E}[X_n| \mathcal{F}_{n-1}] - X_{n-1}\\
+		&= \mathbb{E}[X_n - X_{n-1}|\mathcal{F}_{n-1}] - \mathbb{E}[X_n - X_{n-1}|\mathcal{F}_{n-1}]\\
+		&= 0
+	\end{align*}
+\end{proof}
+
+\begin{lemma}
+	$M_n$ a martingale and $\varphi: \mathbb{R} \rightarrow \mathbb{R}$ a convex function with $\varphi \in L^1$, then $\varphi(M_n)$ is a submartingale. If $\varphi$ is a increasing convex function and $M_n$ a submartingale, then $M_n$ is also a submaringale.
+\end{lemma}
+\begin{remark}
+In particular, $M_n^2 \in L^2$ is a submartingale.
+\end{remark}
+
+
+
+
+\begin{lemma}
+	$X_n \in L^p, M_n \in L^q$ with $\frac{1}{p} + \frac{1}{q} = 1$, $\Rightarrow$ $(X \bullet M)_n $ is again a martingale.
+\end{lemma}
+
+
+
+\subsection{Stopping Times}
+\begin{definition}[Stopping time]
+Stopping time is a random variable w.r.t. the filtration $(\mathcal{F}_t)_{t \ge 0}$ if 
+	\begin{equation*}
+		\{\tau = n \} \in \mathcal{F}_n \quad \forall n \geq 0
+	\end{equation*}
+\end{definition}
+
+\begin{lemma}
+	$\tau$ is a stopping time $\Leftrightarrow$ $ \forall n \in \mathbb{N}: \{\tau \leq n \} \subset \mathcal{F}_n$
+\end{lemma}
+\begin{proof}\quad\\
+	$\Rightarrow$: $\{ \tau \leq n\} = \cup_{i = 1}^n \{\tau = i \}$\\
+	$\Leftarrow$: $\{\tau = n\} = \{ \tau \leq n \} \slash \{ \tau \leq n-1 \}$ both of the latter is $\mathcal{F}_n$ measurable.
+\end{proof}
+
+\begin{remark}
+We define the following notation:\\
+$\mathbf{X_\tau}$: The random variable at time $\tau$.\\
+$\mathbf{X^\tau}$: The stopped process $X^\tau:= X_{n \wedge \tau}$
+\end{remark}
+
+\begin{lemma}
+	Given $X_\tau$ and $X^\tau$ defined as above:
+	\begin{itemize}
+		\item $X_\tau$ is well-defined if $\tau$ is \textbf{finite}
+		\item $X^\tau$ is always well-defined
+	\end{itemize}
+\end{lemma}
+\begin{proof}\quad\\
+	1) For $B \in \mathcal{B}(\mathbb{R})$, 
+	\begin{align*}
+		\{X_\tau \in B \} = \bigcup_{n = 1}^\infty\bigg\{ \{X_n \in B\} \cap \{\tau = n\} \bigg\}
+	\end{align*}
+	since $\tau$ is finite, we only have finite intersection, therefore the set is still in the $\sigma$-field $\mathcal{F}$.\\
+	2) is trivial since we know by $\tau \wedge n$ that the process is bounded.
+\end{proof}
+
+
+
+\begin{theorem}[Doob's Optional stopping]
+	$(M_n)$ (sub)martingale, $\tau$ stopping time. Then the stopped process $(M_\tau^n) := (M_{\tau \wedge n})$ is again (sub)martingale.
+\end{theorem}
+\begin{proof}
+	w.l.o.g show $M_{\tau \wedge n} - M_0$ is martingale. Define $C_k:=\mathbbm{1}_{\tau(\omega) \geq k}$ notice $C_k$ is $\mathcal{F}_{k-1}$ measurable therefore predictable
+	\begin{align*}
+		M_{\tau \wedge n} - M_0 &= \sum_{k = 0}^{\tau \wedge n} M_k  - M_{k-1}\\
+		&= \sum_{k = 0}^{n} C_k M_k - M_{k-1}\\
+	\end{align*}
+	By the property of martingale we know the stopped process is again a martingale.
+\end{proof}
+\begin{remark}
+$\tau \wedge n$ comes to play to apply the martingale transformation. And 
+\begin{align*}
+	\mathbb{E}[X_{\tau \wedge n}|\mathfrak{F}_k] = X_{\tau \wedge k}
+\end{align*}
+\end{remark}
+
+\begin{example}[ $\mathbb{E} X_\tau \neq \mathbb{E} X_0$ even for finite $\tau$, therefore not a martingale ]
+We construct an example where $\mathbb{E} X_\tau \neq \mathbb{E} X_0$ for a martingale $X_n$ in order to show that in general $X_\tau$ is not a martingale.
+$(X_n)$ be i.i.d  random variable with $\mathbb{E}X_n = 0$ , $VarX_n < \infty$. Notice $S_n$ is a martingale with its natural filtration. Observe the tail $\sigma$-field:
+\begin{align*}
+	\mathcal{T}:= \bigcap_{k \in \mathbb{N}} \mathcal{F}_{n \geq k}
+\end{align*}	
+Observe the event:
+\begin{align*}
+	C:= \{ \limsup S_n = \infty \} \in \mathcal{T}
+\end{align*}
+By Kolmogorov $\mathbb{P}(C) \in \{0, 1\}$. Furthermore, by central limit theorem, $S_n$ is $\log n$ normal:
+\begin{align*}
+	\frac{S_n}{\sqrt{n}} \overset{d}{\rightarrow} \mathcal{N}(\mu, Var[X_1])
+\end{align*}
+Select any $a \in \mathbb{R}$
+\begin{align*}
+	\mathbb{P}( \lim_{n \rightarrow \infty}( S_n > \sqrt{n} \cdot a))   = 1 - \Phi(\frac{a}{\sqrt{VarX_1}}) 
+\end{align*}
+(Convergence in distribution implies convergence of cdf in continuous point.) Notice it's strictly positive, by Kolmogrov:
+\begin{align*}
+	\mathbb{P}(\limsup_{n \rightarrow \infty} S_n = \infty) = 1
+\end{align*}
+Define $\tau = \inf \{n: S_n = 10\}$, by the argument above $\mathbb{P}(\tau < \infty) = 1$. Then:
+\begin{align*}
+	\mathbb{E}S_\tau = 10 \neq \mathbb{E}S_0
+\end{align*}
+\end{example}
+
+\begin{remark}[Finiteness and Boundedness]
+	Finiteness doesn't come up in the context of measurable function. We have shown that even for the bounded stopping time, the stopped process may not be a martingale. The fundamental reason is that \textbf{A finite stopped martingale may may not be bounded, or u.i.}
+\end{remark}
+
+
+\begin{corollary}\quad
+\begin{enumerate}
+	\item )Let $\tau$ be a stopping time, if $X$ is a martingale, and $\tau$ is \textbf{bounded}, then $\mathbb{E}X_\tau = \mathbb{E}X_0$.
+	\item If $X$ is a $L^1$ bounded martingale( $X_n < \infty$), then $\mathbb{E}X_\tau = \mathbb{E}X_0$.
+	\item If $X$ is a non-negative supermartingale, then $\mathbb{E} X_\tau \leq \mathbb{E} X_0$
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}\quad\\
+	1)
+	\begin{align*}
+		\mathbb{E}X_\tau = \mathbb{E} X_{\tau \wedge c} = \mathbb{E}X^\tau_c = \mathbb{E} X_0
+	\end{align*}
+	2)we have $\tau \wedge n  \overset{a.s.}{\rightarrow} \tau$. Then we can apply DCT
+	\begin{align*}
+		\mathbb{E}X_0 = \mathbb{E} X_{\tau \wedge n} \overset{a.s}{\rightarrow} \mathbb{E} X_\tau
+	\end{align*}
+	3)Notice the random variable is non-negative. We can apply Fatou
+	\begin{align*}
+		\mathbb{E}X_\tau = \mathbb{E} \liminf_{n \rightarrow \infty} X_{\tau \wedge n} \leq \liminf_{n \rightarrow \infty} \mathbb{E} X_{\tau \wedge n} \leq \mathbb{E} X_0
+	\end{align*}
+	where the last inequality follows from the property of supermartingale 
+\end{proof}
+\begin{remark}
+For the supermartingale to preserve the inequality the stopping time does not to be bounded, since we apply Fatou here.	
+\end{remark}
+
+\begin{theorem}\label{Q2.1}
+	Let $X$ be $(\mathcal{F}_n)$ adapted process, integrable. If:
+	\begin{align*}
+		\mathbb{E} X_\tau = \mathbb{E}X_0 \quad \forall \tau \quad \textbf{bounded}
+	\end{align*}
+	then $X$ is a martingale.
+\end{theorem}
+\begin{remark}
+It's not enough to take all deterministic times	$\mathbb{E}X_n = \mathbb{E}X_0$
+\end{remark}
+\begin{proof}
+The basic idea is, for any  $A \in \mathfrak{F}_{n}$ we define a stopping time and show the martingale property:
+	\begin{equation*}
+		\tau = \left\{
+		\begin{aligned}
+			&n, \qquad \omega \in A^C\\
+			&n+1 \quad \omega \in  A\\
+			&0 \quad \qquad else
+		\end{aligned}
+		\right.
+	\end{equation*}
+	$\tau$ is bounded and notice $\{\tau \le n\} = A^C \in \mathfrak{F}_n$. We have
+	\begin{align*}
+		\mathbb{E}[X_n\mathbbm{1}_{A} + X_n\mathbbm{1}_{A^C}]= \mathbb{E}X_n\overset{deter.st.}{=}
+		\mathbb{E}X_0 \overset{\tau< \infty}{= } \mathbb{E}X_\tau = \mathbb{E}[X_n\mathbbm{1}_{A^C} + X_{n+1}\mathbbm{1}_{A}]
+	\end{align*}
+	We have
+	\begin{align*}
+		\mathbb{E}\mathbbm{1}_{A} X_n = \mathbb{E}\mathbbm{1}_{A}X_{n+1}
+	\end{align*}
+\end{proof}
+
+\begin{definition}[Stopped Filtration]
+	Let $\tau$ be a $\mathcal{F}_n$ stopping time. We define
+	\begin{align*}
+		\mathcal{F}_\tau:= \bigg \{ A \cap \{\tau \leq n \}|\quad A \in \mathcal{F} \quad \forall n \in \mathbb{N}_0 \bigg\}
+	\end{align*}
+\end{definition}
+
+\begin{lemma}
+	Let $\tau$ be a stopping time
+	\begin{itemize}
+		\item $\mathcal{F}_\tau$ is a $\sigma$-field
+		\item If $\tau \equiv n$, then $\mathcal{F}_\tau = \mathcal{F}_n$
+		\item If $\tau$ is \textbf{finite} and $X$ adatpted, then $X_\tau$ is $\mathcal{F}_\tau$-measurable.
+	\end{itemize}
+\end{lemma}
+
+\begin{theorem}[Doob's Optional Sampling]
+	Let $(M_n)$ be a (sub)martingale and $\sigma, \tau$ bounded stopping times with $\sigma \leq \tau$. Then
+	\begin{equation*}
+		\mathbb{E}[M_\tau| \mathcal{F}_\sigma] = M_\sigma \quad (\mathbb{E}[M_\tau| \mathcal{F}_\sigma] \geq M_\sigma)
+	\end{equation*}
+\end{theorem}
+\begin{proof}
+	Define $\rho = \mathbf{1}_A \sigma + \mathbf{1}_{A^C} \tau$. By optional stopping we have:
+	\begin{align*}
+		\mathbb{E} M_\rho = \mathbb{E} M_0 = \mathbb{E} M_\tau \quad(*)
+	\end{align*}
+	We observe:
+	\begin{align*}
+		\{\rho = n \} = \bigg(\{\sigma = n\}\cap A \bigg)\bigcap\bigg(\{\tau = n) \cap A^C\bigg) \in \mathcal{F}_n
+	\end{align*}
+	Therefore $\rho$ defines a stopping time. By $(*)$ 
+	\begin{align*}
+		 \mathbb{E}[\mathbbm{1}_{A}M_\sigma + \mathbbm{1}_{A^C} M_\tau)]  = \mathbb{E}M_\rho =
+		 \mathbb{E}M_\tau = \mathbb{E}[\mathbbm{1}_{A}M_\tau + \mathbbm{1}_{A^C} M_\tau]
+	\end{align*}
+		Consequently: $\forall A \in \mathcal{F}_\sigma:$
+	\begin{align*}
+		\mathbb{E}[\mathbbm{1}_{A} M_\tau ] = \mathbb{E}[\mathbbm{1}_{A}M_\sigma]
+	\end{align*}
+
+\end{proof}
+
+
+\subsubsection*{Closed Martingale}
+Now we turn to the question: what if the stopping time is unbounded.
+We know:
+\begin{align*}
+ X \in L^1 \Rightarrow \mathbb{E}[X|\mathcal{F}_n]	\text{ is a martingale}
+\end{align*}
+The question now is to find out a way to characterise this kind of stochastic process.
+
+\begin{definition}[closed martingale]
+A martingale $(X)_n$ is closed if:
+$\exists Y \in L^1 \forall n \geq 0: \mathbb{E}[Y|\mathcal{F}_n] = X_n$. 
+If the martingale is closed by $Y$, we may define
+\begin{align*}
+	\mathcal{F}_\infty := \sigma(\bigcup_n \mathcal{F}_n)
+\end{align*}
+The smallest filtration contains all $\mathcal{F}_n$. And
+\begin{align*}
+		X_\infty:= \mathbb{E}[Y|F_\infty]
+\end{align*}
+$X_\infty$ is a $\mathcal{F}_\infty$ measurable random variable. Notice that the $X_\infty$ satisfies all the martingale properties, therefore
+\begin{align*}
+	(X_n)_{ n \in \mathbb{N} \cup \{\infty\}}
+\end{align*}
+is a martingale as well. 
+\end{definition}
+
+With the introduction of closable martingale, we may generalise the result of optional sampling:
+
+\begin{theorem}[The second optional sampling]
+	Let $(X_n)$ be a martingale \textbf{closed} by a random variable $Y$, and $\sigma \leq \tau$ \textbf{any }stopping time, then:
+	\begin{align*}
+		\mathbb{E}[X_\tau|F_\sigma] = X_\sigma
+	\end{align*}
+\end{theorem}
+\begin{proof}
+We would like to prove:
+\begin{align*}
+	\forall A \in \mathcal{F}_\sigma: \mathbb{E}[X_\tau \mathbbm{1}_A] = \mathbb{E}[X_\sigma \mathbbm{A}] 
+\end{align*}
+Observe:
+\begin{align*}
+	\mathbb{E}[X_\tau\mathbbm{1}_A] &= \mathbb{E}[\sum_{n = 1}^\infty X_\tau \mathbbm{1}_{A \cap \{\tau = n\}}] \\
+	&= \mathbb{E}[\sum_{n = 1}^\infty X_n \mathbbm{1}_{A \cap \{\tau = n\}}]\\
+	&= \mathbb{E}[\sum_{n = 1}^\infty X_\infty \mathbbm{1}_{A \cap \{\tau = n\}}]\\
+	(Fubini)
+	&= \mathbb{E}[X_\infty \sum_{n = 1}^\infty \mathbbm{1}_{A \cap \{\tau = n\}}]\\
+	&= \mathbb{E}[X_\infty \mathbbm{1}_A]
+\end{align*}
+Analog we can show
+\begin{align*}
+	\mathbb{E}[\mathbbm{1}_{A}X_\tau] = \mathbb{E}[\mathbbm{1}_{A}X_\infty]
+\end{align*}
+\end{proof}
+
+
+\begin{example}[Ruin time of the insurance company]
+We define: $V_n$: capital of time $n$, $c > 0$ premium collected at time, $Y_n$ payment in year $n$, which are i.i.d. We would require $\mathbb{E}Y_n < c$, and we have the capital dynamic:
+\begin{align*}
+	V_n = V_{n-1} + c - Y_n
+\end{align*} 
+We define the stopping time: $T := \inf \{ n \in \mathbb{N}_0 |V_n < 0\}$, the time of bankruptcy. We are interested in the upper bound of $\mathbb{P}(T < \infty)$. Assume we have $\lambda_0$ as the solution of:
+\begin{align*}
+	\mathbb{E} e^{\lambda Y_1} = e^{\lambda c}
+\end{align*}
+\end{example}
+
+
+\subsection{Martingale Inequalities}
+\textbf{Question}: When can we close a martingale? $X_\infty$ some limit of $X_n$. Somehow we would like to bound the running maximum to get closeness and convergence of the martingale. We define the \textbf{Running Maximum till time $n$} of a martingale $(X_n)_{n \in \mathbb{N}}$ as 
+\begin{align*}
+	X^*_n:= \sup_{i\in \{1, \cdots, n\}} |X_i|
+\end{align*}
+It's worth noticing that $X^*_n \in L^1$ since it's less than the finite sum of the integrable random variable.
+Using the Markov inequality we would get
+\begin{align*}
+	\mathbb{P}(X^*_n \geq \alpha)\leq \frac{\mathbb{E}X^*_n}{\alpha}
+\end{align*} 
+We prove we can further improve this upper bound.
+
+\begin{theorem}[Doob's martingale Inequality]
+$X$ is a martingale, or a positive submartingale. then we have:
+\begin{align*}
+	\mathbb{P}(X^*_n \geq \alpha) \leq \frac{\mathbb{E}[|X_n|\mathbbm{1}_{X^*_n \geq \alpha}]} {\alpha} \leq \frac{\mathbb{E}|X_n|}{\alpha}
+\end{align*}	
+In particular,
+\begin{align*}
+	\mathbb{P}(X_\infty^* \ge \alpha) \le \sup_{ n \in \mathbb{N}_0} \frac{\mathbb{E}|X_n|}{\alpha}, \qquad X_\infty^* := \sup_{n} |X_n|
+\end{align*}
+\end{theorem}
+\begin{proof}
+	We define the stopping time:
+	\begin{align*}
+		\tau:= \inf\{k: X_k \geq \alpha\}
+	\end{align*}
+	Then the tail probability may be written as:
+	\begin{align*}
+		\mathbb{P}(X^*_n \geq \alpha) &= \mathbb{E} \mathbbm{1}_{\tau \le n}\\
+	(1)	&\leq \mathbb{E}[ \frac{|X_{\tau \wedge n}|}{\alpha}\mathbbm{1}_{\tau \le n}]\\
+	&\leq \frac{ (\mathbb{E}|X_n| \mathbbm{1}_{X_n^* \ge \alpha})}{\alpha}  \\
+	(2)	&\leq \frac{\mathbb{E}|X_n|}{\alpha}
+	\end{align*}
+	In (1) by $\tau \leq n $ we know $\max_{k = 1}^n X_k \geq a$, therefore $\frac{X_{\tau \wedge n}}{\alpha} \geq 1$. (2) follows from $|X_n|$ is a submartingale and optional stopping.
+\end{proof}
+
+\begin{example}[Random walk]
+For $S_n = \sum_{k = 0} X_k$, $\mathbb{E}X_k = 0$, $Var(X_k) = \sigma^1$. We have
+\begin{align*}
+	\mathbb{P}(S^*_n \ge  a) \le a^{-2} \sigma^2
+\end{align*}	
+The results follows from $S^2_n$ is a positive sub-martingale, we then apply the theorem above to $S_n^2$.
+\end{example}
+
+\begin{theorem}[Doob's $L^p$ martingale inequality]
+	Given $X \in L^p$, $p \in (1, \infty)$.
+	\begin{align*}
+		\mathbb{E}|X^*_n|^p \leq \frac{p}{1-p} \mathbb{E}|X_n|^p
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	\begin{align*}
+		\mathbb{E}|X_n^*|^p &= \mathbb{E}( \int_0^{X^*_n} px^{p-1} dx) \\
+		&= \int_0^\infty px^{p-1} \mathbb{P}(X_n^* \ge x )dx\\
+	(1)	&\leq \int_0^\infty px ^{p-2}  \mathbb{E}\bigg[|X_n| \mathbbm{1}_{(X_n^* \ge x)}\bigg]\\
+		&= \mathbb{E}\bigg[ |X_n| \int_0^{X_n^*} px^{p-2}dx\bigg] \\
+		&= \frac{p}{p-1}\mathbb{E}[|X_n^*|^{p-1}|X_n|]
+	\end{align*}
+	Apply Holder, 
+	\begin{align*}
+	\mathbb{E}|X_n^*|^p &\le  \frac{p}{p-1} (\mathbb{E}|X_n^*|^{pq - q})^{\frac{1}{q}} \|X_n\|_p\\
+	&= \frac{p}{p-1} \|X_n^*\|_p^\frac{p}{q} \|X_n \|_p\\
+	\|X_n^*\|_p^{p - \frac{p}{q}} &\leq \frac{p}{p-1}|X_n\|_p\\
+	\|X_n^*\|_p &\leq \frac{p}{p-1}\|X_n\|_p
+	\end{align*}
+	where (1) follows from the martingale inequality
+\end{proof}
+
+\begin{example}[The $L^p$ inequality fails when $p = 1$]
+Define $X_n:= S_{\tau \wedge n}$ where $S_n$ is a simple random walk and $\tau:= \inf \{n \in \mathbb{N} : S_n = 0 \} $, $S_0 = 1$. By the Doob's inequality:
+\begin{align*}
+	\mathbb{P}(X_n^* \geq M ) \le \frac{\mathbb{E}X_n}{M} = \frac{1}{M}
+\end{align*}
+Therefore
+\begin{align*}
+	\mathbb{E}X_n^* = \sum_{M = 1}^\infty \mathbb{P}(X_n^* \ge M) = \sum_{M = 1}^\infty \frac{1}{M} = \infty
+\end{align*}
+However
+\begin{align*}
+	\mathbb{E}|X_n| = 1
+\end{align*}
+\end{example}
+
+\begin{theorem}
+	If $X_n$ is a martingale with $\sup \mathbb{E}|X_n|^p < \infty$, $p > 1$, then $X_n \rightarrow X$ a.s. and in $L^p$.
+\end{theorem}
+\begin{proof}
+	
+\end{proof}
+
+
+
+\subsubsection{Doob's upcrossing lemma}
+motivation:
+Convergence of a random variable $X_n$ is equivalent to the $\liminf X_n = \limsup X_n$, which is in turn equivalent to, for any interval, there are only finite $X_n$ lying outside the interval($\liminf$ cannot exceeds the $\limsup$), which is equivalent to there are only finite many \textbf{upcrossings}. That's the reason for the following \textbf{Doob's upcrossing theorem}. We denote for a random process $X$, $a < b$:\par 
+$T_0 = 0$,\par
+$B_{j + 1}:= \min\{k \geq T_j: X_k \leq a \}$\par 
+$S_{j+1}:= \min\{ k \geq S_j: X_k \geq b\}$\par 
+$U_n:= \max\{j \geq 0: T_j \leq n\}$ number of upcrossings by time $n$.
+
+\begin{theorem}[Doob's upcrossing theorem]
+	$X$ a submartingale, and $a < b$, then 
+	\begin{align*}
+		\mathbb{E}U_n(a, b) \leq  \frac{1}{b-a} \mathbb{E}(X_n - a)^+
+	\end{align*}
+\end{theorem}
+\begin{proof}
+1. By induction we know $S_j$ and $T_j$ define stopping times.
+	\begin{align*}
+		\{S_j = n\} = \{B_j < n\} \bigcap \bigg\{ \bigcap_{T_j \leq k \leq n}  \{ X_k < b\} \bigg\} \bigcap \{X_n \geq b\}
+	\end{align*}
+	Inductively if $\{B_j \leq n\}$ is $\mathcal{F}_{n}$-measurable, we know $\{S_j = n\}$ is $\mathcal{F}_n$-measurable.\\
+2. Notice $U_n(a, b) (b - a) \leq$ (process of buying at $X \leq a$ then selling at $X \geq b$). With this intuition we define the predictable process:
+\begin{equation*}
+H_m =  \left\{
+\begin{aligned}
+	&1 \quad B_j < m \leq S_{j+1}\\
+	&0 \quad else
+\end{aligned}
+\right.
+\end{equation*} 
+Notice it's a predictable process.\\  
+3. Define $Y_n := (X_n - a)^+ + a$, the max function preserves the submartingale property:
+	\begin{align*}
+		\mathbb{E}[(X_n - a)^+ + a | \mathcal{F}_{n-1}] \geq (\mathbb{E}[X_n|\mathcal{F}_{n-1}] - a)^+ + a
+		\geq (X_{n-1} - a)^+ + a
+	\end{align*}
+	By the argument above we have
+	\begin{align*}
+		\mathbb{E}(H \cdot X)_n \geq (b-a) U_n(a,b)
+	\end{align*}
+	On the other hand, define $K: = 1 - H$,  by construction we have:
+	\begin{align*}
+		X_n - X_0  = (H\cdot X)_n + (K\cdot Y)_n
+	\end{align*}
+	since $Y_n$ is a submartingale, we have $\mathbb{E}[(X\cdot K)_n] \geq \mathbb{E}[(X\cdot K)_0]  = 0$. Hence by the independence of $X_n$:
+	\begin{align*}
+		\mathbb{E}[X_n - Y_0] = \mathbb{E}[(X_n - a)^+] \geq \mathbb{E}(H\cdot X)_n \geq U_n(a, b)(b - a)
+	\end{align*} 
+\end{proof}
+
+
+\subsection{Martingale Convergence theorem}
+In certain sense, the (sub)martingale could be seen as a monotone increasing sequence. Purpose of this chapter is to show that, under certain boundedness conditions, the monotone sequence converges.(in different type).
+\begin{theorem}[The First Martingale convergence theorem]
+	$X$ be a submartingale, s.t. $\sup_n \mathbb{E}|X_n^+| < \infty$
+\begin{align*}
+		\lim_{n \infty} X_n = X_\infty \quad \text{exists a.s.} \quad X_\infty \in L^1
+\end{align*}
+\end{theorem}
+\begin{proof}
+	By monotone convergence theorem
+	\begin{align*}
+		U_n(a, b) \uparrow U(a,b)
+	\end{align*}
+	Observe $(X - a)^+ \le X^+ + |a|$, we have
+	\begin{align*}
+		U_n(a, b) \leq \frac{1}{b-a} \mathbb{E}(X_n - a)^+ \le \frac{1}{b-a}(\mathbb{E}X_n^+ + |a|)
+	\end{align*}
+	If $\sup_n \mathbb{E}X_n^+ < \infty$, we have
+	\begin{align*}
+		\mathbb{E} U(a, b) = \mathbb{E} \liminf_n U_n(a, b) \le \liminf_n \mathbb{E}U_n(a, b) < \infty
+	\end{align*}
+	For all $a, b \in \mathbb{Q}$, we only have finite number of upcrossing, therefore
+	\begin{align*}
+		\mathbb{P}(\bigcup_{a, b \in \mathbb{Q}} 
+		\{\liminf X_n \le a \le b \le \limsup X_n\}) = 0
+	\end{align*}
+	Therefore $\liminf X_n = \limsup X_n$ a.s. The limit exists. To see $X_\infty \in L^1$, 
+	\begin{align*}
+		\mathbb{E}X^+ \le \liminf \mathbb{E}X^+_n < \infty
+	\end{align*}
+	and
+	\begin{align*}
+		\mathbb{E}X^-_n = \mathbb{E}X^+_n - \mathbb{E}X_n \le \mathbb{E}X_n^+ - \mathbb{E}X_0
+	\end{align*}
+	hence
+	\begin{align*}
+		\mathbb{E}X^- \le \liminf_n \mathbb{E}X_n^- \le \liminf_n \mathbb{E}X_n^+ - \mathbb{E}X_0< \infty
+	\end{align*}
+\end{proof}
+\begin{remark}
+The reason we only have the positive part in the assumption is: for a submartingale we have increasing expectation, therefore only the positive parts is of the interest.	
+\end{remark}
+
+
+\begin{example}[The $L^1$ convergence doesn't holds in general. And the existence of the $L^1$ limit doesn't apply the martingale is closed by it.]
+Given i.i.d. $X_n$ with $\mathbb{P}(X_n = 0) = \mathbb{P}(X_n = 2) = \frac{1}{2}$. Observe
+\begin{align*}
+	M_n = \prod_{k = 1}^n X_k
+\end{align*}
+we have
+\begin{align*}
+	M_n \overset{a.s.}{\rightarrow} 0
+\end{align*}
+However
+\begin{align*}
+	\lim_{n \rightarrow\infty}\mathbb{E}|M_n - 0|=\lim_n \prod_{k = 1}^n\mathbb{E}X_k = 1
+\end{align*}
+Also the martingale is \textbf{not closed} by the limit, indeed
+\begin{align*}
+	\mathbb{E}[0 | \mathfrak{F}_n] \neq M_n
+\end{align*}
+\end{example}
+
+\begin{corollary}
+	Give $X$ a supermartingale or a martingale bounded from above or below,then 
+	\begin{align*}
+		X_\infty = \lim X_n \quad
+	\end{align*}
+	exists a.s and $X_\infty \in L^1$
+\end{corollary}
+
+
+
+\subsubsection*{The Second martingale convergence and the Uniform Integrability}
+Additional assumptions are required for the $L^1$-convergence. We at least need this for the closeness because we must have constant expectation. 
+ \begin{definition}[Uniformly integrable]
+ 	A family of random variables $(X_i)_{i \in I}$ is uniformly integrable if
+ 	\begin{equation*}
+ 		\lim_{R \rightarrow \infty} \sup_{i \in I} \mathbb{E}\bigg[ |X_i| \textbf{1}_{\{|X_i| > R\}}\bigg] = 0
+ 	\end{equation*}
+ 	i.e. the value of the RV vanish on the edge of the measurable space.
+ \end{definition}
+\begin{remark}
+	It's a lot stronger than the $L^1$ boundedness for a family of random variable. After proving $L^1$ boundedness we still need $L^p(p>1)$ boundedness or vanishing value on shrinking measure to have u.i.
+\end{remark}
+
+\begin{example}[$\mathbb{E}|X_n| < \infty \nRightarrow$ u.i]
+Observe:
+\begin{equation*}
+ 	X_i = 2^i \mathbbm{1}_{z \in [0, 2^{-i}]}
+\end{equation*}
+For any $c\in \mathbb{R}$, we can find $2^i >c$, such that
+\begin{align*}
+	\mathbb{E}[|X_i| \mathbbm{1}_{X_i > c}] = \mathbb{E}|X_i| = 1
+\end{align*}
+therefore
+\begin{align*}
+	\lim_{c \rightarrow \infty} \sup_{i\in \mathbb{N}} \mathbb{E}[|X_i| \mathbbm{1}_{X_i \ge c}] \ne 0
+\end{align*}
+\end{example}
+
+\begin{example}[Closed martingale is u.i.]
+For $Z \in L^1(\Omega, \mathfrak{F})$,  observe
+\begin{align*}
+	\bigg\{ X_i =  \mathbb{E}[Z|\mathfrak{F}_i]: \ i \in I, \mathfrak{F}_i \subset \mathfrak{F}\bigg\}
+\end{align*} 
+Since $Z\in L^1(\Omega)$, 
+\begin{align*}
+	\forall \epsilon > 0 \exists \delta >0 \forall A\in \mathfrak{F}, \mathbb{P}(A) \le \delta: \mathbb{E}Z\mathbbm{1}_{A} \le \epsilon
+\end{align*}
+Apply Jensen
+\begin{align*}
+	\mathbb{E}\bigg[ |\mathbb{E}[Z|\mathfrak{F}_i]| \mathbbm{1}_{X_i \ge C}\bigg]
+	&\le \mathbb{E}[ \mathbb{E}[|Z||\mathfrak{F}] \mathbbm{1}_{X_i \ge C}]\\
+	&= \mathbb{E}[|Z| \mathbbm{1}_{X_i \ge C}]
+\end{align*}
+Apply Markov, choose $C$ big enough such that
+\begin{align*}
+	\mathbb{P}(X_i \ge C) \le \frac{\mathbb{E}|X_i|}{C}\le \frac{\mathbb{E}|Z|}{C} \le \delta
+\end{align*}
+Then we have
+\begin{align*}
+	\forall i \in I: \lim_{c \rightarrow \infty} \mathbb{E}[|X_i| \mathbbm{1}_{X_i \ge C}] \le \mathbb{E}[|Z|\mathbbm{1}_{X_i \ge C}] \rightarrow   0
+\end{align*}
+\end{example}
+
+\begin{example}[superlinear operator]
+	If there exists a superlinear operator $G$ satisfying 
+	\begin{align*}
+		\forall X \in \mathfrak{X}: \mathbb{E}G(X) < \infty
+	\end{align*}
+	then $\mathfrak{X}$ is u.i. Normally we choose
+	\begin{align*}
+		G(x) &= x^p\\
+		G(x) &= x \log^+ x
+	\end{align*}
+	It follows that \textbf{the $L^p$ boundedness implies u.i.}.
+\end{example}
+
+
+
+\begin{theorem}[characterisation of uniform integrability]
+	$\mathfrak{X} \subset L^1$, then the following are equivalent:
+	\begin{enumerate}
+		\item $\mathfrak{X}$ is u.i.
+		\item $\mathfrak{X}$ is $L^1$ bounded ($\sup_{x \in \mathfrak{X}}\mathbb{E}|X| < \infty$), $\forall \epsilon > 0 \exists \delta > 0\forall A, \mathbb{P}(A) \leq \delta:\sup_{x \in \mathfrak{X}}: \mathbb{E}|X|\mathbbm{1}_A \leq \epsilon$
+
+		\item There exist a $G$ with superlinear growthrate ($\frac{G(X)}{x} \rightarrow \infty$ as $x \rightarrow \infty$ ) such that $\sup_{X \in \mathfrak{X}} \mathbb{E}G(X) < \infty$
+	\end{enumerate}
+\end{theorem}
+\begin{proof}\quad\\
+1)$\Rightarrow$2)
+	By uniform integrability, let $\epsilon > 0$, then there exists $c(\epsilon)$:
+	\begin{align*}
+		\sup_{x \in X} \mathbb{E}\mathbbm{1}_{|x| \geq c} \le \frac{\epsilon}{2}
+	\end{align*}
+	Then we choose $\delta = \frac{\epsilon}{c}$, then we know $\forall A : \mathbb{P}( A) \leq \delta$: 
+	\begin{align*}
+		\mathbb{E}X\mathbbm{1}_A &\leq \mathbb{E} X \mathbbm{1}_{A \cap \{x \leq c\}} + \mathbb{E}X\mathbbm{1}_{x \geq c}\\
+		&\leq c \cdot \frac{\epsilon}{c} +  \frac{\epsilon}{2}
+	\end{align*}
+	2)$\Rightarrow$1)\label{Q:UI} Since $\mathfrak{X} \in L^1$, $\forall \epsilon >0$, we may have:
+	\begin{align*}
+		\mathbb{E}[X_i \mathbbm{1}_{X_i \geq C_i}] \leq \epsilon
+	\end{align*}
+	By 2) we know $\mathbb{P}(X_i \geq C_i)$ is controlled by $\delta$ uniformly:
+	\begin{align*}
+		\forall X_i \in \mathfrak{X}: \mathbb{P}(X_i \geq C_i) \leq \delta
+	\end{align*}
+	Choose $C:= \sup C_i$, $C$ exist since then we have:
+	\begin{align*}
+		\sup_{x \in \mathfrak{X}} \mathbb{E}[X\mathbbm{1}_{X \geq C}] \leq
+		 \epsilon
+	\end{align*}
+	3)$\Rightarrow$1), with the superlinear growth of $G$:
+	\begin{align*}
+		\forall \epsilon > 0 \exists C_0 \forall x \geq C_0:\frac{G(x)}{x} \geq \frac{1}{\epsilon} 
+	\end{align*}
+	i.e
+	\begin{align*}
+		\forall \epsilon > 0 \exists C_0> 0 \forall x > C: X \leq \epsilon G(X)
+	\end{align*}
+	Therefore:
+	\begin{align*}
+		\sup_{x \in \mathfrak{X}} \mathbb{E}[X\mathbbm{1}_{X \geq c}] \leq \epsilon \sup_{x \in \mathfrak{X}} \mathbb{E}[G(X)\mathbbm{1}_{X \geq C}] \overset{(1)}{\rightarrow}0
+	\end{align*}
+	In (1) we used the boundedness
+\end{proof}
+
+\begin{corollary}
+	If  $\sup_{x \in X} \mathbb{E}|X|^p < \infty$ for $p > 1$, $X$ is u.i.
+\end{corollary}
+\begin{proof}
+	$L^p$ boundedness implies $L^1$ boundedness as well as $L^1$ bounded superlinear function.
+\end{proof}
+
+\begin{theorem}[Vitalli]
+Let $X_n, X_\infty \in L^1(\Omega)$ then the followings are equivalent:
+\begin{enumerate}
+	\item $X_n \overset{L^1}{\rightarrow} X_\infty$
+	\item $X_n \overset{P}{\rightarrow} X_\infty$ and $X_i$ u.i.
+\end{enumerate}
+\end{theorem}
+\begin{proof} 
+	1)$\Rightarrow$2) $L^1$ converges implies converges in probability. And for the uniform integrability observe
+	\begin{align*}
+		\forall C > 0: \mathbb{E}[|X_n|\mathbbm{1}_{X_n \geq C}] - \mathbb{E}[|X_\infty| \mathbbm{1}_{X_n \geq C}] 
+		&\leq \mathbb{E}[|X_\infty - X_n|\mathbbm{1}_{X_n > C}]\\
+		\mathbb{E}|X_n| \mathbbm{1}_{X_n \ge C} &\le \mathbb{E}|X_\infty| \mathbbm{1}_{X_n \ge C} + \mathbb{E}|X_\infty - X_n|\mathbbm{1}_{X_n \ge C}
+	\end{align*}
+	By integrability of $X_\infty$, for all $\frac{\epsilon}{2} > 0$, we can choose $\delta_1$ such that for all $A$ with $\mathbb{P}(A) \le \delta_1$, $\mathbb{E}X_\infty\mathbbm{1}_{A} \le \frac{\epsilon}{2}$  
+. We choose $C_1$:
+\begin{align*}
+	\mathbb{P}(X_\infty \ge C_1) \le \frac{\mathbb{E}|X_\infty|}{C_1} \le \delta_1
+\end{align*}	
+By the $L^1$ convergence we can find $n_0$ such that $\forall n \ge n_0$:
+\begin{align*}
+	\mathbb{E}|X_n|\mathbbm{1}_{X_n \ge C} \le \frac{\epsilon}{2} + \frac{\epsilon}{2} \le \epsilon
+\end{align*} 
+As for the finite $n_0$, By the integrability of $X_n$, for all $\epsilon >0$, we can find $\delta_2>0$, such that for all $A$ with $\mathbb{P}(A) \le \delta_2$, $\mathbb{E}X_k \mathbbm{1}_{A} \le \epsilon$ for all $k \in \{1, \dots, n_0\}$. Analog apply Markov we find $C_2$ such that $\mathbb{P}(X_k \ge C) \le \delta_2$ for all $k \in \{1, \dots n_0\}$. Now choose $\hat{C} = \max\{C_1, C_2\}$, we have
+\begin{align*}
+	\mathbb{E}X_n \mathbbm{1}_{X_n \ge \hat{C}} \le \epsilon \quad \forall n
+\end{align*}
+	\\2)$\Rightarrow$1)
+	Define the truncated functions:
+\begin{equation*}
+	\varphi_M = \left\{
+	\begin{aligned}
+		&K \qquad x > K\\
+		&x \qquad -K \le x \le K\\
+		&-K \qquad x < -K
+	\end{aligned}	
+	\right.
+	\end{equation*}
+Observe
+	\begin{align*}
+		\mathbb{E}|X_\infty - X_n| \leq \mathbb{E}|X_\infty - \varphi_M(X_\infty)| + \mathbb{E}|\varphi_M(X_\infty) - \varphi_M(X_n)| + \mathbb{E}|\varphi_M(X_n) - X_n|
+	\end{align*}
+	The second term converges by the boundedness and converges in probability, the first and third part converges by the uniform integrability.
+\end{proof}
+
+\begin{theorem}[The second martingale convergence theorem]
+	Let $X_n$ be an u.i. (sub)martingale, then 
+	\begin{align*}
+		X_n \overset{L^1}{\rightarrow} X_\infty, \quad X_\infty \in L^1
+	\end{align*}
+	and it's closed:
+	\begin{align*}
+		\mathbb{E}[X_\infty|\mathcal{F}_n] = (\geq) X_n
+	\end{align*}
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+
+
+\begin{corollary}
+	A martingale is closed iff it's u.i.
+\end{corollary}
+\begin{proof}
+	"$\Rightarrow$":Shown by the example above.\\
+	"$\Leftarrow$" By the $L^1$ convergence we know $\mathbb{E}[X_\infty|\mathfrak{F}^n]$ forms a martingale. 
+\end{proof}
+
+\begin{corollary}[Kolmogorov 0-1 law]
+ Given $(X_i)$ i.i.d, events in the tail-field happens either a.s. or a.s not.
+\end{corollary}
+\begin{proof}
+	Notice
+	\begin{align*}
+		\mathfrak{T}\subset \mathfrak{F}_\infty
+	\end{align*}
+	Let $A \in \mathfrak{T}$ and 
+	\begin{align*}
+		X_n:= \mathbb{E}[\mathbbm{1}_A |\mathfrak{F}_n]
+	\end{align*}
+	Observe it's a bounded, therefore u.i martingale. Then
+	\begin{align*}
+		\mathbbm{1}_A = \mathbb{E}[1_A|\mathfrak{F}_\infty] 
+		= \lim_n \mathbb{E}[1_A|\mathfrak{F}_n] = \mathbb{E}1_A
+	\end{align*}
+	Therefore $\mathbb{P}(A) \in \{0, 1\}$.
+\end{proof}
+
+\begin{example}[Polya's Urn model]
+Define:
+\begin{itemize}
+	\item $X_n$: \# of black balls at time $n$.
+	\item $Y_n$: \# of red balls at time $n$.
+\end{itemize}
+At each time we draw a ball and put it back with $c$ balls of the same color, define
+\begin{align*}
+	V_n = \frac{X_n}{X_n + Y_n}
+\end{align*}
+1) show $V_n$ is a martingale.\\
+2) show $V_n \overset{a.s.}{\rightarrow} V_\infty$, and compute the distribution of $X_\infty$.
+\begin{proof}
+	\quad\\
+	1) measurability is clear, also $\mathbb{E}V_n \le 1$, $V_n \in L^1$. The martingale inequality comes from:
+	\begin{align*}
+		\mathbb{E} V_{n+1} \mathbbm{1}_{V_n = \frac{b}{b+r}} &= \frac{b}{b+r}  \cdot \frac{b+c}{b+r+c} + \frac{r}{b + r} \cdot \frac{b}{b + r + c}\\
+		&= \frac{b}{b+r}\\
+		&= \mathbb{E} V_n \mathbbm{1}_{V_n = \frac{r}{b+r}}
+	\end{align*}
+	2)First we show the convergence, since $\sup_n \mathbb{E} V_n < \infty$, we know the a.s. limit exists. \\
+	Second, we compute the distribution. Assume we get black at first $m$ times and then red on the next $l = n-m$ times.
+	\begin{align*}
+		 \frac{b}{b+r} \frac{b+c}{b+r+c} \dots \frac{b+(m-1)c}{b+r + (m-1)c} \frac{r}{b+r +(l-1)c} \dots \frac{r + (l-1)c}{b+r+(n-1)c}
+	\end{align*}
+	Notice any $n$ drawn with $m$ black and $l$ red has the same probability since the denominator remains the same while the nominator permuted. Therefore we have for $b = 1, c= 1, r = 1$:
+	\begin{align*}
+		\mathbb{P}(X_n = m) = \frac{1}{n+1}
+	\end{align*}
+	Therefore $V_\infty$ uniformly distributed in $(0, 1)$
+\end{proof} 	
+\end{example}
+
+
+
+
+
+\subsection{Backwards martingales}
+Recall if we have an u.i. martingale, then we proved it implies $L^1$ boundedness, a.s. convergence(hence convergence in probability), $L^1$ convergence and the martingale is closed by a $L^1$ random variable.\par
+But the key property: uniformly integrable is not easy to show. But for a backwards martingale, it's always u.i.
+
+\begin{definition}[Backwards martingale]
+	Let $(\mathcal{F}_{-n})_{n \in \mathbb{N}_0}$ be a filtration that satisfies $\forall n: \mathfrak{F}_{-n-1} \subset \mathfrak{F}_{-n}$ , we call $(X_{-n})_{n \in \mathbb{N}_0}$ if it satisfies:
+	\begin{itemize}
+		\item $X_{-n} \in L^1$
+		\item adapted
+		\item $\mathbb{E}[X_{-n} | \mathcal{F}_{-n -1}] = X_{-n-1}$
+	\end{itemize}
+	Intuitively, $\mathcal{F}_0 \approx \mathcal{F}_{\infty}$ is the largest filtration(smallest $\sigma$-algebra contains all $\mathfrak{F}_n$) in the previous section
+\end{definition}
+
+\begin{theorem}
+	Let $(X_{-n})$ be a backward martingale, set\label{Q:why a filtration } 
+	\begin{align*}
+		\mathcal{F}_{-\infty} := \bigcap_{n \in \mathbb{N}_0} \mathcal{F}_{-n}
+	\end{align*}
+	then 
+	\begin{align*}
+		X_{-n} \rightarrow X_{-\infty} \quad a.s.
+	\end{align*}
+	Moreover, the martingale is closable by $X_0$ hence the convergence is also in $L^1$.
+\end{theorem}
+\begin{proof}
+we would like:
+\begin{align*}
+	\mathbb{E}U_{-n}(a, b) \leq \frac{1}{b-a} \mathbb{E}[(X_0-a)^+] < \infty
+\end{align*}	
+We would transform it to a forward martingale to apply Doob, we cannot just change the sign of index but we can control the problem in finite dimension.
+Define:
+\begin{align*}
+	Y_k:= X_{k-n} \quad 0 \le k \le n
+\end{align*}
+$Y_n$ is then a forward martingale, apply Doob on $Y_k$:
+\begin{align*}
+	\mathbb{E}U_{-n} &\le \frac{1}{b-a} \mathbb{E}[(Y_n - a)^+]
+	= \frac{1}{b-a} \mathbb{E}[(X_0 - a)^+]
+\end{align*}
+it only works in finite dimension but it doesn't matter. To show the limits is in $L^1$, observe:
+\begin{align*}
+	\mathbb{E}X_\infty^+ \le \liminf_n \mathbb{E}X_\infty^+ 
+	= \liminf_n \mathbb{E}[X_\infty]^+
+\end{align*}
+\end{proof}
+
+\begin{example}[Strong Law of large numbers]
+$X_n$ i.i.d. $\mathbb{E}X_n < \infty$, then
+\begin{align*}
+	\lim_{n \rightarrow \infty} \frac{S_n}{n}  = \mathbb{E}X_1 \quad a.s.
+\end{align*}
+
+\end{example}
+\begin{proof}
+	Let $\mathcal{F}_{-n} = \sigma(S_{n}, \dots, S_{n + m}, \dots)$, 
+	Hence
+	\begin{align*}
+		M_{-n} := \mathbb{E}[X_1|\mathcal{F}_{-n}]
+	\end{align*}
+	By the result in the exercise(1.4):
+	\begin{align*}
+		M_{-n} = \mathbb{E}[X_1|\mathcal{F}_n] = \dots =\mathbb{E}[X_n |\mathcal{F}_n]
+	\end{align*}
+	therefore:
+	\begin{align*}
+		M_{-n} = \frac{1}{n}\mathbb{E}[S_n|\mathcal{F}_{-n}] = \frac{1}{n}s_sn
+	\end{align*}
+	By the theorem above we have a a.s. convergent limit:
+	\begin{align*}
+		M_{-\infty} = \lim_{n} M_{-n}, \quad \mathbb{E}M_{-\infty} = \mathbb{E}X_1 
+	\end{align*}
+	since $M_{-\infty}$ is a random variable in the tail-$\sigma$ field, we know it's a.s. constant.
+\end{proof}
+
+
+
+\begin{example}[The Ballot theorem]
+	
+\end{example}
+
+
+\begin{lemma}
+	Given a martingale with bounded increment, then
+\begin{align*}
+	\{\lim_n X_n \text{ exists and finite }\} = \{\sup_k X_k < \infty\}
+\end{align*}
+\end{lemma}
+\begin{proof}\quad\\
+"$\subset$": trivial\\
+"$\supset$": Define $\tau_a:= \inf \{n \in \mathbb{N}: X_n \geq a\}$. 
+\begin{align*}
+	\{ \lim X_n \textbf{ exists and finite} \} \supset \bigcup_{a \in \mathbb{R}} \{\tau_a = \infty\} \supset \{\sup X_n < \infty \}
+\end{align*}
+\end{proof}
+
+\begin{theorem}
+Let $(X_n)$ be a martingale with \textbf{bounded increments}, then either of the following event \textbf{must occur}
+\begin{enumerate}
+	\item $\lim_{n} X_n$ exists and is finite
+	\item $\liminf = -\infty$ and $\limsup = +\infty$.
+\end{enumerate}	
+\end{theorem}
+\begin{proof}
+	We apply the lemma to $X$ and $-X$,\\
+ 	$\{ \lim X_n$ exists and finite $\} = \{ \sup X_n < \infty\} = \{\limsup X_n < \infty\}$\\ 
+\end{proof}
+
+
+\subsection{The Radon-Nikodym Theorem}
+Motivation: $(\Omega, \mathcal{F}, \mathbb{P})$ the probability space. Given:
+\begin{align*}
+	X \in L^1, X \geq 0, \mathbb{E}_PX = 1
+\end{align*}
+then 
+\begin{align*}
+	A \rightarrowtail \mathbb{E}_P X \mathbbm{1}_{A}:= Q(A)
+\end{align*}
+defines a probability measure admitting the same null set as $\mathbb{P}$.
+
+\begin{definition}[Absolutely continuous]
+\end{definition}
+
+The next theorem provides the characterisation of absolute continuity.
+\begin{theorem}
+	Given a probability space, The followings are equivalent:
+	\begin{itemize}
+		\item $Q \ll \mathbb{P}$
+		\item $\forall \epsilon > 0 \exists \delta > 0: \mathbb{P}(A) \leq \delta \Rightarrow Q(A) \leq \epsilon $
+	\end{itemize}
+\end{theorem}
+\begin{proof}
+\quad\\
+2)$\Rightarrow$1): By 2) $Q(A)$ cannot be big if $\mathbb{P}(A)$ is small. So if $\mathbb{P}(A)= 0$, then $\mathbb{P}(A) \leq \delta \quad \forall \delta > 0$, therefore $Q(A) = 0$.\\ 
+1)$\Rightarrow$2): Assuming by contradiction there exists $\epsilon > 0 \forall \delta > 0: \mathbb{P}(A) < \delta \Rightarrow Q(A) > \epsilon$, then choose $\delta_n = \frac{1}{2^n}$, then $\sum_{n = 1}^\infty \mathbb{P}(A_n) < \infty$, we have:
+\begin{align*}
+	\mathbb{P}(\limsup_n A_n) \rightarrow 0
+\end{align*}
+On the other hand, 
+\begin{align*}
+	Q(\limsup_n A_n) &= \mathbb{E}^Q(\limsup_n  \mathbbm{1}_{A_n})\\
+	&\geq \limsup_n  \mathbb{E}^Q( \mathbbm{1}_{A_n})\\
+	&= \limsup_n Q( A_n)\\
+	&\geq \epsilon
+\end{align*}
+Contradiction.
+\end{proof}
+
+\begin{definition}[Atom]
+	Given a measurable space, for $\omega \in \Omega$, we define
+	\begin{align*}
+		a_\omega := \bigcap_{E \in \mathcal{F}, \omega \in E} E
+	\end{align*}
+	as the atom.
+\end{definition}
+\begin{remark}
+\quad
+\begin{enumerate}
+	\item The atom is not necessarily in the $\sigma$-field.
+	\item The atom forms a disjoint partition of $\Omega$
+	\item In general $A(\mathcal{E})$ does not belong to $\mathcal{F}$, if the $\sigma$-field is countably generated. If the $\sigma$-field is finite generated, w.l.o.g. we can assume it's generated by the atoms.
+\end{enumerate}	
+\end{remark}
+
+\begin{theorem}[Radon-Nikodym I]
+	Given $(\Omega, \mathcal{F}, \mathbb{P})$, $\mathcal{F}$ countably generated, $\mathbb{Q} \ll \mathbb{P}$ for some probability measure $\mathbb{Q}.$ Then there exists an $\mathbb{P}-a.s.$ uniquely defined random variable $\frac{dQ}{d\mathbb{P}}$, such that:
+	\begin{align*}
+		\forall A \in \mathcal{F}: Q(A) = \mathbb{E}^\mathbb{P}[\frac{dQ}{d\mathbb{P}} \mathbbm{1}_{A}]
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	Define:
+	\begin{align*}
+		\mathcal{F}_n:= \sigma(A_1, \dots, A_n)
+	\end{align*}
+	w.o.l.g. we $A_1, \dots, A_n$ is a partition of $\Omega$?(why partition) \label{Q:partition}.\\
+	1)We construct a problem in finite dimension, 
+\end{proof}
+
+\begin{corollary}
+	
+\end{corollary}
+
+
+
+
+
+
+
+
+
+
+
+ 
+\begin{corollary}
+ 	$(M_n)$ is a (super)martingale, then $\exists M_\infty \in L^1: M_n \rightarrow M_\infty$ $\mathbb{P} a.s.$ and 
+ 	\begin{equation*}
+ 		\mathbb{E}M_\infty \leq \liminf_n \mathbb{E} M_n = \inf_n \mathbb{E} M_n
+ 	\end{equation*}
+ \end{corollary}
+ 
+
+ 
+ \begin{lemma} \quad
+ 	\begin{enumerate}
+ 		\item $(X_i)_{i \in I}$ u.i. $\Leftrightarrow$ $X_i$ is $L^1$ bounded and $\forall \epsilon > 0 \exists \delta > 0: \mathbb{P}(A) < \delta \Rightarrow \sup_{i \in I}\mathbb{E}\{|X_i|| \textbf{1}_A\} < \epsilon$
+ 		\item $\sup_{i \in I}\mathbb{E} |X_i|^p < \infty, p > 1 \Rightarrow$ $(X_i)_{i \in I}$ u.i.  
+ 		\item All $X_i$ are bounded by the same $Y \in L^1$.
+ 	\end{enumerate}
+ \end{lemma}
+ 
+
+ 
+ 
+ 
+ \newpage
+ \section{Markov chains}
+ \subsection{Introduction}
+ The Markov chain indicates that the probability conditioned on the past is entirely dependent on the last state. 
+ \begin{definition}[Markov chain]
+ Given a canonical stochastic process $(X_n)_{n \in \mathbb{N}}$, $(E, \mathfrak{E})$ the state space, $X$ is a Markov chain w.r.t. $\mathbb{P}$ and $\mathfrak{F}_n$ if:
+ \begin{align*}
+ 	\mathbb{P}(X_n\in B | \mathfrak{F}_m) = \mathbb{P}(X_n \in B|X_{m}) \quad \forall m \le n, B \in \mathfrak{E}
+ \end{align*}
+ \end{definition}
+ 
+ \begin{lemma}
+ 	If $X = (X)_{n \geq 0}$ is a $(\mu, P)$ Markov chain, then the past and future are independent:
+ 	\begin{align*}
+ 		\mathbb{P}(X_0 = i_0, \dots, X_{m+n} = i_{m+n}, \dots|X_m = i) = \mathbb{P}(X_0 = i_0, \dots,X_m = i_i |X_m = i)\delta_{i,i_m} p_{i_n, i_{n+1}}\dots, p_{i_{m+n-1}, i_{m+n}}\dots
+ 	\end{align*}
+ \end{lemma}
+  \begin{proof}
+ For $A \in \mathcal{F}_m$, $B \in \mathfrak{G} = \sigma(X_m, X_{m+1}, \dots)$:
+ \begin{align*}
+ 	\mathbb{P}(A \cap B|X_m) &= \mathbb{E}[\mathbbm{1}_{A} \mathbbm{1}_{B}|X_m]\\
+ 	&= \mathbb{E}\bigg[\mathbbm{1}_{A}\mathbb{E}[\mathbbm{1}_{B}|\mathfrak{G}]|X_m\bigg]\\
+ \bigg(\mathbb{E}[X|\mathfrak{G}]\in L^1(\Omega, \mathcal{F}^{X_m})\bigg)
+  	&= \mathbb{E}[\mathbbm{1}_{A}|X_m] \mathbb{E}[\mathbbm{1}_{B}|X_m]\\
+ 	&= \mathbb{P}(A|X_m) P(B|X_m)
+ \end{align*}
+\end{proof}
+ 
+\begin{remark} By the Markov probability the regular conditional probability always exist, therefore there exists the transition kernel:
+ \begin{align*}
+ 	\mathbb{P}(X_{n+1} \in B | X_n(\omega)) =  \bar{P}_{n+1}(X_n(\omega), B)
+ \end{align*}
+ \end{remark}
+ 
+ \begin{definition}[The transition probability and initial distribution]
+ 	A Markov chain is \textbf{homogeneous }if the transition law is state-independent, i.e., $\forall n \in \mathbb{N}_0$:
+ 	\begin{align*}
+ 		\bar{P}_{n+1} = \bar{P}_n
+ 	\end{align*}
+ 	and the probability distribution:
+ 	\begin{align*}
+ 		\bar{\mu}(B) =  \mathbb{P}(X_0 \in B)
+ 	\end{align*}
+ 	is called the \textbf{initial distribution}
+ \end{definition}
+ 
+\begin{remark}[homogeneosity]
+ We can always construct a homogeneous Markov chain from an inhomogeneous Markov chain by extending the state space to $E \times \mathbb{N}$. But it comes with a price.	 We may lost the property of $E$ such as the compactness.
+\end{remark}
+
+\begin{remark}[transition matrix]
+If we have a countable state space, then we call $u = (u_i)_{i \in E}$ a probability vector, if
+ \begin{align*}
+ 	\sum_i \mu_i = 1
+ \end{align*}
+ and $P = (p_{ij})_{i, j \in E}$ the stochastic matrix, if:
+ \begin{align*}
+ 	p_{ij} \geq 0, \qquad \sum_{j \in E} p_{ij} = 1 \quad \forall i \in E
+ \end{align*}
+ Observe the transition matrix of the Markov chain is a stochastic matrix with $p_{ij} = P(X_{n + 1} = j|X_n = i)$.\\
+ We call a Markov chain on the countable state space a $(\mu, P)$ Markov chain if it admits the initial distribution of $\mu$ and the transition kernel  of $P$.
+\end{remark}
+
+\begin{example}[M/G/1 queue]
+The model describe the customers waiting for a service. The customers arrive according to a Poisson process with rate $\lambda$. We denote
+\begin{itemize}
+	\item $X_n$: the number of customers in line when $n$-th customer enters.
+	\item $F(t)$: the distribution of service time.
+	\item $a_k$: $a_k = \int_0^\infty e^{-\lambda t} \frac{(\lambda t)^k}{k!} dF(t)$ probability that $k$ customers arrive.
+	\item $\xi_i$: net customer arriving at $i$-th service time.
+\end{itemize}
+Observe the MC defined as
+\begin{align*}
+	X_{n+1} = (X_n + \xi_{n+1})^+
+\end{align*}
+The transition matrix:
+\begin{align*}
+	p(0, 0) &= a_0 + a_1\\
+	p(j, j + k - 1) &= a_k \quad j \ge 1, or, k > 1
+\end{align*}
+\end{example}
+
+
+\subsection{Basic Properties}
+\begin{lemma}
+	Let $X$ be a $(\mu, P)$ Markov chain, then conditioned on $X_m = i$, the process
+	\begin{align*}
+		(X_{n + m})_{n \geq 0} \text{ is a $(\delta_i, P)$-Markov chain }
+	\end{align*}
+	and is independent of $\mathcal{F}_m^X$.
+\end{lemma}
+\begin{proof}
+	Let
+	\begin{align*}
+		A = \{X_0 = i_0, \dots, X_m = i_m\} \in \mathcal{F}_m^X
+	\end{align*}
+	Independence of past and future yields
+	\begin{align*}
+		\mathbb{P}(X_0= i_1, \dots, X_n = i_n| X_m = i) &= \mathbb{P}(A \cap \{X_{m+1} = i_{m+1}, \dots, X_{m+n} = i_{m+n}\}|X_m = i) \\
+	&= \mathbb{P}(A|X_m = i)\mathbb{P}(X_{m+1} = i_{m+1}, \dots, X_{m+n} = i_{m+n}|X_m = i) \\
+	&= \mathbb{P}(A|X_m = i) \delta_i(i_m) p_{i_m i_{m+1}} \dots p_{i_{m+n-1}i_{m+n}}
+	\end{align*}
+	We see $\forall A \in \mathcal{F}^m$, $A$ is independent from the event of future given $X_m = i$. 
+\end{proof}
+\begin{remark}
+independence means finitely many independence
+\end{remark}
+
+\begin{theorem}[Chapman-Kolmogorov]
+	The transition matrix satisfies the Chapman-Kolmogorov equation:
+	\begin{equation*}
+		P(t_1, t_3) = P(t_1, t_2) P(t_2, t_3)
+	\end{equation*}
+\end{theorem}
+ Given a $(\mu, P)$-Markov Chain, we have:
+ \begin{align*}
+ 	\mathbb{P}(X_0= i_0, \dots, X_n = i_n) = \mu_{i_0}p_{i_1i_2} \dots p_{i_{n-1}i_n}
+ \end{align*}
+\quad\\
+Now we introduce some notation:
+\begin{itemize}
+	\item $(\mu P)_j = \sum_{i \in E}\mu_i p_{ij}$: From the initial distribution to state $j$
+	\item $(P^2)_{ik} = \sum_{j \in E}p_{ij}p_{jk}$: Take 2 steps from $i$ to $j$. 
+	\item $(P^n)_{ik} = \sum_{j \in E} p_{ij}^{n-1}  p_{jk}$: Take $n$ steps from $i$ to $j$.
+\end{itemize}
+
+\begin{corollary}
+	Let $X$ be a $(\mu, P)$-MC, then
+	\begin{enumerate}
+		\item $(\mu P^n)_j = \mathbb{P}(X_n = j)$
+		\item $p^{(n)}_{ij} = \mathbb{P}(X_n = j|X_0 = i) = \mathbb{P}(X_{n + m} = j|X_n = i)$ or $\bigg(p_{ij}^n = \mathbb{P}_i(X_n = j) = \mathbb{P}(X_{m+n} = j| X_m = i)\bigg)$
+	\end{enumerate}
+\end{corollary}
+\begin{proof}
+\end{proof}
+
+\begin{example}[M/G/1 queue]
+\end{example}
+
+\begin{example}[Polya's urn model]
+\end{example}
+
+\begin{example}[Ehrenfest Model]
+$S = \{0, 1, \dots, r\}$. And
+\begin{enumerate}
+	\item $p(k, k+1) = \frac{r-k}{r}$
+	\item $p(k, k-1) = \frac{k}{r}$
+	\item $p(i, j) = 0$ otherwise.
+\end{enumerate}
+\end{example}
+
+
+
+\begin{definition}[communicating classes]
+	\textbf{1.} For, $i, j \in E$, we say that $i$ leads to $j$ if:
+	\begin{align*}
+		\mathbb{P}(X_n = j| X_0 = i) > 0 \quad \textbf{for some $n$}
+	\end{align*}
+
+	We write $i \rightarrow j$. \\
+	\textbf{2. }we define the $i$ and $j$ \textbf{communicate} if:
+	\begin{align*}
+		i \rightarrow j, j \rightarrow i
+	\end{align*}
+	and we write $i \leftrightarrow j$. Notice the relation $\leftrightarrow$ defines a equivalent relation, therefore we may speak of the \textbf{communicating class}: 
+	\begin{align*}
+		E = \dot{\bigcup} C_i
+	\end{align*}
+	For $i, j$ in 2 different communicating classes we have either $i \nrightarrow j$ or $j \nrightarrow i$. \\
+	\textbf{3.} we say a communicating class is \textbf{closed}, if 
+	\begin{align*}
+		i \rightarrow j \Rightarrow j \in C_i
+	\end{align*}
+\end{definition}
+\begin{remark}
+If $C_k$ is not closed, $C_k$ will be left eventually, in fact, we can never return. For the long run dynamic, "$C_k$ should not matter".
+\end{remark}
+
+\begin{definition}[absorbing state and irreducible Markov chain]
+	For a $E$-valued Markov chain $X$, we have
+	\begin{itemize}
+		\item $j \in E$ is an absorbing state: $\{j\}$ is closed
+		\item $X$ is \textbf{irreducible}: $E$ is a communicating class.
+	\end{itemize}
+\end{definition}
+
+
+\subsection{First entrance time}
+Asumme $A \subset E$, we denote:
+\begin{align*}
+	&1)\mathbb{P}_i(B) = \mathbb{P}(B|X_0 = i)\\
+	&2)\textbf{first hitting time of $A$: } H^A:= \inf \{ n \in \mathbb{N}| X_n \in A\} \\
+	&3)\textbf{absorption probability: }h_i^A:= \mathbb{P}_i(H^A < \infty) = \mathbb{P}(H^A < \infty |X_0 = i)\\
+	&4)\textbf{expected time to reach:} k_i^A:= \mathbb{E}_i H^A.
+\end{align*}
+If $A$ is close, then $H^A < \infty$ implies $X_n$ will never leave $A$, which motivates us to compute the absorption probability. \\
+
+\begin{theorem}
+$h_i^A$ is the minimal non-negative solution of the linear system:
+
+\begin{equation*}
+\left\{
+\begin{aligned}
+	h_i^A &= 1 						   &i \in A\\
+	h_i^A &= \sum_{j \in E}p_{ij}h_j^A &i \notin A
+\end{aligned}
+\right.	
+\end{equation*}
+\end{theorem}
+\begin{proof}\quad\\
+(i): $i \in A$, trivially we have $\mathbb{P}_i(H^A < \infty) = 1$ \\
+(ii): $i \notin A$,  
+\begin{align*}
+	h_i^A &= \mathbb{P}_i (H^A < \infty) \\
+	&= \sum_{j \in E}\mathbb{P}_i(H^A< \infty|X_1 = j)\mathbb{P}_i(X_1 = j) \\
+	&= \sum_{j \in E}\mathbb{P}_i(H^A< \infty|X_1 = j) p_{ij}\\
+	(Markov)&= \sum_{j \in E}\mathbb{P}_j(H_A< \infty)p_{ij}\\
+	&= \sum_{j \in E}h_j^A p_{ij}
+\end{align*} \\
+(iii)\textbf{minimal solution:} Let $\hat{h}_j$ be another solution
+\begin{align*}
+	\hat{h} &= \mathbb{P}(X_1 \in A) + \mathbb{P}(X_1 \notin A, X_2 \in A) \dots \mathbb{P}(X_1 \notin A, X_{n-1}\notin A, X_n \in A) + \sum_{p_{ij_1}, p_{ij_2}, \dots, p_{ij_n} \notin A} p_{ij_1} \dots p_{j_{n-1}j_n}\hat{h}_n^A\\
+	&=  \mathbb{P}_i(H_A \le n) + \dots
+\end{align*}
+Then
+\begin{align*}
+	\hat{h}_i \geq \lim_{n \rightarrow}\mathbb{P}_i(H^A \le n) = \mathbb{P}_i(H^A < \infty) = h_i^A
+\end{align*}
+\end{proof}
+
+\quad\\
+\textbf{Question:} how long does it take in average until $X$ reaches $A$? Namely $k_i^A:= \mathbb{E}_i[H^A]$?
+
+\begin{theorem}
+	The vector $k^A := (k_i^A)_{i \in E}$ is the minimal non-negative solution of the linear equation system:
+	\begin{equation*}
+	\left\{
+	\begin{aligned}
+		k_i^A &= 0 \qquad \qquad \quad i \in A\\
+		k_i^A &= 1 +  \sum_{j \in E} p_{ij}k_j^A  \quad i \notin A
+	\end{aligned}
+	\right.
+	\end{equation*}
+\end{theorem}
+\begin{proof}
+\quad\\i) $k_i^A = 0$ for $i \in A$ is trivil\\
+ii)
+\begin{align*}
+	\mathbb{E}_iH^A &=  \sum_{j \in E} \mathbb{E}_i[H^A|X_1 = j]\mathbb{P}_i(X_1 = j)\\
+	&= \sum_{j \in E}\mathbb{E}_j[H^A \circ \theta_1]p_{ij}\\
+	&= \sum_{j \in E}(1+k_j^A) p_{ij}\\
+	&= 1 + \sum_{j \in E} k_j^A p_{ij}
+\end{align*}
+iii) We show $\mathbb{E}_i H^A$ is the only solution of the equation system that satisfies $\mathbb{E}_iH^A = 0$ for $i \in A$.
+\end{proof}
+
+\begin{example}[Birth and death]
+	In a birth and death chain we define the transition probability:
+	\begin{align*}
+		p_{i, i-1} = q_i,\quad p_{i, i+1} = p_i \qquad \forall i \in \mathbb{N}
+	\end{align*}
+	Starting from $i$, we calculate $h_i^A$, $A = \{0\}$. We have
+	\begin{align*}
+		h_i^A &= p_ih_{i+1}^A + q_i h_{i-1}^A  \quad \forall i \in \mathbb{N}\\
+		h_i^A &= 1 \quad \qquad \qquad\qquad i = 0
+	\end{align*}
+	Then compute:
+	\begin{align*}
+		h_{i+1}^A - h_i^A = \prod_{j = 1}^i \frac{q_i}{p_i}
+	\end{align*}
+	notice it's a telescope sum, therefore:
+	\begin{align*}
+		h_i^A - 1 = \sum_{j = 0}^{i-1} \prod_{k = 1}^j \frac{q_i}{p_i}(h_1^A - 1)
+	\end{align*}
+	the solution is uniquely determined by $h_1^A$. Now we observe the expected iteration to return to the origin:
+	\begin{align*}
+		k_0^A = 0, \quad k_1
+	\end{align*}
+\end{example}
+
+\subsection{Recurrence and transience}
+\textbf{Question}: when will a state be visited infinitely often. And how much time will a Markov chain spent in this state. 
+
+\begin{definition}[transient and recurrent state]
+	We call a state $i$
+	\begin{enumerate}
+		\item \textbf{transient:} if $\mathbb{P}_i(X_n = i \text{ for $n$ infinitely often}) = 1$
+		\item \textbf{recurrent:} if $\mathbb{P}_i(X_n = i \text{ for $n$ infinitely often}) = 0$
+	\end{enumerate}
+\end{definition}
+\begin{remark}
+Notice that we alway have the $\delta_i$ as the initial distribution in the definition since many Markov chain is not irreducible. In this case the recurrent state can only be visited infinitely often if it starts there.	
+\end{remark}
+
+\quad\\
+T\textbf{he k-th visiting time:} 
+\begin{align*}
+	T_i^0 = 0, \quad
+	T_i^1 = \inf_{n \geq 0} \{ n > 0 | X_n = i\}, \quad
+	T^{k}_i:= \inf_{n \ge 0} \{n > T_{k-1}| X_n = i \} 
+\end{align*}
+\textbf{The recursion time:}
+\begin{equation*}
+	S_k = \left\{
+	\begin{aligned}
+		T^k_i - T^{k-1}_i\quad &T^k_i < \infty \\
+		0 \quad & T^k_i = \infty
+	\end{aligned}
+	\right.
+\end{equation*}
+
+we are interested in if $\mathbb{P}(T_i^k < \infty) = 1$. we need Markov property to study this stopping time. We now interested in $\{X_{T_i^{(k+1)}+ n}\}_{n \in \mathbb{N}}$ on $\{ T_i^{(k+1)} < \infty \}$
+
+\begin{theorem}[Generalised Markov property]
+ $Y: \Omega \rightarrow \mathbb{R}$
+ 	\begin{equation*}
+ 		\mathbb{E}_\mu[Y \circ \theta_n|\mathcal{F}_n] = h(X_n).\mathbb{P}_\mu a.s. \quad h(X) = \mathbb{E}_x Y  
+ 	\end{equation*}
+\end{theorem}
+\begin{proof}\quad
+ 	\begin{enumerate}
+ 		\item First let be the simple function  $Y: \textbf{1}(X_0 = i_0, \dots, X_n = i_n)$,  $\forall A:= \{(X_0, \dots, X_n) \in B_n| B_n \subset S^{n+1}\} \subset \mathcal{F}_n$
+ 		\begin{align*}
+ 			\mathbb{E}_\mu[Y\circ \theta^n \textbf{1}_A] &= \sum_{b_0, \dots, b_n \in B_n}\mathbb{E}_\mu[\textbf{1}(X_n = i_0, \dots, X_{n+m} = i_m)\textbf{1}(X_0 = b_0, \dots, X_n = b_n)]\\
+ 			&= \sum_{b_0, \dots, b_n \in B_n}\mathbb{P}_\mu(X_0= b_0, \dots, X_n = b_n)\mathbb{P}_\mu(X_n = i_0, \dots, X_{n+m} = i_m|X_n = b_n)\\
+ 			(time\text{-}homogeneous)&= \sum_{b_0, \dots, b_n \in B_n}\mathbb{P}_\mu(X_0= b_0, \dots, X_n = b_n) \mathbb{P}_{b_n}(X_0 = i_0, \dots, X_{m} = i_m)\\
+ 			&= \sum_{\dots}\mathbb{E}_\mu[\textbf{1}_{\dots}\mathbb{E}_{X_n}[Y]]\\
+ 			&= \mathbb{E}_\mu[\mathbb{E}_{X_n}Y \textbf{1}_A]
+ 		\end{align*}
+ 		\item The cylinder sets of all the finite dimensional subsets forms a intersectional stable generator of Borel $\sigma$-algebra of the product space.
+ 		\begin{equation*}
+ 			C_m := (X_0, \dots, X_m)^{-1}(D_m), D_m \subset S^{m+1}
+ 		\end{equation*}
+ 		\item Apply measure theoretical induction.
+ 	\end{enumerate}
+ \end{proof}
+ 
+
+ 
+\begin{theorem}[Strong Markov Property]
+	Given a Markov chain and a \textbf{finite} stopping time $\tau$, $X_\tau = i$, we have
+	\begin{align*}
+		(X_{\tau + n})_{n \in \mathbb{N}} \textbf{ is a $\delta_{i, P}$ Markov chain}
+	\end{align*}
+	and is \textbf{independent} of $\mathcal{F}^X_\tau$, or
+ 	\begin{equation*}
+ 		\mathbb{E}_\mu [Y \circ \theta_\tau|\mathcal{F}_\tau] = \mathbb{E}_{X_\tau} Y \quad \mathbb{P}_\mu a.s. \quad \text{on } \{\tau < \infty\}
+ 	\end{equation*}
+\end{theorem}
+\begin{proof}
+	Let $A \in \mathcal{F}^X_\tau$, we need to show 
+	\begin{align*}
+		\mathbb{P}(\{X_\tau = j_0, X_{\tau + 1} = j_2, \dots  X_{\tau + n} = j_n\} \cap A| X_\tau = i, \tau < \infty )
+		&= \mathbb{P}(\{ X_\tau = j_0 \dots \}|X_\tau = i, \tau < \infty)\mathbb{P}(A|X_\tau = i, \tau < \infty)\\
+		&= \delta_{i, j_0}p_{j_0j_1} \dots p_{j_{n-1}j_n} \mathbb{P}(A |X_\tau = i, \tau < \infty)
+	\end{align*}
+	Indeed, 
+	\begin{align*}
+		&\mathbb{P}(\{X_\tau = j_0, X_{\tau + 1} = j_1,\dots, X_{\tau + n} = j_n\} \cap A| X_\tau = i, \tau < \infty )	\\
+		&\overset{\tau < \infty} = \sum_{m \ge 0} \mathbb{P}(\{X_m = j_0, X_{m + 1} = j_1, X_{m + n} = j_n\} \cap A \cap  \{\tau = m\}| X_\tau = i, \tau < \infty )\\
+		(Bayes) &= \sum_{m \geq 0}\mathbb{P}(\{ X_m = j_0, X_{\tau + 1} = j_1, \dots, X_{m + n} = j_n\} \cap A \cap\{\tau = m\} \cap  \{X_m = i\} ) \frac{1}{\mathbb{P}(X_\tau = i, \tau < \infty)} \\
+		(past\perp future) 
+		&= \sum_{m \geq 0} \mathbb{P}(\{X_m = j_0,\dots, X_{m + n} = j_n\}| X_m = i) \mathbb{P}(A \cap \{\tau = m\}|X_m = i) \frac{\mathbb{P}(X_m = i)}{P(X_\tau = i, \tau < \infty)} \\
+		(Homogeneous)&= \mathbb{P}(X_0 = j_0, X_1 = j_1, \dots X_n = j_n|X_0 = i) \sum_{ m \geq 0}\frac{\mathbb{P}(A \cap \{\tau = m\})}{\mathbb{P}(\tau < \infty, X_\tau = i)}\\
+		&= \delta_{i, i_0} p_{i j_1} \dots \mathbb{P}(A | \tau < \infty, X_i = i)
+	\end{align*}
+\end{proof}
+
+In the next theorem we will see that the property of recurrence of transience can be determined by the first(or finite) returning time. We introduce the notation:
+\begin{itemize}
+	\item $S_i^k$: \textbf{the excursion time between $k-1$ and $k$-th visits of the state $i$}
+	\item $V_i = \sum_{n \geq 0} \mathbbm{1}_{\{X_n = i\}}$: \textbf{$\#$returns}
+\end{itemize}
+
+\begin{theorem}
+	Let $X$ be a $(\mu, P)$ Markov chain, then
+	\begin{itemize}
+		\item if $\mathbb{P}_i(T_i^1 < \infty) = 1$, then $i$ is recurrent and $\sum_n p_{ii}^n = \infty$
+		\item if $\mathbb{P}_i(T_i^1 < \infty) < 1$, then $i$ is transient and $\sum_n p_{ii}^n < \infty$
+	\end{itemize}
+\end{theorem}
+\begin{proof}
+	To show the recurrence is to show:
+	\begin{align*}
+		\mathbb{P}_i(V_i = \infty)
+	\end{align*}
+	1) Observe the excursion time. On $\{T_i^{k -1} < \infty\}$ we have 
+	\begin{align*}
+		X_{T_i^{k-1}} = i
+	\end{align*}
+	By the strong Markov property
+	\begin{align*}
+		(X_{T_i^{k-1} + n})_{n \in \mathbb{N}}
+	\end{align*}
+	is a Markov chain, thus (on $\{T_i^{k-1} < \infty \}$)
+	\begin{align*}
+		S_i^k = \inf \{n \geq 0| X_{T_i^{k-1} + n} = i\}
+	\end{align*}
+	so conditioned on the stopping time $T_i^k$ we would still have the same $(\mu, P)$ Markov chain and the future state is independent of the filtration of the past.
+	\begin{align*}
+		\mathbb{P}_i(S_i^k < \infty | T_i^{k-1}) & = \mathbb{P}_i(S_i^1 < \infty)\\
+		&= \mathbb{P}_i(T_i^1 < \infty)
+	\end{align*}
+	2)
+	if $X_0= i$, we obtain the recursive formula of $\mathbb{P}_i(V_i > k)$:
+	\begin{align*}
+		\mathbb{P}_i(V_i > 0) &= \mathbb{P}_i(T_i^0 < \infty ) = 1\\
+		\mathbb{P}_i(V_i > k) &= \mathbb{P}_i(T_i^k < \infty)\\
+		&= \mathbb{P}_i(T_i^{k-1} < \infty, S_k < \infty)\\
+		&= \mathbb{P}_i(T_i^1 < \infty) \mathbb{P}_i(T_i^{k-1} < \infty)\\
+		&= \mathbb{P}_i(V_i > 1)	\mathbb{P}_i(V_i > k-1)
+\end{align*}
+therefore:
+\begin{align*}
+	\mathbb{P}_i(V_i > k) = \mathbb{P}_i(V_i > 1)^k
+\end{align*}
+Then we have
+	\begin{align*}
+		\mathbb{E}V_i &= \sum_{k \geq 0} \mathbb{P}(V_i \geq k)\\
+		&= \sum_{k \geq 0} \mathbb{P}(T_i^1< \infty)^k  
+	\end{align*}
+If $i$ is recurrent, i.e. $\mathbb{E}_iV_i = \infty$, then $\mathbb{P}(T_i^1 < \infty) = 1 $ must hold by the geometric series.\\
+3)Furthermore:
+	\begin{align*}
+		\mathbb{E} V_i &\overset{def}{=} \sum_{n \geq 1} \mathbb{P}_i(X_n = i)\\
+		&= \sum_{n \geq 1} p_{ii}^n 
+	\end{align*}
+	In the case of recurrence the sum must go to infinity.
+\end{proof}
+\begin{remark}
+we have the $0-1$ event:
+\begin{align*}
+	\mathbb{P}_i(V_i = \infty ) \in \{0, 1\}
+\end{align*}	
+in another word
+\begin{align*}
+	\mathbb{P}_i(V_i = \infty)> 0 \Rightarrow \mathbb{P}(V_i = \infty) = 1
+\end{align*}
+\end{remark}
+
+\begin{corollary}
+	Let $C$ be a communication class of $X$, then either all states of $C$ are recurrent or all state of $C$ are transient.
+\end{corollary}
+\begin{proof}
+	Let $i, j \in C$, then
+	\begin{align*}
+		p_{ij}^m > 0, \quad p_{j, i}^n > 0 \qquad \forall m, n \in \mathbb{N}
+	\end{align*}
+	hence
+	\begin{align*}
+		p_{ii}^{n+k+m} &\geq p_{ij}^n p_{jj}^k p_{ji}^m\\
+	\end{align*}
+	Thus 
+	\begin{align*}
+		\sum_{k \geq 0} p_{jj}^k \le \frac{1}{p_{ij}^n p_{ji}^m} \sum_{k \geq
+		 0} p_{ii}^k
+	\end{align*}
+	if $i$ is transient, then $\sum_{k \geq 0} p_{ii}^k < \infty$, we would have $\sum_{k \geq 0} p_{jj}^k < \infty$ 
+\end{proof}
+\begin{remark}
+If $X$ is irreducible, then either all states are recurrent, or all states are transient.	
+\end{remark}
+
+\begin{corollary}\quad
+	\begin{enumerate}
+		\item Every recurrent communication class is closed
+		\item Every \textbf{finite} closed communication class is recurrent.
+	\end{enumerate}
+\end{corollary}
+\begin{proof}\quad\\
+	1) Let $C$ be a non-closed communication class, 
+	\begin{align*}
+		\exists i \in C, j\notin C: p_{ij}^k > 0 \text{ for some $k \in \mathbb{N}$}
+	\end{align*}
+	thus
+	\begin{align*}
+		P_i(V_i = \infty) &= \mathbb{P}_i(X_k \neq j, V_i = \infty) + \mathbb{P}_i(X_k = j, V_i = \infty)\\
+		&\le \mathbb{P}_i(X_m \neq j) + 0\\
+		&< 1
+	\end{align*}
+	therefore $\mathbb{P}(V_i = \infty) = 0$. Contradiction.\\
+		2)since the communication class is finite, for all $i \in C$,  there exists $j \in C$ :
+	\begin{align*}
+		0<\mathbb{P}_i(V_j = \infty) &= \mathbb{P}_i(V_j = \infty|T_j^1 < \infty) \mathbb{P}_i(T_j^1 < \infty)\\
+		&= \mathbb{P}_j(V_j = \infty)\mathbb{P}_j(T_j^1 < \infty)
+	\end{align*}
+	Since the class is closed we have $\mathbb{P}_j(V_j = \infty) > 0$, consequently, $\mathbb{P}_j(V_j = \infty) = 1$ 
+\end{proof}
+
+\begin{example}[irreducible but non-recurrent Markov chain]
+	\quad\\
+	\textbf{transient:} 3-d random walk
+\end{example}
+
+
+\begin{example}[Branching Process(Galton + Watson)]
+	Given an organism producing offsprings with probabilities
+	\begin{align*}
+		\mathbb{P}(\text{i offsprings}) = \alpha_i \quad \text{before dying}
+	\end{align*}
+	Each generation is independent.\\
+	$X_0$: size of the 0-th generation\\
+	$X_n$: size of the n-th generation\\
+	$(X_n)_{n \in \mathbb{N}}$ is a Markov chain on $\mathbb{N}_0$ with the transition matrix:
+	\begin{align*}
+		p_{i, 0} = (\alpha_0)^i
+	\end{align*}
+	since $p_{0, 0} = 1$, $\{0\}$ is an absorbing state.\\
+	$\{0\}$ is recurrent, $\{1, 2, \dots, \}$ is a class of transient states.(class of recurrent states are closed)\\
+	$\Rightarrow$ either the polulation dies out or goes to infinity.\\
+	let 
+	\begin{align*}
+		\mu= \sum_{i \in \mathbb{N}_0} i \alpha_i
+	\end{align*}
+	let $K_i$ be the number of i-th organism of the $(n-1)$ generation, then we have
+	\begin{align*}
+		X_n = \sum_{i = 1}^{X_{n-1}} K_i 
+	\end{align*}
+	By the Wald's identity:
+	\begin{align*}
+		\mathbb{E} X_n = \mu \mathbb{E} X_{n-1} \dots = \mu^n 
+	\end{align*}
+	Let $\mu < 1$, then 
+	\begin{align*}
+		\mathbb{P}(X_n \ge 1) \le \sum_{i = 1}^\infty \mathbb{P}(X_n \geq 1) = \mathbb{E}X_n = \mu^n \rightarrow 0
+	\end{align*}
+	let $\mu >1$, we have the equation:
+	\begin{align*}
+		p &= \mathbb{P}(extinction|X_0 = 1)\\ 
+		&= \sum_{i = 0}^\infty \mathbb{P}(extinction|X_1 = i)\alpha_i\\
+		(\texttt{independent offsprings})
+		&= \sum_{i= 0}^\infty p^i \alpha _i
+	\end{align*}
+\end{example}
+
+\begin{example}[Birth and Death]
+We revisit our example of birth and death. We want to analyse the recurrence of the Markov chain using martingale. To construct a martingale $\varphi(X_n)$, $\varphi$ must satisfies
+\begin{itemize}
+	\item \textbf{fair game:} $\varphi(k) = p_k\varphi(k-1) + r_k\varphi(k) + q_k\varphi(k+1)$
+	\item \textbf{initial value:} $\varphi(0) = 0, \varphi(1) = 1$
+\end{itemize}
+rewrite the first equation we get a recursive formula:
+\begin{align*}
+	\varphi(k+1) - \varphi(k) = \prod_{i = 1}^k \frac{q^i}{p^i}
+\end{align*}
+Combined with $\varphi(1) - \varphi(0) = 1$, $\varphi(0) = 0$, we get
+\begin{align*}
+	\varphi(m) = \sum_{n = 1}^{m-1} \prod_{i= 1}^n \frac{q^i}{p_i}
+\end{align*}
+\end{example}
+
+\begin{example}
+We summarise some results using this martingale. For $a < x < b$, define
+\begin{align*}
+	T:= T_a \wedge T_b
+\end{align*}
+we can compute the probability 
+\begin{align*}
+	\mathbb{P}_x (T_a < T_b) = \frac{\varphi(b) - \varphi(x)}{\varphi(b) - \varphi(a)}, \quad \varphi(x) = \mathbb{E}_x \varphi(X_T)
+\end{align*}
+\end{example}
+
+\begin{example}[1-d symmetric random walk]
+	$X_n \in \mathbb{Z}$, $\mathbb{P}(X_{n+1} = X_n + 1|X_n) = 1\slash 2$,  $\mathbb{P}(X_{n+1} = X_n - 1|X_n) = 1\slash 2$, then
+	\begin{align*}
+		p_{0, 0}^{2n} = \binom{2n}{n} p^n(1-p)^n
+	\end{align*}
+	by Sterling:
+	\begin{align*}
+		p_{0, 0}^{2n} = \frac{(2n)!}{n!n!}p^n q^n \sim p^n q^n\frac{4^n}{\sqrt{\pi n}} 
+	\end{align*}
+	$p = q = \frac{1}{2}$, then we have:
+	\begin{align*}
+		 p_{0, 0}^{2n} > \frac{1}{2 \sqrt{\pi n}}, \quad  \sum_{n \geq 1} p_{0, 0}^{2n} = \infty
+	\end{align*}
+	the 1-d symmetric Random walk is recurrent.	
+\end{example}
+
+
+
+\begin{example}[2-d symmetric random walk]
+\end{example}
+
+\begin{example}[3-d symmetric random walk]
+Given $X_n = (x, y, z)$, then
+\begin{align*}
+	X_{n+1} = \{(x+1, y, z), (x, y+1, z), (x, y, z+1)\}
+\end{align*}	
+\begin{align*}
+	p_{ij} &= \frac{1}{6} \quad |i - j| = 1\\
+	&= 0 \quad else
+\end{align*}
+again we compute:
+\begin{align*}
+	p^{2n}_{0,0} &= \sum_{ i, j, k \geq 0, i+j+k = n} (\frac{1}{6})^{2n} \binom{2n}{i, i, k, k , j, j, } \\
+	&= \sum (\frac{1}{6})^{2n} \frac{(2n)!}{(i!)^2 (j!)^2 (k!)^2} \\
+	&= \binom{2n}{n}(\frac{1}{2})^{2n} \sum (\frac{1}{3})^{2n} \binom{n}{i, j, k}^2\\
+	( n = 6m)&\le C (\frac{1}{3})^n \binom{n}{m, m, m}
+\end{align*}
+then again by Sterling 
+\begin{align*}
+	p_{0, 0}^{6m} < < \infty
+\end{align*}
+analog we get:
+\begin{align*}
+	p^{6m}_{0, 0} \geq (\frac{1}{6})^2 p^{6m - 2}_{0,0}
+\end{align*}
+Therefore the 3-d symmetric random walk is transient.
+\end{example}
+
+\begin{example}[Asymmetric 1-d random walk]
+	$X_n \in \mathbb{Z}$, $\mathbb{P}(X_{n+1} = X_n + 1|X_n) = p$,  $\mathbb{P}(X_{n+1} = X_n - 1|X_n) = 1-p$, then
+	\begin{align*}
+		p_{0, 0}^{2n} = \binom{2n}{n} p^n(1-p)^n
+	\end{align*}
+	by Sterling:
+	\begin{align*}
+		p_{0, 0}^{2n} = \frac{(2n)!}{n!n!}p^n q^n \sim p^n q^n\frac{4^n}{\sqrt{\pi n}} 
+	\end{align*}
+	if $p = q = \frac{1}{2}$, then we have:
+	\begin{align*}
+		 p_{0, 0}^{2n} > \frac{1}{2 \sqrt{\pi n}}, \quad  \sum_{n \geq 1} p_{0, 0}^{2n} = \infty
+	\end{align*}
+	the 1-d symmetric Random walk is recurrent.\\
+	If $p > \frac{1}{2}$, then we have $4^n p^n q^n \le 2^n$, $\alpha < 1$, in this case
+	\begin{align*}
+		\sum_{n \geq 0} p_{00}^{2n} < \infty
+	\end{align*}
+	The random walk is therefore transient.\\
+
+	If we start at $0$, denote: 
+	\begin{align*}
+		X_n = \sum_{i = 1}^n Y_i 
+	\end{align*}
+	by the LLN
+	$\mathbb{P}(Y_i = 1) = p, \mathbb{P}(Y_i = -1) = 1-p$, $p > \frac{1}{2}$
+	\begin{align*}
+		\frac{1}{n} X_n \rightarrow \mathbb{E}Y_1 &>0 \quad a.s.\\
+		\Rightarrow  X_n &\rightarrow \infty
+	\end{align*}
+	we want to compute:
+	\begin{align*}
+		h^0_0:= \mathbb{P}(\text{ever returning to 0}|X_0 = 0)
+	\end{align*}
+	We abuse the notation and exclude the original hit of $0$. By the theorem of first entrance we get
+	\begin{align*}
+		h_0^0 &= (1 - p)h_{-1}^0 + ph_1^0\\
+		&= (1 - p) + p h_1^0
+	\end{align*}
+	Now we compute $h_1^0$ :
+	\begin{align*}
+		h^0_1 = (1-p)h_0^0 + ph_2^0
+	\end{align*}
+	By the \textbf{Markov Property:}
+	\begin{align*}
+		h_2^0 &= \mathbb{P}(H^0< \infty|X_2 = 2) \\
+		&= \mathbb{P}(H^1< \infty|X_2 = 2)\mathbb{P}(H^0 < \infty|X_1 = 1)\\
+		&= (h_1^0)^2
+	\end{align*}
+	we have the solution:
+	\begin{align*}
+		h_1^0 = 1, or, \frac{1-p}{p}
+	\end{align*}
+	By asymmetry of the random walk, $1$ is not admissable, therefore we have:
+	\begin{align*}
+		h_0^0 = 2 - 2p
+	\end{align*}
+\end{example}
+
+\begin{example}[M/G/1 quene]
+	
+\end{example}
+
+
+
+\subsection{Invariant distribution}
+Motivation: let $(X_n)$ be i.i.d with $X_n \sim \mu$, by the SLLN we know:
+\begin{align*}
+	\frac{1}{n} \sum X_i \rightarrow \mathbb{E}_\mu X_1 \quad a.s.
+\end{align*}
+More generally, the empirical distribution satisfies 
+\begin{align*}
+	\frac{1}{n} \sum \delta_{Y_i} \rightarrow \mu \quad weakly
+\end{align*}
+\textbf{Question:} can we expect same result for Markov chain, and if yes, what is $\mu$. i.e. when do we have:
+\begin{align*}
+	\frac{1}{n} \sum f(X_i) \rightarrow \int f(x) \lambda(dx)
+\end{align*}
+For a Markov chain $X$ and some $\lambda$.(section 3.6).\\
+W.l.o.g for $X$ irreducible, we expect some form of asymptotic loss of memory, e.g.
+\begin{align*}
+	\mathbb{P}(X_n = j| X_0 = i) - \mathbb{P}(X_n = j| X_0 = i_0) \rightarrow 0
+\end{align*}
+or 
+\begin{align*}
+	P_{ij}^n \rightarrow \pi_j
+\end{align*}
+\begin{definition}[Invariant distribution]
+	Given a Markov chain $X = (P, \mu)$ with state space $E$, a vector is called \textbf{invariant measure} if:
+	\begin{align*}
+		\lambda = \lambda P, \quad \lambda_i = \sum \lambda_j p_{ij}
+	\end{align*}
+	if in addition $\lambda$ is a stochastic vector, then $\lambda$ is an \textbf{invariant distribution}
+\end{definition}
+\begin{remark}
+We do not assume a priori that $\sum_{i \in E} \lambda_i< \infty$. We can always normalise $\lambda$ such that $\sum \lambda_i = 1$.	
+\end{remark}
+
+\begin{lemma}
+	If $\lambda$ is invariant and $X$ is a $(\lambda, P)$ Markov chain, then $(X_{m+n})_{m \in \mathbb{N}}$ is a $(\lambda, P)$ Markov chain. In another word
+	\begin{align*}
+		\lambda = \lambda P = \lambda P^n
+	\end{align*}
+	Furthermore, if $\lambda_i > 0$, then $\lambda_k > 0$ for all $k \in E$.
+\end{lemma}
+\begin{proof}
+	\begin{align*}
+		\lambda_k &= \sum_{j \in E} \lambda_j p_{jk}^n\\
+		&\ge \lambda_i p_{ik}^n > 0
+	\end{align*}
+\end{proof}
+
+\begin{theorem}
+If $E$ is \textbf{finite }and suppose that for \textbf{some} $i \in E$:
+\begin{align*}
+	p_{ij}^n \overset{n \rightarrow \infty}{\rightarrow} \pi_j \quad \forall j \in E
+\end{align*}	
+Then $\pi$ is an invariant distribution.
+\end{theorem}
+\begin{proof}
+	1. $\pi$ is a distribution
+	\begin{align*}
+		\sum_{j \in E} \pi_j &= \sum_{j \in E} \lim_n p_{ij}^n \\
+		(E finite) &= \lim_n \sum_{j \in E} p_{ij}^n \\
+		&= 1
+	\end{align*}
+	2. $\pi$ is invariant
+	\begin{align*}
+		\pi_j = \lim_n p_{ij}^n &= \lim_n \sum_{k \in E}p_{ik}^{n -1} p_{kj}\\
+		&= \sum_{k \in E} \pi_k p_{kj}\\
+		&\Leftrightarrow \pi = \pi P
+	\end{align*}
+\end{proof}
+
+\begin{example}[The condition of finite state is necessary]
+	
+\end{example}
+
+
+\begin{example}[compute the invariant distribution]\quad
+\begin{itemize}
+	\item compute $p_{ij}^n$ for all j
+	\item solve the linear system $\pi = \pi P$ with $\sum \pi_i = 1$.
+\end{itemize}
+\end{example}
+\begin{remark}
+$\lambda \equiv 0$ is always invariant. For the 1-d symmetric random walk:
+\begin{align*}
+	p_{ij}^n \rightarrow 0
+\end{align*}	
+but clearly $\lambda \equiv 0$ is not a distribution.
+The fact that $E$ is finite in the theorem is important.
+\end{remark}
+
+
+
+\subsubsection{Existence and Uniqueness of invariant distribution}
+	We assume $X$ is irreducible(nn recurrent), first we consider the finite case, we see the finite Markov chain always admits an invariant distribution.
+
+\begin{lemma}
+	Let $X$ Markov chain and $E$ finite, then there exists an invariant \textbf{measure}
+\end{lemma}
+\begin{proof}
+	Since $P$ is a stochastic matrix, 
+	\begin{align*}
+		PI_n = I_n
+	\end{align*}
+	hence, 1 is an eigenvalue of $P$, therefore also an eigenvalue of $P^T$, and the eigenvector is the row vector of $I_n$.
+\end{proof}
+
+To consider the general case where the Markov chain could have countable many state. For this we define
+\begin{itemize}
+	\item \textbf{First revisit of k:}
+	$T^1_k = \inf\{n > 0, X_n = k\} \quad (\inf \emptyset = \infty)$
+	\item \textbf{Number of visit of $i$ until first revisit of $k$} $\gamma_i^k = \mathbb{E}_k \sum_{n = 0}^{T_k^1 -1} \mathbbm{1}_{X_n = i}$
+\end{itemize}
+
+\begin{lemma}[Existence of the invariance measure]
+	Let $X$ be irreducible and recurrent, then the following holds
+	\begin{enumerate}
+		\item $\gamma_k^k = 1$
+		\item $ (\gamma^k_i)_{i \in E}$ is an invariant vector. Moreover
+		\begin{align*}
+			\gamma_i^k = \mathbb{E}_k \sum_{n = 0}^{T_k^1} \mathbbm{1}_{X_n = i} = \sum_{n = 0}^\infty \mathbb{P}(X_n = i, T \geq n)
+		\end{align*}
+		\item $0 < \gamma_i^k < \infty$ for all $i \in E$.
+	\end{enumerate}
+\end{lemma}
+\begin{proof}\quad\\
+1) trivial\\
+2) Since $X$ is recurrent, 
+	\begin{align*}
+		\mathbb{P}_k( T_k^1 < \infty ) = 1,\quad X_{T_k^1 } = k
+	\end{align*}
+	For $j \neq k$, we have:
+	\begin{align*}
+		\gamma_j^k &= \mathbb{E}_k \sum_{n = 0}^{T_k^1 -1} \mathbbm{1}_{X_n = j}\\
+		&= \mathbb{E}_k \sum_{n = 0}^\infty \mathbbm{1}_{X_n = j} \mathbbm{1}_{n \le T_k^1 -1}\\
+		&= \sum_{n = 0}^\infty \mathbb{P}_k(X_n = j, n \le T_k^1 -1)\\
+	(!)	&= \sum_{n = 1}^\infty \mathbb{P}_k(X_n = j, n \le T_k^1 )\\
+		&= \sum_{n = 1}^\infty \sum_{i \in E} \mathbb{P}_k(X_n = j, n \le T_k^1, X_{n-1} = i )
+	\end{align*}
+	The \textbf{recurrence }of $k$ gives us a finite stopping time to be conditioned on. Using the strong Markov property, the future is independent form the past given the current state.
+	\begin{align*}
+		\mathbb{P}_k(X_n = j, n \le T_k^1, X_{n-1} = i) &= p_{ij} \mathbb{P}_k(n \le T_k^i, X_{n-1} = i)
+	\end{align*}
+	Hence
+	\begin{align*}
+	(Fubini)	&= \sum_{i \in E} p_{ij} \sum_{n = 1}^\infty \mathbb{P}_k(n \le T_k^i, X_{n-1} = i)\\
+	(cycling)	&= \sum_{i \in E} p_{ij} \sum_{m = 0}^\infty \mathbb{P}_k(m \le T_k^i, X_{m} = i)\\
+		&= \sum_{i \in E} p_{ij} \mathbb{E}_k \sum_{m = 0}^{T_k^1 -1} \mathbbm{1}_{X_m = i}\\
+		&= \sum_{i \in E} p_{ij} \gamma_i^k
+	\end{align*}
+	3)
+	Since $X$ is irreducible, we know
+	\begin{align*}
+		p_{ik}^n > 0, \quad p_{ki}^m > 0
+	\end{align*}
+	Thus
+	\begin{align*}
+		\gamma_i^k &= \sum_{j \in E} \gamma_j^k p_{ji}^n \\
+		&\ge \gamma_k^k p_{ki}^m = p_{ki}^m > 0
+	\end{align*}
+	Moreover
+	\begin{align*}
+		1 = \gamma_k^k = \sum_j \gamma_j^k p_{jk}^n \ge \gamma_i^k p_{ik}^n\\
+		\Rightarrow \gamma_i^k \le \frac{1}{p_{ik}^n}< \infty
+	\end{align*}
+\end{proof}
+
+\begin{theorem}[minimal bound of the invariance measure]
+	Let $X$ be \textbf{irreducible}, let $\lambda$ be any invariant measure with $\lambda_k = 1$(always satisfied for some $k$ after normalisation).
+	then $\forall i \in E$:
+	\begin{align*}
+		\lambda_i \geq \gamma_i^k 
+	\end{align*}
+	if $X$ is also \textbf{recurrent}, then
+	\begin{align*}
+		\lambda = (\gamma^k)_{i \in E}
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	since $\lambda$ is invariant and $\lambda_k = 1$:
+	\begin{align*}
+		\lambda_j = (\lambda P)_j = \sum_{i_0 \in E} \lambda_{i_0} p_{i_0 j} 
+		= \sum_{ i_0 \neq k} \lambda_{i_0} p_{i_0j} + p_{kj}
+	\end{align*}
+	now we use
+	\begin{align*}
+		\lambda_{i_0} = \sum_{ i_1 \neq k} \lambda_{i_1} p_{i_1 i_0} + p_{k i_0} 		
+	\end{align*}
+	and get
+	\begin{align*}
+		\lambda_j &= p_{kj} + \sum_{i_0 \neq k} p_{ki_0} p_{i_0 j} +  \sum_{i_0, i \neq k} \lambda_{i_1}p_{i_1i_0} p_{i_0 j} \\
+		&= p_{kj} + \sum_{i_0 \neq k} p_{k i_0} p_{i_0 j} + \cdots + \sum_{i_0, i_1, \cdots, i_{n-1} \neq k}p_{k i_{n-1}} \dots p_{i_1i_0} p_{i_0 j} k + \epsilon \quad \epsilon>0
+	\end{align*}
+	Notice the equation represents the probability of hitting $j$ without hitting $k$ in $1, 2, \dots, $ steps. Altogether we have
+	\begin{align*}
+		\lambda_j &\geq \sum_{m = 1}^n \mathbb{P}_k(X_m = j, T_k^1 \geq m)\\
+		&= \mathbb{E}_k \sum_{m = 1}^{n \wedge T_k^1}\mathbbm{1}_{X_m = j}
+	\end{align*}
+	letting $n \rightarrow \infty$ and shifting the index
+	\begin{align*}
+		\lambda_j \geq \mathbb{E}_k \sum_{m = 0}^{T_k^1 -1} \mathbbm{1}_{X_n = j} = \gamma_j^k
+	\end{align*}
+	If $X$ is recurrent, then $\gamma^k$ is an invariant measure, hence
+	\begin{align*}
+		\tilde{\lambda} = \lambda - \lambda^k is invariant, \quad \tilde{\lambda_k} = 0
+	\end{align*}
+	since $X$ irreducible
+	\begin{align*}
+		p_{jk}^n  >0
+	\end{align*}
+	and so
+	\begin{align*}
+		\tilde{\lambda_k} = 0 = \sum_{j} \tilde{\lambda_j}p_{jk}^n \geq \tilde{\lambda}_i p_{ik}^n
+	\end{align*}
+	since $\gamma^k$ is the lower bound of $\gamma$ we have $\tilde{\lambda} = 0$.
+	Up to normalisation, $\lambda_k= 1$, we have the uniqueness.
+\end{proof}
+
+\begin{example}
+The communication classes, we look at the recurrent classes and get invariant distribution. And the convex combination of which is also invariant distribution.	
+\end{example}
+
+
+
+Now we have get a invariant measure, which is the expected number of visits between 2 visits of a recurrent state. But it's not yet an invariant distribution. To have a invariant distribution we need the measure to be finite:
+\begin{align*}
+	\sum_{i \in E} \gamma_i^k < \infty
+\end{align*}	
+We may have $\sum_{i} \gamma_i^k = \infty$, the question is when is it finite.
+
+\begin{definition}[positive and null recurrent]
+	Let $X$ be an irreducible Markov chain on $E$, let 
+	\begin{align*}
+		T_i^1 : = \inf\{ n > 0, X_n = i\}
+	\end{align*}
+	\begin{itemize}
+		\item A state $i \in E$ is \textbf{positive recurrent:} $\mathbb{E}_i T_i^1 = m_i < \infty$
+		\item A state $i \in E$ is \textbf{null recurrent}: $\mathbb{E}_i T_i^1 = m_i =\infty$.
+	\end{itemize}
+\end{definition}
+
+The following theorem states, in the class of recurrent and irreducible Markov chain, existence of an invariant distribution and positive recurrence is equivalent.
+\begin{theorem}
+	Let $X$ be irreducible, recurrent Markov chain, the following are equivalent
+	\begin{enumerate}
+		\item every state is positive recurrent
+		\item some state $i \in E$ is positive recurrent
+		\item there exists an (unique) invariant distribution  $\pi$.
+	\end{enumerate}
+	In any of these cases, 
+	\begin{align*}
+		m_i = \frac{1}{\pi_i}, \quad i \in E, \pi_i > 0
+	\end{align*}
+\end{theorem}
+\begin{proof}\quad\\
+1)$\Rightarrow$2):trivil\\
+2)$\Rightarrow$3): we know $(\gamma^k)$ is an invariant measure with $\gamma_k^k = 1$, hence
+\begin{align*}
+	1 < \sum_{i \in E} \gamma_i^k &= \sum_{i \in E}\mathbb{E}_k \sum_{n = 0}^{T_k^1 -1}\mathbbm{1}_{X_n = i}\\
+	(1)
+	&= \mathbb{E}_k \bigg[ \sum_{n = 0}^{T_k^1 -1} \sum_{i \in E} \mathbbm{1}_{X_n = i} \bigg]\\
+	&= \mathbb{E}_k T_k^1\\
+	&= m_k \\
+(\text{k positive recurrent})
+	&< \infty
+\end{align*}
+(1) follows from monotone convergence theorem. We already know $\gamma^k_i$ defines an invariant vector.
+\begin{align*}
+	\sum_{i \in E}\gamma_i^k = \mathbb{E}_k T^1_k < \infty
+\end{align*}
+Therefore $\pi_i = \frac{\gamma_i^k}{m_k}$ defines an invariant distribution.\\
+3)$\Rightarrow$1) assuming there exists an invariant measure $\pi$ with $\pi_k >0$. 
+\begin{align*}
+	\lambda_i = \frac{\pi_i}{\pi_k}
+\end{align*}
+is invariant and $\lambda_k = 1$, then for any $l \in E$:
+\begin{align*}
+	m_l &= \sum_{j \in E} \gamma_j^l \\
+	(\text{minimal bound})
+	&\le \sum \lambda_j = \frac{1}{\pi_k} \sum_{j \in E} \pi_j = \frac{1}{\pi_k} < \infty
+\end{align*}
+thus $k \in E$ is positive recurrent.
+	
+\end{proof}
+
+\begin{example}[Null recurrent Markov chain: 1-d symmetric random walk]
+The symmetric 1-d random walk is recurrent, $\pi = (\pi_j)$ with $\pi_j = 1$ is \textbf{the} invariant measure, $\pi = \gamma^k$ for all $k$, hence
+\begin{align*}
+	m_k = \sum_{i \in E} \gamma_i^k = \infty
+\end{align*}	
+hence no invariant distribution
+\end{example}
+
+\begin{remark}
+To summarise, we get: Given $X$ is irreducible, recurrent, 
+\begin{itemize}
+	\item \textbf{positive recurrent}: unique invariant distribution
+	\item \textbf{null recurrent}: unique(up to scalar multiplication) invariant measure, no invariant distribution.
+\end{itemize}	
+$X$ is irreducible, transient(E countable), anything can happen.
+\end{remark}
+
+\begin{example}[transient Markov Chain]\quad\\
+1)let $E = \mathbb{N}_0$, $P_{i, i+1} = 1$ for all $ i \in E$. $\pi_i 
+\equiv 0$ is then the only invariant measure\\
+2)let $E = \mathbb{Z}$, $P_{i, i+1} = 1$ for all $i \in E$, the invariant measure is $\pi_i \equiv c$ for some $c \ge 0$. We have a invariant measure but no invariant distribution. 	\\
+3)Asymmetric 1d random walk:
+
+\end{example}
+
+\begin{example}[reflective 1d random walk.]
+(in general $Y$ MC not imply $|Y|$ a MC). If $X$ a standard random walk, $|X|$ is a reflective random walk, if $q \neq p$, then $|X|$ is transient.
+\end{example}
+
+\begin{example}[M/G/1 queue]
+	
+\end{example}
+
+
+\subsubsection*{The detailed balance condition}
+
+\begin{theorem}
+	let $X = (X_n)_{0 \le n \le N}$ be an irreducible $(\pi,P)$ Markov chain, let $\pi$ be an invariant distribution, then
+	\begin{align*}
+		Y = (Y_n)_{0 \le n \le N},\quad Y_n = X_{N - n}
+	\end{align*}
+	is an irreducible $(\pi, \hat{P})$ Markov chain with
+	\begin{align*}
+		\hat{p}_{ij} = \frac{\pi_j}{\pi_i} p_{ji}
+	\end{align*}
+	and $\pi$ is invariant distribution for $Y$. In particular, 
+	\begin{align*}
+		\forall i \neq j : \pi_i = \pi_j \Rightarrow \hat{P} = P^T
+	\end{align*}
+\end{theorem}
+\begin{proof}\quad\\
+	1)$\hat{P}$ is a stochastic matrix, compute the row sum
+	\begin{align*}
+		\sum_j \hat{p}_{ij} = \frac{1}{\pi_i} \sum \pi_j p_{ji} = 1
+	\end{align*}
+	2)$\pi$ is invariant:
+	\begin{align*}
+		\sum_{i \in E} \pi_i \hat{p}_{ij} = \sum_{i \in E}\pi_jp_{ji} = \pi_i
+	\end{align*}
+	3)Markov chain
+\end{proof}
+
+\begin{definition}[The detailed balanced condition]\quad
+	\begin{itemize}
+		\item A stochastic matrix $P$ and a measure $\lambda$ are in \textbf{detailed balance} if
+		\begin{align*}
+			\lambda_i p_{ij} = \lambda_j p_{ji} \quad \forall i, j \in E
+		\end{align*}
+		\item An Markov chain $(\lambda, P)$ Markov chain $X$ is called \textbf{reversible }if $\forall N \in \mathbb{N}:$ $(X_{N-n})_{0 \le n \le N}$ is a $(\lambda, P)$ Markov chain.
+	\end{itemize}
+\end{definition}
+
+
+\begin{theorem}
+	Given an irreducible Markov chain $(\lambda, P)$ , the followings are equivalent:
+	\begin{enumerate}
+		\item $X$ is reversible.
+		\item $X$ satisfies the detailed-balance sheet condition.
+	\end{enumerate}
+\end{theorem}
+\begin{proof}
+	
+\end{proof}
+
+\begin{example}
+	
+\end{example}
+
+
+
+
+
+\subsection{Convergence theorem of Markov chain}
+\subsubsection*{Aperiodic Markov chain}
+\begin{definition}
+	Let $X$ be a Markov chain with transition matrix $P$, then
+	\begin{itemize}
+		\item the \textbf{period} of a state $i$ is defined as $d_i:= gcd\{n \in \mathbb{N}: p_{ii}^n > 0 \}$ with $gcd\{\emptyset\} = \infty$.
+		\item A state $i$ is called \textbf{aperiodic}, if $d_i = 1$ 
+		\item The MC $X$ is called \textbf{aperiodic}, if $\forall i \in E: d_i = 1$
+	\end{itemize}
+\end{definition}
+
+\begin{lemma}
+	Let $X$ be a Markov chain on the state space $E$ with transition matrix $P$. We have:
+	\begin{enumerate}
+		\item $i \leftrightarrow j \Rightarrow d_i = d_j$
+		\item For $i \in E$, we have: $d_i < \infty \Rightarrow \exists n_0 \forall n > n_0: p_{ii}^{nd_i} > 0$
+	\end{enumerate}
+\end{lemma}
+\begin{proof}1)
+	Since $i\leftrightarrow j$, there exists $m, n \in \mathbb{N}$, such that $p_{ij}^m > 0, p_{ji}^n>0$. For all $k \in \mathbb{N}$ with $p_{jj}^k >0:$
+	\begin{align*}
+		p_{ii}^{m + n + k} &\ge p_{ij}^m p_{jj}^k p_{ji}^n > 0\\
+		p_{ii}^{m+n+2k} &\ge p_{ij}^m p_{jj}^k p_{jj}^k p_{ji}^n >0
+	\end{align*}
+	therefore $d_il = m+n+k, d_i l' = m + n + 2k \Rightarrow d_i (l'- l) = k \Rightarrow d_j | d_i$. Analog we can prove $d_i | d_j$.\\
+	2)w.l.o.g assume $d_i = 1$.\\
+	The key observation is that $N_i:= \{n: p_{ii}^n > 0\}$ is closed under addition(not subtraction since it's not irreducible). First we show if $N_i$ contains 2 subsequent integer $N, N+1$, then $\forall m \geq N^2: m \in I_x$, indeed,
+	\begin{align*}
+		m - N^2 &= kN + r \quad 0 \le r < N\\
+		\Rightarrow 
+		m &= N^2 + kN + r\\
+		m &= N(N + k -r) + (1 + N) r \in N_i
+	\end{align*}
+	Now we prove it contains 2 subsequent integers. 
+\end{proof}
+
+\begin{corollary}
+	Let $X$ be an irreducible, \textbf{aperiodic }Markov chain, then for all $i, j \in E$, we have
+	\begin{align*}
+		p_{ij}^n > 0 \quad \text{for sufficiently large $n$}
+	\end{align*}
+\end{corollary}
+\begin{proof}
+	For $i, j \in E$. Let $n(i), n(j)$ be the natural number given by the last lemma,then we have:
+	\begin{align*}
+		p_{ij}^{n(i) + n(j) + 1} \ge p_{ii}^{n(i)} p_{ij} p_{jj}^{n(j)}>0
+	\end{align*}
+	All components are positive by periodicity and irreducibility.
+\end{proof}
+
+\begin{theorem}[Convergence theorem]
+	Given $X$ an \textbf{aperiodic, irreducible} Markov chain with a invariant distribution, then
+	\begin{align*}
+		\lim_{n \rightarrow \infty}\mathbb{P}_i (X_n = j) = \pi_j
+	\end{align*}
+\end{theorem}
+\begin{proof}
+\quad\\
+1)\textbf{Construct the coupling:} Let $Y_n$ be an independent copy of $X_n$. We show $(X_n, Y_n)$ is an irreducible positive recurrent Markov chain. Irreducibility requires \textbf{aperiodicity}. We define the transition probability as:
+\begin{align*}
+	p_{(i,j)(k,l)} = p_{ik} p_{jl}
+\end{align*}
+By the \textbf{aperiodicity} there exists a large $N$ such that $\forall n \ge N$: $p_{ik}^n > 0, p_{jk}^n >0$. We see all states in $(X, Y)$ commutes, hence the irreducibility. \par 
+On the other hand, by the existence of an invariant distribution, we know the irreducible Markov chain is positive recurrent.\\
+2)\textbf{Formulate the variational distance:} we want:
+\begin{align*}
+	\sum_{j \in E} |\mathbb{P}_i(X_n = j) - \pi(j)| \rightarrow 0
+\end{align*}
+By recurrence we know the Markov chain hits diagonal in finite time. Define $T:= \inf\{n\in \mathbb{N}:$ the MC hits the diagonal $\}$. By Markov property we have:
+\begin{align*}
+	\mathbb{P}(X_n = j, T \le n) &= \sum_{m = 1}^n \sum_{k \in E} \mathbb{P}(X_n = j, X_m = k, T = m)\\
+	&= \sum\sum \mathbb{P}(X_m = k, T = m)\mathbb{P}(X_n = j|X_m = k)\\
+	&= \sum\sum \mathbb{P}(Y_m = k, T = m)\mathbb{P}(Y_n = j|Y_m = k)\\
+	&= \mathbb{P}(Y_n = j, T \le n)
+\end{align*}
+therefore:
+\begin{align*}
+	|\mathbb{P}(X_n = j) - \mathbb{P}(Y_n = j)| &\le 2 \mathbb{P}(X_n = j, T\ge n) \\
+	 &\le 2 \mathbb{P}(T \ge n)
+\end{align*}
+3)\textbf{Show the convergence: }Notice the result above is entirely base on the property of the transition matrix, by the independence of $X$ and $Y$ we can assign different initial distributions. Let $\mu_X = \delta_i $ and $\mu_Y$ be the invariance distribution we have:
+\begin{align*}
+	\sum|p_{ij}^n - \pi(j)| \le \sum |\mathbb{P}(X_n = j) - \mathbb{P}(Y_n = j)| \le 2\mathbb{P}(T \ge n) \rightarrow 0
+\end{align*}
+\end{proof}
+\begin{remark}
+The technique is called \textbf{coupling}. Usually used to prove convergence in probability.	
+\end{remark}
+
+
+
+\subsubsection*{Birkoff's ergodic theorem}
+Goal:
+\begin{align*}
+	\frac{1}{n} \sum_{k= 0}^{n-1} f(x_k) \rightarrow \int f(i)d \pi_i
+\end{align*}
+
+\begin{lemma}
+	let $(Y_n)$ i.i.d $Y_n \ge 0$ and $\mathbb{E}Y_0 = \mu \in [0, \infty]$, then we have:
+	\begin{align*}
+		\frac{1}{n}\sum_{i = 1}^n \rightarrow \mu \quad a.s.
+	\end{align*}
+	In particular, if 
+	\begin{align*}
+		N_n \rightarrow \infty \quad a.s.
+	\end{align*}
+	then 
+	\begin{align*}
+	\frac{1}{N_n} \sum_{i = 1}^{N_n} \rightarrow \mu \quad a.s.
+	\end{align*}
+\end{lemma}
+
+\begin{theorem}[Birkoff's Ergodic theorem]
+	Let $X$ be an irreducible $(\lambda, P)$ Markov chain. And let 
+	\begin{align*}
+		V_i^n := \sum_{k = 0}^{n -1} \mathbbm{1}_{X_k = i}
+	\end{align*}
+	then 
+	\begin{align*}
+		\frac{1}{n} V_i^n \rightarrow \frac{1}{m_i} \quad a.s.
+	\end{align*}
+	If $X$ is also positive recurrent($m_i < \infty$), then the Markov chain admits an unique invariant distribution $\pi$, then we have:
+	\begin{align*}
+		\forall f :E \rightarrow \mathbb{R} \textbf{ bounded}: \frac{1}{n} \sum_{k = 0}^n f(x_k) \rightarrow \bar{f} = \sum_{i \in E} \pi_i f(i)
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	let $X$ be transient, then $m_i = \infty$ for all $i \in E$ and $V_i^n < \infty$ a.s. Hence
+	\begin{align*}
+		\frac{1}{n} V_i^n \rightarrow 0 = \frac{1}{\infty}(?)
+	\end{align*}
+	2)let $X$ be recurrent, then 
+	\begin{align*}
+		\forall i, j \in E :\mathbb{P}_j(T_j^1 < \infty) = 1 
+	\end{align*}
+	By strong Markov $(X_{T_i^1+ n})_n$ is a Markov chain, moreover
+	\begin{align*}
+		\frac{V_i^n}{V_i^n + V_i^{T_i^1}} \rightarrow 1
+	\end{align*}
+	3)Let $X$ be positive recurrent, then we know the invariant distribution is given be $\frac{1}{m_i}$. In this case 
+	\begin{align*}
+		\frac{1}{n} V_i^n
+	\end{align*}
+\end{proof}
+
+
+
+
+\newpage
+\section{General Theory of stochastic process}
+
+\subsection{Construction of stochastic process}
+
+\textbf{Question:} Given a consistent family of finite dimensional distribution(as constructed in MC), does a measure $\mathbb{P}$ in the big space exists, such that
+\begin{definition}[projective family]
+$T$ be an index set, $(S, \mathcal{S})$ be a measurable set, for each finite subset $J \subset T$ the probability $\mathbb{P}_J$ is given. If $(\mathbb{P}_J)_{J \subset T finite}$ satisfies the \textbf{consistency condition}:
+\begin{equation*}
+	\forall J \subset J' \subset T, A \subset \mathcal{S}^{\otimes J}: \mathbb{P}_{J'}(\pi_{J', J}^{-1}(A)) = \mathbb{P}_J(A)
+\end{equation*}
+\end{definition}
+
+\begin{lemma}[Consistency in finite product probability space]
+	Let $(X_t, t \in T)$ be a stochastic process with state space $(S, \mathcal{I})$ and denote by $\pi_{J, I}: S^J \rightarrow S^I$ for $I \subset J \subset T$ the coordinate projection. Then the finite-distributions $(P_J^X)_{J\in T}$ satisfies:
+	\begin{equation*}
+		\forall I \subset J \subset T \quad \forall A \in \mathcal{I}^{\otimes I}: P^X_J(\pi_{J, I}^{-1}(A)) = P_I^X(A)
+	\end{equation*}
+\end{lemma}
+
+
+
+\begin{theorem}[Kolmogorov consistency theory]
+	Given a Polish measurable space $(S, \mathcal{B}_S)$, $T \neq \emptyset$ an index set and $(\mathbb{P}_J)$ be a projective family of $S$ and $T$. Then there exists a unique probability measure $\mathbb{P}$ on the product space $(S^T, \mathcal{B}^{\otimes T}_S)$ satisfying:
+	\begin{equation*}
+		\forall J \subset T, J < \infty, B \in \mathcal{B}^{\otimes J}_S: \mathbb{P}_J(B) = \mathbb{P}(\pi_{T, J}^{-1}(B))
+	\end{equation*}
+\end{theorem}
+\begin{remark}
+	Here the state space is Polish.
+\end{remark}
+\begin{proof}
+\end{proof}
+
+\begin{example}[Markov chain]
+Let $(E, \mathcal{E})$ be polish, $\mu$ a probability measure on the space, $P:E \times \mathcal{E} \rightarrow [0, 1]$ transition kernal. We have the consistent family:
+\begin{align*}
+	\{\mathbb{P}_J, J \subset  H(\mathbb{N}_0)\}
+	 \quad H(\mathbb{N}_0):= \{J< \infty: J \subset H\}
+\end{align*}	
+Kolmogorov tells us the unique measure $\mathbb{P}$ exists, then we have
+\begin{align*}
+	\pi_n(\omega) = \omega_n
+\end{align*}
+is a Markov Chain.
+\end{example}
+
+\begin{example}[Brownian motion]
+The Brownian motion $(B_t)_{t \in [0, \infty)}$ on $(\Omega, \mathcal{F}, \mathbb{P})$ is defined as 
+	\begin{enumerate}
+		\item $\mathbb{P}(B_0 = 0) = 1$
+		\item stationary, normally distributed increments: $\forall 0 \le s \le t: B_t - B_s \sim N(0, t-s)$
+		\item independent increments: $\forall 0 \le t_1 \le t_2 \dots t_n: B_{t_n} - B_{t_{n-1}} \dots B_1 - B_0$ are independent.
+		\item $t \rightarrow B_t(\omega)$ is continuous a.s.
+	\end{enumerate}
+	We construct a process $B = (B_t)_{t\in [0, \infty])}$ that satisfies 1),2),3).(Pre Brownian motion). Let $(E, \mathcal{E}) = (\mathbb{R}, B(\mathbb{R}))$, we construct a probability measure $\mathbb{P}$ on the functional space $(E^T, \mathcal{E}^T)$. For $T = [0, \infty)$, 
+	\\
+	For $\mu \in \mathbb{R}$, $\sigma^2 > 0$ let 
+	
+	\begin{align*}
+		C([0, \infty), \mathbb{R}) \notin \mathcal{E}^{[0, T)}
+	\end{align*}
+\end{example}
+
+\begin{corollary}
+	For any Polish space $(S, \mathcal{B}_S)$, and $T \neq \emptyset$ an index set. There exists to a prescribed projected family $(\mathbb{P}_J)$ a stochastic process $(X_t, t \in T)$ whose finite dimensional distribution is given by $\mathbb{P}_J$.
+\end{corollary}
+Let $(\Omega, \mathcal{F}, \mathbb{P})$ be a probability space, $X = (X_n)$ a MC, we have
+\begin{align*}
+	\mathbb{P}
+\end{align*}
+
+
+
+
+
+
+
+
+
+
+\subsection{Continuity of stochastic process}
+So far we constructed the "pre-Brownian Motion" on 
+\begin{align*}
+	(\Omega, \mathcal{F}) = (E^{[0, \infty)}, \mathfrak{E}^{[0, \infty)})
+\end{align*}
+
+Now we make the BM continuous on the space
+\begin{align*}
+	(C([0, \infty), \mathbb{R}), B(C([0, \infty), \mathbb{R}))
+\end{align*}
+instead of 
+\begin{align*}
+	(\mathbb{R}^{[0, \infty)}, B(\mathbb{R})^{[0, \infty)})
+\end{align*}
+
+
+\begin{definition}[Version and Indistinguishable]
+	two process $(X_t)_{t \in T}), (Y_t)_{t \in T})$ on the probability space $(\Omega, \mathcal{F}, \mathbb{P})$ is called
+	\begin{enumerate}
+		\item \textbf{Indistinguishable}: $\mathbb{P}(\forall t \in T: X_t = Y_t) = 1$, i.e., there exists a set $N \in \mathcal{F}, \mathbb{P}(N) = 0$, such that 
+		\begin{align*}
+			\{X_t \neq Y_t\} \subset N \quad \forall t \in T
+		\end{align*}
+		Notice the set may not be measurable.
+		\item \textbf{Version of each other} $\forall t \in T: \mathbb{P}(X_t = Y_t) = 1$
+	\end{enumerate}
+\end{definition}
+
+\begin{example}[Poisson Process]
+	Let $(\tau)_{i \in \mathbb{N}}$ be independent, $\exp(\lambda)$ distributed.
+	\begin{align*}
+		\sigma_k = \sum_{i = 1}^k \tau_i, k \in \mathbb{N}
+	\end{align*}
+	and 
+	\begin{align*}
+		N(t) = \sum_{k = 1}^\infty \mathbbm{1}_{[0, t]}(\sigma_k)
+	\end{align*}
+	It models the number of events happens at time $t$. The Poisson process has right-continuous sample path with left limit(catalag). Let 
+	\begin{align*}
+		N_-(t) = \sum_{i = 1}^\infty \mathbbm{1}_{[0, t)}(\sigma_k)
+	\end{align*}
+	the left-continuous version of $N$, then
+	\begin{align*}
+		\mathbb{P}\bigg(N(t) \neq N_-(t)\bigg) = \mathbb{P}\bigg(\bigcup_n \{\sigma_n = t\}\bigg) = 0
+	\end{align*}
+	Moreover, for any $t_1 < t_2 < \dots t_n$
+	\begin{align*}
+		\mathbb{P}(\bigcup_{i = 1}\{N(t_i) \neq N_-(t_i)\}) = 0, N\overset{d}{=} N
+	\end{align*}
+	But have different sample path.
+\end{example}
+
+\begin{definition}
+	A stochastic process $X$ taking value in $(E, d)$ is called
+	\begin{itemize}
+		\item continuous in probability at $t_0$ if
+		\begin{align*}
+			X_t \rightarrow X_{t_0} \quad i.p.\quad t \rightarrow t_0
+		\end{align*}
+		\item continuous a.s. if
+		\begin{align*}
+			X_t \rightarrow 
+		\end{align*}
+	\end{itemize}	
+\end{definition}
+\begin{remark}
+$\{\omega: t \rightarrow X_t(\omega)$ is continuous $\}$ may not be measurable
+\end{remark}
+
+\begin{example}
+The Poisson process satisfied
+\begin{align*}
+	\mathbb{P}(N(t + s) - N(s) = n) = \frac{(\lambda t)^n}{n!}e^{-\lambda t}
+\end{align*}	
+In particular, $N$ is continuous in probability
+\end{example}
+
+A probability space $(\Omega, \mathcal{F}, \mathbb{P})$ is called complete, if $\mathcal{F}$ contains all $\mathbb{P}$-null sets. If a probability space if complete, then the indistinguishability becomes
+\begin{align*}
+	\mathbb{P}(X_t = Y_t \quad\forall t) = 1
+\end{align*}
+Indeed
+\begin{align*}
+	\bigcup_t \{X_t \neq Y_t \} \subset N, \mathbb{P}(N) = 0\\
+	\Rightarrow (\bigcup_t \{X_t \neq Y_t \})^C = \{X_t = Y_t \quad\forall t\} \in \mathcal{F}
+\end{align*}
+and has measure 1. Conversely, if
+\begin{align*}
+	\mathbb{P}(X_t = Y_t \quad \forall t ) = 1
+\end{align*}
+then
+\begin{align*}
+	(\{\forall t: X_t = Y_t\})^C = \bigcup_t \{X_t \neq Y_t\} \in \mathcal{F}
+\end{align*}
+Clearly, indistinguishable implies the 2 are versions. The converse is not true. However, if $X, Y$ are version and have a.s. right-continuous sample paths, then 
+\begin{align*}
+	X_t(\omega) = \lim_{s \downarrow t, s \in \mathbb{Q}} X_s(\omega) \quad Y_t(\omega) = 
+\end{align*}
+Since $X,Y$ are versions
+\begin{align*}
+	\mathbb{P}(X_s = Y_s \quad \texttt{for all } s \in T\cap \mathbb{Q}) = 1
+\end{align*}
+By right continuity, for any $t \in T$, $\omega \in \Omega_0$, 
+\begin{align*}
+	X_t = \lim_{s \downarrow t, s \in T \cap \mathbb{Q}}
+\end{align*}
+
+\begin{theorem}[Kolmogorov-Centsov-continuity theorem]
+	Let $X_t$ be a stochastic process on $(\Omega, \mathcal{F}, \mathbb{P})$ such that 
+	\begin{align*}
+		\mathbb{E}|X_t - X_s|^\alpha \le C |t - s|^\beta, t, s \in [0, T]
+	\end{align*}
+	for $\alpha, \beta, c >0$, then $X$ has a continuous version $\tilde{X}$ such that
+	\begin{align*}
+		\mathbb{P}(\sup_{0 \le t- s \le} 
+	\end{align*}
+\end{theorem}
+\begin{proof}
+	w.l.o.g. $T = 1$. By Markov inequality
+	\begin{align*}
+		\mathbb{P}(|X_t - X_s| \geq \epsilon ) \le \frac{\mathbb{E}|X_t - X_s|^\alpha}{\epsilon^\alpha} \le C 
+	\end{align*}
+	2. $X$ is uniformly continuous on 
+	\begin{align*}
+		D
+	\end{align*}
+	We apply 1) to $t = \frac{k}{2^n}$, $s = \frac{k-1}{2^n}$, $\epsilon = 2^{-\gamma n}$, we get
+	\begin{align*}
+		\mathbb{P}(|X_t - X_s| \ge 2^{\gamma n}) \le C 2^{- \alpha\gamma n}
+	\end{align*}
+	Hence 
+	\begin{align*}
+		\mathbb{P}(\max_{0 \le k \le 2^n} | X_{k \slash 2^n} - X_{(k-1)\slash 2^n}
+	\end{align*}
+\end{proof}
+
+
+
+
+
+
+ 
+ 
+
+ 
+ 
+ \newpage
+ \section{Ergodic Theorem}
+ \subsection{Stationary and Ergodic process}
+ \begin{definition}[stationary stochastic process]
+ \begin{equation*}
+ 	(X_{t_1}, \dots, X_{t_n}) \overset{d}{=} (X_{t_1 + s}, \dots, X_{t_n + s})
+ \end{equation*}
+ \end{definition}
+ 
+ \begin{definition}[measure-preserving map]\quad
+ \begin{equation*}
+ 	\forall A \in \mathcal{F}: \mathbb{P}(T^{-1}(A)) = \mathbb{P}(A) 
+ \end{equation*}
+ \end{definition}
+ 
+ \begin{lemma}\quad
+ \begin{enumerate}
+ 	\item Every stationary process induces a measure preserving map
+ 	\item $T$ measure preserving $\Rightarrow$ $\forall Y$ S-valued: $X_n(\omega) := Y(T^n(\omega))$ is stationary
+ \end{enumerate}
+ \end{lemma}
+ 
+ \begin{definition}[Invariant events Ergodic map and process]\quad
+ \begin{enumerate}
+ 	\item Invariant event:
+ 	\begin{equation*}
+ 		T^{-1}(A) = A \quad \mathbb{P}. a.s. \Leftrightarrow \mathbb{P}(A \Delta T^{-1}(A)) = 0
+ 	\end{equation*}
+ 	\item \textbf{Ergodic map}: the measure-preserving map with trivial $\mathcal{F}^T(\mathcal{F}^T:= \{A \in \mathcal{F}| \text{A is invariant} \})$.
+ 	\item \textbf{Ergodic process}: stationary process induced by ergodic map.
+ \end{enumerate}
+ \end{definition}
+ 
+ \begin{lemma}\quad
+ \begin{enumerate}
+ 	\item  $\forall A \in \mathcal{F}^T \exists B \subset A: T^{-1}(B) = B, \mathbb{P}(A \Delta B) = 0$. In particular
+ 	\begin{equation*}
+ 	\forall B: \mathbb{P}(B) \in \{0, 1\} \Rightarrow \text{$T$ is ergodic}
+	\end{equation*}
+ \end{enumerate}
+ \end{lemma}
+ 
+ \begin{example}[i.i.d random variables]
+ Given a sequence of i.i.d random variables.\par
+ $(X_n) \text{i.i.d}, A \in \mathcal{F}^T$\par
+ $A = \theta^{-1}(A) = \dots = \theta^{-n}(A) \in \sigma(\pi_k, k \geq n)$\\
+ $\overset{n \uparrow \infty}{\Rightarrow} A \in \mathcal{T}((\mathcal{A}_i)_{i \in I}) \quad \text{(the $\sigma$-Algebra are independant)}$\\
+ $\overset{\text{0-1}}{\Rightarrow} \mathbb{P}(A) \in \{0, 1\}$\\
+ $\overset{\text{lemma}}{\Rightarrow} \theta \text{is ergodic}$
+
+ \end{example}
+
+ 
+
+
+\begin{lemma} We have:
+	\begin{itemize}
+		\item $Y$ is $\mathcal{F}^T$ measurable $\Leftrightarrow$ $Y$ is $\mathcal{F}^T$ a.s. invariant, in particular\\
+		$T$ is ergodic $\Leftrightarrow$ Every invariant and bounded RV is constant
+	\end{itemize}
+\end{lemma}
+
+
+
+\subsection{Recurrence and transience of Markov chains}
+ Some notation:
+ \begin{itemize}
+ 	\item $(X_n)_{n \geq 0}$ the time-homogeneous Markov chain. 
+ 	\item $\Omega = S^{\mathbb{N}_0}$
+ 	\item $\mu$: initial distribution of the Markov chain $(X_n)$.
+ 	\item $\mathbb{P}_x := \mathbb{P}_{\delta_x}$ for a Markov Chain starting at $x$.
+ \end{itemize}
+
+ \begin{proof}
+ \end{proof}
+ \begin{remark}	
+ $Y$ may depends on all future value of $X_n$.
+ \end{remark}
+ 
+ aka, $(X_{\tau + n}$ is a $(\delta_{X_\tau}, P)$ Markov chain. for any stopping time $\tau$ 
+
+ 
+ \begin{definition}[recurrent \& transient state]\quad \\
+ 	Set $\tau_y^0 := 0 \quad$:
+ 	\begin{enumerate}
+ 		\item time of $k$th return ro $y: \quad$ $\tau_y^k := \inf \{n > \tau_y^{k-1}| X_n = y\}$
+ 	\end{enumerate}
+Set $\tau_y := \tau_y^1$ $\rho_{xy}:= \mathbb{P}_x(\tau_y < \infty)$
+ 	\begin{enumerate}
+ 		\item $y$ recurrent state: $\rho_{yy} = 1$
+ 		\item $y$ transient state: $\rho_{yy} < 1$
+ 	\end{enumerate}
+ \end{definition}
+ 
+ \begin{theorem}
+ 	 For $y \in S$, define $N(y):= \sum_{n = 1}^\infty \textbf{1}(X_n = y)$.
+ 	 \begin{enumerate}
+ 	 	\item $\mathbb{P}_x(\tau_y^k < \infty) = \rho_{xy}\rho_{yy}^{k-1}$\newline
+ 	 		$y \text{ is recurrent} \Rightarrow \mathbb{P}_y(X_n = y \text{ infinitely ofen}) = 1$
+
+ 	 	\item $y$ is transient $\Rightarrow$ $\forall x \in S:\mathbb{E}_x[N(y)] = \frac{\rho_{xy}}{1 - \rho_{yy}}$; \newline
+ 	 		  $y$ is recurrent $\Rightarrow \mathbb{E}_y[N(y)] = \infty$
+ 	 	\item $y$ is recurrent $\wedge$ $\rho_{yx} > 0$ $\Rightarrow$ $\rho_{xy} = \rho_{yx} = 1$ and x is recurrent(recurrent is infectious)
+ 	 \end{enumerate}
+ \end{theorem}
+ \begin{proof}\quad
+ \begin{enumerate}
+ 	\item Define $Y:= \textbf{1}(\tau_y < 0)$, then
+ 	\begin{align*}
+ 		\mathbb{P}_x(\tau_y^k < \infty) &= \mathbb{E}_x[ \mathbb{E}_x[Y\circ\theta_{\tau^{k-1}_y}|\mathcal{F}_{n-1}]\textbf{1}(\tau_y^{k-1}< \infty)]\\
+ 		&= \mathbb{E}_x[\mathbb{E}_{X_{\tau_y^k}}[Y]\textbf{1}(\tau_y^{k-1} < \infty)]\\
+ 		&= \mathbb{P}_x(\tau_y^{k-1} < \infty)\rho_{yy}
+ 	\end{align*}
+ 	By induction we have:
+ 	\begin{equation*}
+ 		\mathbb{P}_x(\tau_y^{k}< \infty) = \rho_{xy} \rho_{yy}^{k-1}
+ 	\end{equation*}
+ 	Then we know:
+ 	\begin{equation*}
+ 		\text{$y$ is recurrent} \Rightarrow \rho_{yy} = 1 \Rightarrow \forall k \in \mathbb{N}: \mathbb{P}_y(\tau_y^k < \infty) = \rho_{yy}^k = 1
+ 	\end{equation*}
+ 	
+ 	\item Notice $N(y)$ is a random variable takes value at $\mathbb{N}_0$. Therefore:
+ 	\begin{align*}
+ 		\mathbb{E}_x[N(y)] &= \sum_{n = 0}^\infty n \mathbb{P}_x(N(y) = n)\\
+ 		&= \sum_{n = 0}^\infty \mathbb{P}_x(N(y) \geq n)\\
+ 		&= \sum_{n = 0}^\infty \mathbb{P}_x(\tau_y^n < \infty)\\
+ 		&= \sum_{n = 0}^\infty \rho_{xy}\rho_{yy}^{n-1}\\
+ 	\end{align*}
+ 	If $y$ is recurrent the expectation goes to infinity. Otherwise $\frac{\rho_{xy}}{1-\rho_{yy}}$.
+ 	
+ 	\item 
+ 	\begin{align*}
+ 		0 = \mathbb{P}_y(\tau_y = \infty) &\geq \mathbb{P}_y(\tau_y = \infty, \tau < \infty)\\
+ 		&= \mathbb{E}_y[\mathbb{E}_y[\textbf{1}(\forall n \in \mathbb{N}: X_n \neq y) | \mathcal{F_\tau}] \textbf{1}(\tau < \infty)]\\
+ 		&= \mathbb{E}_y[\mathbb{E}_{X_\tau}[\textbf{1}(\forall n \in \mathbb{N}: X_n \neq y]\textbf{1}(\tau_x < \infty)]\\
+ 		&= \mathbb{E}_y[\mathbb{E}_x[\textbf{1}(\forall n \in \mathbb{N}: X_n \neq y]\textbf{1}(\tau_x < \infty)]\\
+ 		&= (1- \rho_{xy})\rho_{yx}
+ 	\end{align*}
+ 	By assumption we know $\rho_{yx} > 1$. Therefore $1 - \rho_{xy} = 0$, $\rho_{xy} = 1$.\\
+ 	To prove that $x$ is recurrent, notice $\tau_x \leq \tau_y + \tau_x \circ \theta_{\tau_y}$. Notice
+ \end{enumerate}
+ \end{proof}
+ 
+\begin{theorem}
+	The Markov chain $(X_n)$ admit an initial invariant distribution $\pi$ $\Rightarrow$ all states $y$ are recurrent.
+\end{theorem}
+\begin{proof}
+	Assume $\exists y$ transient, then 
+	\begin{align*}
+		\mathbb{E}_\pi[N(y)] = \mathbb{E}_\pi[\sum_{n = 0}^\infty \textbf{1}(X_n = y)] = \sum_{x \in S} \pi(\{x\})\frac{\rho_{xy}}{1 - \rho_{yy}} \overset{\text{y tansient}}{\leq}\frac{1}{1-\rho_{yy}} < \infty
+	\end{align*}
+	And by the invariance of the initial distribution
+	\begin{align*}
+		\mathbb{E}_\pi[N(y)] = \mathbb{E}_\pi[\sum_{n = 1}^\infty \textbf{1}(X_n = y)] = \sum_{n = 1}^\infty \pi(\{y\}) \in \{0, \infty\}
+	\end{align*}
+	Therefore $\pi(\{y\}) = 0$. 
+\end{proof}
+\begin{remark}
+The converse is not true.	
+\end{remark}
+
+\begin{definition}[recurrent \& irreducible Markov chain]\quad
+\begin{itemize}
+	\item recurrent Markov chain: all states are recurrent
+	\item irreducible Markov chain: all states are pairwise connected
+	\item connected states: $x \sim y \Leftrightarrow \rho_{xx} = 1, \rho_{yy}, \rho_{xy} > 0$, which implies $\rho_{xy} = \rho_{yx}= 1$
+\end{itemize}
+\end{definition}
+
+\begin{theorem}
+	$(X_n)$ recurrent Markov chain with invariant initial distribution $\pi$, $\mathcal{F}^\theta$ the invariant $\sigma$-field of the left shift $\theta$, then
+	\begin{equation*}
+		\forall A \in \mathcal{F}^\theta \exists B \subset S: A = \{[X_0] \subset B\} \quad \mathbb{P}_\pi-a.s.
+	\end{equation*}
+\end{theorem}
+\begin{proof}
+\end{proof}
+
+\begin{corollary}
+$(X_n)$ recurrent Markov chain with invariant initial distribution $\pi$ is ergodic $\Leftrightarrow$ $\pi$-almost all states all connected.
+\end{corollary}
+\begin{proof}
+\end{proof}
+
+
+
+
+
+\subsection{Ergodic theorems}
+\begin{lemma}[Maximal ergodic lemma]
+$Y \in L^1$, $T$ measure preserving, $S_n := \sum Y \circ T^k, S_0 = 0$,  $M_n := \max \{ S_0, \dots, S_n \}$. We have
+\begin{equation*}
+	\mathbb{E}[\textbf{1}_{M_n > 0}] \geq 0
+\end{equation*}
+\end{lemma}
+\begin{proof}
+\end{proof}
+
+\begin{theorem}[Birkoff's ergodic theorem]
+$X \in L^1$, $T$ measure preserving map on $(\Omega, \mathcal{F}, \mathbb{P})$, then 
+\begin{equation*}
+	\lim_{n \rightarrow \infty} \frac{1}{n} \sum_{k = 1}^{n-1} X \circ T^k = \mathbb{E}[X|\mathcal{F}^T] \quad \mathbb{P}.a.s. \& \text{ in $L^1$}
+\end{equation*}
+If $T$ is ergodic,
+\begin{equation*}
+	\lim_{n \rightarrow \infty} \frac{1}{n} \sum_{k = 1}^{n-1} X \circ T^k = \mathbb{E}X \quad \mathbb{P}.a.s. \& \text{ in $L^1$}
+\end{equation*}
+\end{theorem}
+\begin{proof}
+Define:
+\begin{itemize}
+		\item The running average: $A_n:\frac{1}{n} \sum_{n = 0}^{n-1} X \circ T^k$.
+		\item limus supremum: $\overline{X}:= \limsup A_n$
+		\item limus infimum: $\underbar{X} := \liminf A_n$
+\end{itemize}
+\begin{enumerate}
+	\item \textbf{$\overline{X}, \underline{X} \in \mathcal{F}^T$}:
+	\begin{equation*}
+		\frac{n + 1}{n} A_{n+1} = A_n \circ T + \frac{1}{n} X_n
+	\end{equation*}
+	Hence
+	\begin{align*}
+		\overline{X} &= \limsup A_n\\
+		&= \limsup \frac{n+1}{n} A_{n+1}\\
+		&= \limsup A_n \circ T\\
+		&= \overline{X} \circ T
+	\end{align*}
+	
+	\item $\overline{X} = \underline{X}$ $\mathbb{P}$-a.s:\\
+	Use the notation in the last lemma. Define $Y:= (X - b) \textbf{1}_{\{\overline{X} < b, \underline{X} > a \}}$. We have
+	\begin{align*}
+		\lim \textbf{1}_{\{M_n > 0\}} &= \lim \textbf{1}_{\{(A_n - b) \textbf{1}_{\{\overline{X} < b, \underline{X} > a \}} > 0 \}} \\
+		&= \textbf{1}_{\{\overline{X} < b, \underline{X} > a \}}
+	\end{align*}
+	
+	\item $(A_n)$ u.i:(lemma of u.i.)
+	\begin{align*}
+		\mathbb{E}|A_n| &= \frac{1}{n}\mathbb{E}|\sum X \circ T^k|\\
+		&\leq \frac{1}{n} \sum \mathbb{E}|X \circ T^k|\\
+		&= \mathbb{E}|X|
+	\end{align*}
+	and since $(X \circ T^k)$ are u.i. Taking the same $A, \epsilon, \delta$: 
+	\begin{align*}
+		\mathbb{E}[|A_n|| \textbf{1}_A] &= \frac{1}{n} \mathbb{E}[|\sum X \circ T^k| | \textbf{1}_A]\\
+		&\leq \sup_k \mathbb{E}[|X \circ T^k||\textbf{1}_A]\\
+		& < \epsilon
+	\end{align*}
+	There for $A_n$ is u.i.
+	\item $\overline{X} = \underline{X} = \mathbb{E}[X|\mathcal{F}^T]$:
+	\begin{align*}
+		\overline{X} &= \mathbb{E}[\overline{X}|\mathcal{F}^T]\\
+		&\overset{L^1}\leftarrow \mathbb{E}[A_n|\mathcal{F}^T]\\
+		&= \mathbb{E}[X|\mathcal{F}^T]
+	\end{align*}
+	
+\end{enumerate}
+\end{proof}
+
+\begin{theorem}
+$X \in L^p$, $T$ measure preserving
+	\begin{equation*}
+	\lim_{n \rightarrow \infty} \frac{1}{n} \sum_{k = 1}^{n-1} X \circ T^k = \mathbb{E}[X|\mathcal{F}_T] \quad \mathbb{P}a.s. \& \text{ in $L^p$}
+\end{equation*}
+\end{theorem}
+
+\begin{corollary}
+	$(X_k; k \geq 0)$ ergodic process in $L^1$, then 
+	\begin{equation*}
+		\frac{1}{n} \sum_{k = 0}^{n-1} X_k = \mathbb{E}X_1 \quad \mathbb{P}.a.s \quad and \quad L^1
+	\end{equation*}
+\end{corollary}
+
+\begin{corollary}
+	\begin{equation*}
+		\textbf{T is ergodic} \Leftrightarrow \forall A, B \in \mathcal{F}: \lim_n \frac{1}{n} \sum_{k = 0}^{n-1} \mathbb{P}(A \cap (T^k \circ B)) = \mathbb{P}(A)\mathbb{P}(B)
+	\end{equation*}
+\end{corollary}
+
+
+
+
+
+
+
+\newpage
+
+
+
+
+
+\subsection{Poisson process}
+\begin{review}[Poisson, Gamma, Exponential
+, Beta distribution]Observe: 
+\begin{enumerate}
+    \item Poisson distribution \begin{itemize}
+        \item Assumption: In a fixed interval(could be any length), the occurrence of a certain event is proportional to the length of the interval, and independently distributed. And \textbf{the expected occurrence(namely also the proportion constant $\lambda$ is fixed.}
+        \item Description: The probability of k times occurrence in the time interval. 
+        \end{itemize}
+    \item Gamma distribution:\begin{itemize}
+        \item Assumption: Same as Poisson
+        \item Description: $Gamma_r(t)$ Probability of at least r occurrence in  the time interval $(0, t)$. The expectation of a exponential distributed variable approximated the time till the next occurrence.
+        \item Density:\begin{equation}
+            \gamma_{\alpha, r} = \frac{\alpha^r}{\Gamma(r)} x^{r -1 } e^{- \alpha x}
+        \end{equation}
+        The proof:
+        \begin{equation*}
+        \begin{aligned}
+            \mathbb{P}_{\gamma}[(0, t)] &= 1 - \mathbb{P}_{\alpha}[\{ 1, \dots,  \gamma - 1\}] \\
+            &= 1 - \sum_{k = 1}^{n} \frac{(\alpha t)^k}{k!} e^{-\alpha t}\\
+            (*)&= \int_0^t\frac{\alpha^r}{\Gamma(r)} x^{r -1 } e^{- \alpha x} dx
+            \end{aligned}
+        \end{equation*}
+        \begin{equation}
+            \Gamma(r) = \int_{0}^{\infty} y^{r - 1} e^{-y} dy, r > 0
+        \end{equation}
+        \end{itemize}
+    \item Beta-Distribution:
+\end{enumerate}
+\end{review}
+
+\begin{definition}[counting process, jump time]
+	Define a \textbf{monotone increasing} sequence of non-negative RV $(S_i)_{i = 0}^{n}$, the process:
+	\begin{equation*}
+		N_t: = \sum_{k \geq 1} \mathbbm{1}(S_k \leq t)
+	\end{equation*}
+	is called a counting process with jumping time($S_k$).
+\end{definition}
+
+\begin{definition}[Poisson Process]
+A counting process $N_t$ is called a \textbf{poisson process} if it satisfies:
+\begin{enumerate}
+	\item $\mathbb{P}(N_(t + h) - N_t = 0) = \lambda h + o(h)$
+	\item $\mathbb{P}(N_(t + h) - N_t = 1) = 1 - \lambda h + o(h)$
+	\item (independant increament)
+	\item (stationary increament)
+\end{enumerate} 
+\end{definition}
+\begin{remark}
+We can interpret $S_k$ as the time of k-th occurrence of an event. 	
+\end{remark}
+
+
+\begin{theorem}
+	The followings are equivalent:
+	\begin{enumerate}
+		\item $N$ is a poisson process
+		\item 3, 4, are satisfied and $N_t \overset{d}{\sim} Poiss(\lambda t)$
+		\item The jumping times are i.i.d RV with distribution $Exp(\lambda)$
+	\end{enumerate}
+\end{theorem}
+
+
+
+
+
+
+
+\section{Weak and functional convergence}
+Throughout $(S, \mathcal{B}_S)$ denote metric space with Borel $\sigma-$Algebra.
+\subsection{Fundamental properties}
+\begin{theorem}[Continuous mapping]
+	$g: S \rightarrow T$ continuous $T$ another metric space. then
+	\begin{equation*}
+		X_n \overset{d}{\rightarrow} X \Rightarrow g(X_n) \overset{d}{\rightarrow}g(X)
+	\end{equation*}
+\end{theorem}
+
+\begin{theorem}[Portmanteau theorem]
+For the probability measure $(\mathbb{P}_i)_{i \in \mathbb{N}}$ the followings are equivalent
+\begin{enumerate}
+	\item $\mathbb{P}_i \overset{weakly}{\rightarrow} \mathbb{P}$
+	\item $\forall f \textbf{ Lipschitz continuous: } \int f d\mathbb{P}_i \rightarrow \int f d\mathbb{P} $
+	\item 
+\end{enumerate}
+\end{theorem}
+
+
+\subsection{Tightness}
+\begin{definition}[]
+A family of probability measures $(\mathbb{P}_i)_{i \in I}$ is called 
+\begin{itemize}
+	\item \underline{(weakly)relatively compact}: Every sequence admits a weakly convergent subsequence
+	\item \underline{(uniformly)tight}:
+	\begin{equation*}
+		\forall \epsilon > 0 \exists K_\epsilon \textbf{ compact} \forall i \in I: 1-\mathbb{P}_i(K_\epsilon) < \epsilon
+	\end{equation*}
+\end{itemize}
+\end{definition}
+
+\begin{theorem}
+	Any tight family of probability measure on a separable metric space is relatively compact.
+\end{theorem}
+
+
+\subsection{Weak convergence on $C([0, T])$, $C(\mathbb{R})$}
+We denote $C:= C([0, T])$ and $\mathcal{B}_C$ the canonical Borel $\sigma-Algebra$
+\begin{theorem}
+	A sequence of probability measure $(\mathbb{P}_n)$ on $\mathcal{B}_C$ converges weakly to the probability measure $\mathbb{P}$ iff all the finite-dimensional distribution $\mathbb{P}^{\pi_1, \dots, \pi_m}_n$ converges to $\mathbb{P}^{\pi_1, \dots, \pi_m}$ and $(\mathbb{P}_n)$ are tight.
+\end{theorem}
+
+\begin{definition}[The modulus of continuity]
+	For $f \in C([0, T])$, the modulus of continuity if defined as 
+	\begin{equation*}
+		\omega_\delta := \{ \max |f(t) - f(s)| | s \in B_\delta(t),\quad s,t \in [0, T]\}
+	\end{equation*}
+\end{definition}
+
+\begin{theorem}[Arzila-Ascole] 
+	A family of function in $C([0, T])$ is weakly compact if
+	\begin{itemize}
+		\item uniformly bounded: $\sup_{f \in A} |f(0)| < \infty$
+		\item They are equi-continuous
+	\end{itemize}
+\end{theorem}
+
+\begin{theorem}[Kolmogorov, Centsov criterion]
+Let $(X_n(t), 0 \leq t \leq T)$ be a sequence of continuous process. Then their laws are tight on $C([0, T)$ if
+\begin{enumerate}
+	\item $\lim_{R \rightarrow \infty} \sup_n \mathbb{P}(\{X_n(0) \geq R\}) \rightarrow 0$ 
+	\item $\exists \alpha, \beta > 0, K > 0,  \forall n \in \mathbb{N}_0 \forall t, s \in [0, T]:\mathbb{E}[|X_n(t) - X_n(s)|^\alpha] \leq K|s-t|^{1+\beta}$
+\end{enumerate}
+\end{theorem}
+
+\section{Invariant principle and the empirical process}
+\subsection{Invariant principle and the Brownian motion}
+\begin{definition}[Brownian motion]
+	A process $(B_t)_{t \geq 0}$ is called a Brownian motion if
+	\begin{itemize}
+		\item $B_0 = 0$ and $B_t \sim N(0, t)$
+		\item stationary and independent increment:
+		\begin{align*}
+			(B_{t_n} - B_{t_{n-1}}, \dots, B_{t_1} - B_{t_0}) \sim N(0, diag(t_n - t_{n-1}, \dots, t_1 - t_0))
+		\end{align*}
+		\item $B_t$ has a continuous sample
+	\end{itemize}
+\end{definition}
+
+\begin{theorem}[Invariance principle]
+	Suppose $(X_n)_{n \geq 0}$ are i.i.d. $X_n \in L^2$, $\mathbb{E}X = 0, Var[X] = 1$, $S_n = \sum X_k$, then the rescaled linear interpolated random walk 
+	\begin{equation*}
+		Y_n(t) = \frac{1}{\sqrt{n}} S_{\lfloor nt \rfloor} + \frac{\lfloor nt \rfloor - nt}{\sqrt{n}} X_{\lfloor nt \rfloor + 1}, \quad t \geq 0
+	\end{equation*}
+	satisfies 
+	\begin{equation*}
+		Y_n(t) \overset{n \rightarrow \infty}{\rightarrow} B
+	\end{equation*}
+\end{theorem}
+\begin{proof}:
+	\begin{enumerate}
+		\item The finite dimensional distribution of $Y_n$ converges to the Brownian motion
+	\end{enumerate}
+\end{proof}
+\begin{remark}
+To prove the convergence in distribution to normal distribution: CLT\\
+General technique: 
+\begin{enumerate}
+	\item continuous mapping
+\end{enumerate}
+\end{remark}
+
+
+\chapter{Stochastic Analysis}
+\section{Gaussian random variable}
+Given $X_n$ real random variables with $X_n \sim \mathcal{N}(m_n, \sigma_n)$. Suppose $X_n \overset{L^2}{\longrightarrow} X$, then it holds
+\begin{enumerate}
+	\item $X \sim \mathcal{N}(m, \sigma)$ with $\lim m_n \rightarrow m$ and $\lim_n \sigma_n \rightarrow \sigma$.
+	\item $X_n \overset{L^p}{\rightarrow} X$ for all $1 \le p < \infty$. 
+\end{enumerate}
+
+
+
+\section{Brownian motion}
+\subsection{Construction}
+\begin{definition}[The pre-brownian motion]
+	$(B_t)_{t \geq 0}$ is a pre-brownian motion if
+	\begin{itemize}
+		\item $B_0 = 0$ almost surely
+		\item $\forall 0 \le s < t: B_t - B_s \sim \mathcal{N}(0, t - s)$
+		\item $\forall 0 \le s < t: B_t - B_s \perp (B_r)_{0 \le r \le s}$
+	\end{itemize}
+\end{definition}
+
+\begin{definition}[Haar wavelets]
+	\begin{equation*}
+		\chi_{n, k}(t) := 2^{\frac{n}{2}}(\textbf{1}_{[k2^{-n}],2^{-n-1}(k+1)]} (t)- \textbf{1}_{[2^{-n-1}(k+1), 2^{-n}(k+1)]}(t))
+	\end{equation*}
+\end{definition}
+\begin{remark}
+The Haar wavelet
+\begin{align*}
+	(\chi_{n, k})_{ n \ge -1, k \le n}
+\end{align*}
+defines an ONB of $L^2([0, 1])$. 	
+\end{remark}
+
+\begin{definition}[The Schauder function]
+$\forall f \in C^1([0, 1])$ with $f(0) = 0$, $f' \in L^2$ we have:
+\begin{align*}
+	f(t) &= \int_0^1 f'(s)ds = \int_0^1 \textbf{1}_{[0, t]}(s) \sum \langle f', \chi_{n, k} \rangle \chi_{n, k} ds\\
+	&= \sum \langle f', \chi_{n, k} \rangle \underbrace{ \int_0^t \chi_{n, k} ds}_{ := \varphi_{n, k}(t)}
+\end{align*}
+The \textbf{Schauder function} is defined as
+\begin{equation*}
+	\varphi_{n, k}(t):= \int_0^t \chi_{n, k} ds
+\end{equation*}
+Observe the coefficients of the Schauder basis are the \textbf{pointwise evaluation:}
+\begin{align*}
+	\langle f', \chi_{n. k} \rangle &= 2^{\frac{n}{2}} ( 2 f(2^{-n-1}(2k+1) - f(2^{-n}k) - f(2^{-n}(k+1))\\
+	 &:= f_{n,k}
+\end{align*}
+And we have
+\begin{equation*}
+	f_n:= \sum f_{n, k} \varphi_{n, k}
+\end{equation*}
+Convince yourself that $f_n = \sum f_{n, k} \varphi_{n, k}$ is a piecewise linear interpolation of the function $f$.
+\end{definition}
+
+
+
+\subsection{The path properties}
+\begin{definition}[Sample paths]
+\end{definition}
+
+\begin{definition}[Modification and indistinguishable process]
+Given $X$ and $Y$ two probability processes. Then there are
+\begin{enumerate}
+	\item \textbf{modification:} of each other if 
+	\begin{align*}
+		\forall t \in I \exists N_t \text{ null set}: X_t = Y_t \text{ on } \Omega \backslash N_t
+	\end{align*}
+	\item \textbf{indistinguishable:}
+	\begin{align*}
+		\exists N: X = Y \text{ on } \Omega \backslash N 
+	\end{align*}
+\end{enumerate}
+\end{definition}
+
+\begin{lemma}[Modification $\Rightarrow$ Indistinguishable]
+	Given $X$ and $Y$ modification of each other, if one of the following holds true, then $X$ and $Y$ are indistinguishable. 
+	\begin{enumerate}
+		\item $I$ is countable
+		\item $X$, $Y$ are right continuous. 
+	\end{enumerate}
+\end{lemma}
+\begin{proof}\quad\\
+1): trivial\\
+2): By right continuity:
+\begin{align*}
+	\forall \omega \in N_t\text{ s.t. } X_t(\omega) \neq Y_t(\omega): X_r(\omega) \neq Y_r(\omega) \quad \forall r \in [t, s) \text{ for some } s \in \mathbb{Q}
+\end{align*}	
+We may merge the uncountable null set $N_t$ into a collection of countable null sets. 
+\end{proof}
+
+
+
+\begin{definition}[Holder-Continuous functions]
+For $\alpha \in (0, 1)$. The space of $\alpha$-$Holder$ continuous function is defined as 
+\begin{equation*}
+	C^\alpha([0, T]), \mathbb{R}) : = \{f : [0, T] \rightarrow \mathbb{R} \quad| \quad \|f\|_\alpha < \infty\}      \qquad
+	\|f\|_\alpha:= \sup_{0 \leq s \leq t \leq T} \frac{|f(s) - f(t)|}{|t - s|^\alpha}
+\end{equation*}	
+\end{definition}
+
+\begin{lemma}[Ciesielski]
+For a function $f$, given $\alpha \in (0, 1)$ inheriting notations above
+\begin{itemize}
+	\item $\forall n \geq -1, 0 \leq k \leq n:$,
+	\begin{align*}
+		\sup_{n \geq 1} \max_{ k \leq n}  2^{n(\alpha - \frac{1}{2})} |f_{n, k}| < C
+	\end{align*} then $\sum f_{n, k} \varphi_{n, k}$ converges (abs)uniformly to a $f \in C^\alpha([0, T])$. 
+	\item  Conversely
+	\begin{equation*}
+		\sup_{n \geq -1} \max_{k \leq n} 2^{n(\alpha - \frac{1}{2})}|f_{n, k}| \leq \|f\|_\alpha
+	\end{equation*}
+\end{itemize}
+\end{lemma}
+\begin{proof}
+	1. First we show the convergence. Given any point in the interval:
+	\begin{align*}
+		\sum_{n, k} |f_{n, k} \varphi_{n, k}| &= \sum_{n} \max_k |f_{n, k}\varphi_{n, k}|\\
+		(\|\varphi_{n, k}\|_\infty = 2^{-\frac{n}{2}})
+  		&\leq \sum_{n} \max_k |f_{n, k}| 2^{-\frac{n}{2}}\\
+  		&\leq \sum_n C 2^{-n \alpha + \frac{n}{2} - \frac{n}{2}}\\
+  		&\rightarrow f
+	\end{align*}
+	by convergence of the geometric series we know $\sum f_{n, k} \varphi_{n, k}$ is absolutely and uniformly convergent to a $f$.\par 
+	Then we show the $\alpha$-continuity. Choose $2^{-n_0 -1} \leq t < s \leq 2^{-n_0}$
+	\begin{align*}
+		|f(s) - f(t)| &\leq \sum_{n \geq -1} |\sum_{ k \leq 2^n} f_{n, k} \varphi_{n, k}(s) - f_{n, k} \varphi_{n, k}(t)|\\
+		&\leq \sum_{n \geq -1} 2 \max |f_{n, k}| \|\varphi_{n, k}\|_\infty\\
+		&\leq \sum_{n \leq n_0}2C2^{-n(\alpha - \frac{1}{2})}\|\varphi_{n, k}\|_\infty + \sum_{n > n_0}2C 2^{-n(\alpha - \frac{1}{2})}2^{-n_0}\\
+		&\leq 2C\sum_{n \leq n_0} 
+	\end{align*}
+	2. By the definition of $f_{n, k}$
+	\begin{align*}
+		|f_{n, k}|&:= \langle f', \varphi_{n, k} \rangle \\
+		&= 2^{-\frac{n}{2}}(2f(\frac{2k+1}{2^{n+1}}) - f(\frac{k}{2^n}) - f(\frac{k+1}{2^n}))\\
+		&= 2^{-\frac{n}{2}}(|f(\frac{2k+1}{2^{n+1}}) - f(\frac{k}{2^n})| + 
+		|f(\frac{2k+1}{2^{n+1}}) - f(\frac{k+1}{2^n})|)\\
+		&\leq 2^{-\frac{n}{2}}\|f\|_\alpha 2^{\alpha(-n-1)}2\\
+	\end{align*}
+	up to a constant we showed the second result.
+\end{proof}
+
+\begin{lemma}
+	Let $\alpha \in \mathbb{R}, p \in [1, \infty]$, $f_{n, k}$ are real numbers. We define
+\end{lemma}
+
+\begin{theorem}[Kolmogorov-Chentsov continuity theorem]
+Given $X$ a stochastic process and assume:
+\begin{align*}
+	\mathbb{E} | X_t - X_s|^q \le |s - t|^{ 1 + \epsilon}
+\end{align*}
+then $X$ admits a modification $\tilde{X}$ that is a.s. $\alpha$-Holder-continuous with $\alpha \in (0, \frac{\epsilon}{q})$ , i.e., 
+\begin{align*}
+	|\tilde{X}_t(\omega) - \tilde{X}_s(\omega) | \le C(\omega) |t - s|^\alpha 
+\end{align*}
+\end{theorem}
+\begin{proof}\quad\\
+\textbf{1).}Use Markov inequality to bound the probability of discontinuity at a single point. 
+
+\quad\\
+\textbf{2)}: Use $\sigma$-subadditivity to prove probability at dyadic points are bounded. Infer by Borel-Cantelli:
+\begin{align*}
+	K_\alpha(\omega):= \frac{|X_{i 2^{-n}} - X_{(i +1) 2^{- n}}|}{2^{-n \alpha}} < \infty
+\end{align*}
+
+\quad\\
+\textbf{3):} Use the lemma to infer $\forall s, t$ in the dyadic cube
+\begin{align*}
+	|X_t - X_s| \le C(\omega) |s - t|^\alpha
+\end{align*}
+
+\quad\\
+\textbf{4)} Extends process to $[0, 1]$ for a.e. $\omega$ and define an arbitrary value on the null set. 
+\end{proof}
+
+\begin{corollary}
+	Every pre-Brownian motion admits a continuous modification. 
+\end{corollary}
+
+
+\subsection{Excercise}
+\begin{exercise}
+	Let $B$ be a pre-Brownian motion and $f: \mathbb{R}^+ \rightarrow \mathbb{R}$ are defiend as $f = \sum \lambda_i \textbf{1}_{[t_{i + 1} - t_i]}$ and $\xi(f) := \sum \lambda_i (B_{i +1} - B_i)$
+\end{exercise}
+
+
+c.2.11, finite not bounded. a.s. sense. the constant depends on omega
+
+
+
+\section{Filtrations and stopping time}
+
+\begin{definition}[Measurable stochastic process]
+	A stochastic process $X$ defined on a probability space $(\Omega, \mathcal{F}, \mathbb{P})$ is called \textbf{measurable} if the mapping $(t, \omega) \mapsto X_t(\omega)$ from $(I \times \Omega, \mathcal{B}(I) \otimes \mathcal{F})$ to $(\mathbb{R}, \mathcal{B})$ is measurable.
+\end{definition}
+
+\begin{definition}[Progressively measurable, adapted, progressive and predictable $\sigma$-fields]
+	A stochastic process $X$ defined on a filtered probability space $(\Omega, \mathcal{F}, (\mathcal{F}_t), \mathbb{P})$ is called
+	\begin{itemize}
+		\item \textbf{progressively measurable} w.r.t.\ $(\mathcal{F}_t)$ if for all $t \in I$ the mapping $(\omega, s) \mapsto X_s(\omega)$ from $(\Omega \times [0,t], \mathcal{F}_t \otimes \mathcal{B}_t)$ to $(\mathbb{R}, \mathcal{B})$ is measurable.
+		\item \textbf{adapted} to the filtration $(\mathcal{F}_t)$ if for all $t \in I$ the mapping $\omega \mapsto X_t(\omega)$ from $(\Omega, \mathcal{F}_t)$ to $(\mathbb{R}, \mathcal{B})$ is measurable.
+	\end{itemize}
+
+	The \textbf{progressive $\sigma$-field} on $\Omega \times [0, \infty)$ generated by $(\mathcal{F}_t)$ is the smallest $\sigma$-field such that all progressively measurable processes are measurable.
+
+	The \textbf{predictable $\sigma$-field} on $\Omega \times [0, \infty)$ generated by $(\mathcal{F}_t)$ is the smallest $\sigma$-field such that all left-continuous adapted processes are measurable. It is generated by sets of the form $(s, t] \times A$ with $A \in \mathcal{F}_s$ ($s > 0$) and $\{0\} \times A$ with $A \in \mathcal{F}_0$.
+\end{definition}
+
+\begin{lemma}
+	Let $X$ be a progressively measurable stochastic process. Then $X$ is measurable and adapted.
+\end{lemma}
+\begin{proof}
+	\textbf{Measurability}: Define for each $t$ the restriction $X^t: (\Omega \times [0,t], \mathcal{F}_t \otimes \mathcal{B}([0,t])) \to (\mathbb{R}, \mathcal{B})$ by $X^t(\omega, s) := X_s(\omega)$, which is measurable by progressive measurability. Extend to $\bar{X}^t(\omega, s) := X_{s \wedge t}(\omega)$ on all of $\Omega \times [0,\infty)$. This is $\mathcal{F}_t \otimes \mathcal{B}([0,\infty))$-measurable (composition of $X^t$ with the measurable map $(s, \omega) \mapsto (s \wedge t, \omega)$), hence $\mathcal{F} \otimes \mathcal{B}$-measurable since $\mathcal{F}_t \subset \mathcal{F}$. Then $X_s(\omega) = \lim_{t \to \infty} \bar{X}^t(\omega, s)$ is $\mathcal{F} \otimes \mathcal{B}$-measurable as a pointwise limit.
+
+	\textbf{Adaptedness}: For each fixed $t$, the section $\omega \mapsto X_t(\omega)$ of $X^t$ at $s = t$ is $\mathcal{F}_t$-measurable by Fubini's theorem.
+\end{proof}
+
+\begin{proposition}
+	If $X$ is adapted and all trajectories are right-continuous (or all trajectories are left-continuous), then $X$ is progressively measurable.
+\end{proposition}
+\begin{proof}
+	The idea is to construct a step-path on dyadic interval with closed left side. 
+	This process is adapted and measurable. By the right continuity we get the limit is also measurable. 
+	Assume all trajectories are right-continuous. For each $n$, define the approximation on $\Omega \times [0, t]$:
+	\begin{align*}
+		X_s^n(\omega) := X_{\frac{k}{2^n}t}(\omega), \quad \frac{k-1}{2^n}t \le s < \frac{k}{2^n}t, \quad k = 1, \dots, 2^n, \qquad X_t^n := X_t.
+	\end{align*}
+	
+	\textbf{Measurability of $X^n$}: Each $X^n$ is a finite sum $\sum_k X_{\frac{k}{2^n}t}(\omega) \cdot \mathbbm{1}_{[\frac{k-1}{2^n}t, \frac{k}{2^n}t)}(s)$. Since $X$ is adapted and $\frac{k}{2^n}t \le t$, the factor $X_{\frac{k}{2^n}t}$ is $\mathcal{F}_t$-measurable, while $\mathbbm{1}_{[\frac{k-1}{2^n}t, \frac{k}{2^n}t)}$ is $\mathcal{B}_t$-measurable. Hence $X^n$ is $\mathcal{F}_t \otimes \mathcal{B}_t$-measurable.
+
+	\textbf{Convergence}: For fixed $(\omega, s)$, the evaluation point $\frac{k_n}{2^n}t \downarrow s$ from above as $n \to \infty$. By right-continuity of the sample paths, $X^n_s(\omega) \to X_s(\omega)$.
+
+	\textbf{Conclusion}: $X$ restricted to $\Omega \times [0,t]$ is a pointwise limit of $\mathcal{F}_t \otimes \mathcal{B}_t$-measurable functions, hence $\mathcal{F}_t \otimes \mathcal{B}_t$-measurable. This holds for all $t$, so $X$ is progressively measurable.
+
+	The left-continuous case is analogous: use $X_{\frac{k-1}{2^n}t}(\omega)$ on $(\frac{k-1}{2^n}t, \frac{k}{2^n}t]$, giving left-continuous approximations whose evaluation points approach $s$ from below.
+\end{proof}
+
+
+
+\section{$\sigma$-filed and stopping time}
+\begin{definition}[$\mathbb{F}$-stopping time]
+	as in the discrete case, a stopping time $\tau$ w.r.t. the filtration $\mathbb{F}$ is a non-negative random variable on the probability space such that
+	\begin{align*}
+		\{ \tau \le t \} \in \mathcal{F}_t
+	\end{align*}
+\end{definition}
+
+\begin{definition}[\textbf{stopped $\sigma$-field}($\sigma$-field of the past before $\tau$)]
+Define
+The stopped filtration for the stopping time $\tau$ is defined as 
+\begin{align*}
+	\mathcal{F}_\tau:= \{ A \in \mathcal{F}_\infty: A \cap \{ \tau \le t \} \in \mathcal{F}_t \quad \forall t \ge 0\}
+\end{align*}
+\end{definition}
+\begin{remark}
+Check that $\mathcal{F}_\tau$ is indeed a $\sigma$-field. Namely we should check 1. $\Omega \in \mathcal{F}_\tau$, 2. Inclusion of the complement, 3. Inclusion of the countable union. 	
+\end{remark}
+\begin{remark}
+$\mathcal{F}_\infty$. 	
+\end{remark}
+
+
+\begin{definition}[The right $\sigma$-field]
+	We define for the filtration $\mathbb{F}$: 
+	\begin{align*}
+	\mathcal{F}_\infty := \cup_{t \ge 0} \mathcal{F}_t
+	\quad \text{ and } \quad \mathcal{F}_{t^+}:= \bigcap_{s \ge t} \mathcal{F}_s
+\end{align*}
+
+\end{definition}
+
+\begin{lemma}[First entrance time]
+	Let $X: \Omega \to \mathbb{R}$ be right-(or left-)continuous and adapted. Let $\Gamma \subset \mathbb{R}$ be non-empty and measurable, and define the first entrance time
+	\begin{align*}
+		\tau_\Gamma := \inf\{ t \ge 0: X_t \in \Gamma \} \quad (\inf \emptyset := \infty).
+	\end{align*}
+	\begin{itemize}
+		\item If $\Gamma$ is open, then $\tau_\Gamma$ is an optional time.
+		\item If $X$ is continuous and $\Gamma$ is closed, then $\tau_\Gamma$ is a stopping time.
+	\end{itemize}
+\end{lemma}
+
+\begin{lemma}
+	Given a stopping time $\tau$:
+	\begin{enumerate}
+		\item $\tau$ is $\mathcal{F}_\tau$-measurable
+		\item (\textbf{The trace $\sigma$-field)}: For the deterministic stopping time $\tau \equiv t$: 
+		\begin{align*}
+			\mathcal{F}_\tau = \mathcal{F}_t
+		\end{align*}
+	\end{enumerate}
+\end{lemma}
+\begin{remark}
+Given a stopping time $\tau$, $\tau + a$ is also a stopping time for $a \in [0, \infty]$.
+\end{remark}
+
+\begin{proposition}
+	Let $X$ be a progressively measurable stochastic process and $\tau$ a stopping time. Then the random variable
+	\begin{align*}
+		X_\tau(\omega) := X_{\tau(\omega)}(\omega)
+	\end{align*}
+	defined on $\{\tau < \infty\}$ (and only there) is $\mathcal{F}_\tau$-measurable. Moreover, the stopped process $X^\tau := (X_{\tau \wedge t})$ is progressively measurable.
+\end{proposition}
+\begin{proof}
+	To show that $X_\tau$ is $\mathcal{F}_\tau$ measurable we need to show: 
+	\begin{align*}
+		\{X_\tau \in B\} \cap \{\tau \le t\} = \{X_{\tau \wedge t} \in B\} \cap \{\tau \le t\} = \{X_t^\tau \in B\} \cap \{\tau \le t\}
+	\end{align*}
+	We notice it can be shown if the stopped process is progressively measurable. In particular, by the adaptedness. 
+	\begin{align*}
+		(s, \omega) \mapsto X_s(\omega) \quad \text{from } ([0,t] \times \Omega, \mathcal{B}_t \otimes \mathcal{F}_t) \to (\mathbb{R}, \mathcal{B})
+	\end{align*}
+
+	\begin{align*}
+		(s, \omega) \mapsto (\tau(\omega) \wedge s, \omega) \quad \text{from } ([0,t] \times \Omega, \mathcal{B}_t \otimes \mathcal{F}_t) \to ([0,t] \times \Omega, \mathcal{B}_t \otimes \mathcal{F}_t)
+	\end{align*}
+
+	\begin{align*}
+		(s, \omega) \mapsto X_{\tau(\omega) \wedge s}(\omega)
+	\end{align*}
+\end{proof}
+
+\begin{definition}[d-dim Brownian motion ]
+	
+\end{definition}
+
+\begin{proposition}
+\quad
+\begin{enumerate}
+	\item Given $X$ progressively measurable, then the terminal value of the stopped process $X_\tau$ is $\mathcal{F}_\tau$ measurable. 
+	\item The stopped $\sigma$-field is the smallest $\sigma$ field that generated by $X_\tau$ for a $X$ progressively measurable
+\end{enumerate}
+	
+\end{proposition}
+\begin{proof}
+	ref. Protter 
+\end{proof}
+
+\begin{theorem}[Strong Markov property of Brownian motion]
+Given $X$ a $\mathbb{F}$-Brownian motion and $\tau$ a stopping time, then we have
+\begin{align*}
+	X^\tau_h = \mathbbm{1}_{\tau < \infty} (X_{\tau + h} - X_\tau)
+\end{align*}	
+\end{theorem}
+\begin{proof}
+equivalent to show for arbitrary $p \in \mathbb{N}$  :
+\begin{align*}
+	\forall f \in C_b(\mathbb{R}^p) \forall A \in \mathcal{F}_\tau:
+	\mathbb{E} [\mathbbm{1}_A f(X^\tau_{t_1}, \dots, X^\tau_{t_p})] = \mathbb{P}(A)\mathbb{E}[f(X_{t_1}, \dots, X_{t_p})]
+\end{align*}
+taking $A = \Omega$ we see
+\begin{align*}
+	(X^\tau_{t_1}, \dots, X^\tau_{t_p}) \sim (X_{t_1}, \dots, X_{t_p})
+\end{align*}
+which shows that the lefthand side in independent of $\mathcal{F}_\tau$. \\
+\quad\\
+\textbf{2) }Approximate $\tau$ from right with dyadic points and transform to a problem of weak Markov property:
+
+\end{proof}
+
+
+\section{Martingale in continuous time}
+\subsection{Path regularity}
+\subsection{The stopping theorem}
+\begin{theorem}
+	Let $X$ be \textbf{right-continuous u.i.} martingale, $S, T$ stopping time with $S \le T$, then we have 
+	\begin{enumerate}
+		\item $X_S, X_T \in L^1$ 
+		\item $\mathbb{E}[X_T | \mathcal{F}_s ] = X_S$
+	\end{enumerate} 
+\end{theorem}
+
+
+\section{Continuous semartingale}
+\subsection{process of finite variation}
+\begin{definition}[finite variation]
+	a continuous function $a: [0, T] \rightarrow\mathbb{R}$ with $a(0) = 0$ is said to have \textit{finite variation} if 
+	\begin{align*}
+		a(t) = \mu([0, t])
+	\end{align*}
+	for some signed measure $\mu$. 
+\end{definition}
+
+\subsection{local martingale and the quadratic variation}
+
+we observe the (continuous) local martingale and its quadratic variation, namely:
+\begin{align*}
+	M \in \mathcal{M}^c_{loc}, \quad \langle M \rangle := \langle M , M \rangle
+\end{align*}
+
+\begin{definition}
+	An adapted continuous process $M$ is called the local martingale if there exists a sequence of stopping time $(\tau_n)$ with $\tau_n \rightarrow \infty$ such that
+	\begin{align*}
+		M^{\tau_n} \text{ are martingale}
+	\end{align*}
+	we write:
+	\begin{align*}
+		M \in \mathcal{M}_{loc}^c
+	\end{align*}
+\end{definition}
+\begin{remark}
+we write $\mathcal{M}^c$ for the \textbf{uniformly integrable} continuous martingale. 
+\begin{enumerate}
+	\item many useful convergence, e.g., $\mathcal{M}^c_{loc}$ is stable under stopping. 
+	\item more general definition: $(M - M_0)^{\tau_n}$ is uniformly integrable. (relaties to stochastic integral). 
+\end{enumerate}	
+\end{remark}
+
+\begin{proposition}
+	for $M \in \mathcal{M}_{loc}^c$ we have
+	\begin{enumerate}
+		\item $M \ge 0 \Rightarrow M$ is a supemartingale. 
+		\item if $|M_t| \le Z$ for all $t$ with $Z \in L^1$, then $M \in \mathcal{M}_{loc}^c$
+		\item if $M_0 = 0$ or $M_0 \in L^1$, then 
+		\begin{align*}
+			\tau_n:= \inf \{ t \ge 0 | |M_t| \ge n \} 
+			\quad (\inf \{ t \ge 0 | |M_t - M_0| \ge n\} )
+		\end{align*}
+		is a localising sequence for $M$. 
+	\end{enumerate}
+\end{proposition}
+\begin{proof}
+	\quad\\
+	1): Fatou\\
+	2) By the assumption the process is uniformly integrable. Hence
+	\begin{align*}
+		M_s = \lim M_s^{\tau_n} = \mathbb{E}[\lim_n M_t^{\tau_n} | \mathcal{F}_s]
+	\end{align*}
+	
+	
+	\quad\\
+	3) The natural localising stopping time to consider. Observe the equation of (indistinguishable) process
+	\begin{align*}
+		M^{\tau_n} = (M - M_0)^{\tau_n} + M_0^{\tau_n} \in \mathcal{M}^c
+	\end{align*}
+\end{proof}
+
+The intersection of continuous martingale and process of finite variation is almost trivial. 
+
+
+\begin{lemma}
+	Let $M \in \mathcal{A} \cap \mathcal{M}_{loc}^c$, then 
+	\begin{align*}
+		M_t = M_0 = 0 \quad \forall t \ge 0
+	\end{align*}
+	i.e., almost every trajectory of $M$ is constant. 
+\end{lemma}
+
+
+
+\begin{theorem}
+	Let $M \in \mathcal{M}_{loc}^c$, then there exists an increasing process $\langle M , M \rangle:= \langle M \rangle \in \mathcal{A}^+$, unique up to indistinguishability, such that 
+	\begin{align*}
+		M^2 - M_0^2 - \langle M, M \rangle \in \mathcal{M}_{loc}^c
+	\end{align*}
+\end{theorem}
+\begin{proof}\quad\\
+\textbf{Uniqueness:}
+
+\quad\\
+\textbf{Existence}:w.l.o.g $M_0 = 0$. Now we have $M_0 = 0$,  $M$ bounded and 
+\begin{align*}
+	M^2 - \langle M, M \rangle \text{ is a martingale}
+\end{align*}
+we define
+\begin{align*}
+	S_n:= \inf\{ t \ge 0 | |M|_t \ge n\}
+\end{align*}
+Define
+\begin{align*}
+	T_0^n:= 0, T_{k +1}^n:= \inf\{ t \ge T_k^n: M_t \in 2^{-n}
+\end{align*}
+\end{proof}
+
+\end{document}
+

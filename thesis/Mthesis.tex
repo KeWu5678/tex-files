@@ -71,7 +71,6 @@ bindingoffset=0mm, top=20mm,bottom=20mm}
 \DeclareMathOperator*{\cl}{cl}
 \DeclareMathOperator*{\relu}{ReLU}
 
-
 \title[Review]{Review}
 \begin{document}
 \section{Abstract}
@@ -84,16 +83,19 @@ The gradient augmentation combined with hyperbolic cross basis is proven to be v
  
 In terms of different approximation methods besides the hyperbolic basis functions, there is a growing literature on solving the nonlinear optimal control problem using neural networks. 
 Although the number of neurons may not serve as a control parameter of the model capacity \cite{neyshabur2014search}, sparsity is crucial for the computational efficiency in many problems. 
-Furthermore, it is also necessary for certain applications, such as deconvolution of point-like objects. 
+Furthermore, sparsity is also necessary for certain applications, such as deconvolution of point-like objects. 
  A sparse learning procedure usually adopts convex reformulation of the problem and employ a sparse promoting convex penalty term on the outer weights, a popular choice is the $l^1$ function (LASSO). 
  However it was indicated in \cite{pieper2022nonconvex} that the convex penalty terms are not able to effectively eliminate the redundancy, especially when the neurons are clustering in a small neighborhood. 
  A nonconvex sparse learning method is proposed by the author. \par
-In the paper \cite{pieper2022nonconvex}(Pieper et al., 2022), the authors choose ReLU as the activation function. 
-The ReLU functions enjoy many nice properties such as Lipschitz continuity and positive homogeneity, which are essential to prove the optimality and for the penalty term to promote the sparsity. 
-The problem is that the ReLU activation functions are not smooth, which may suffer from exploding gradient. 
-In this thesis we propose different activation functions that may circumvent this problem. 
-Furthermore, we investigate a different nonconvex penalty that further enhaces the sparcity. 
-And as in \cite{azmi2021optimal} we incorporate the gradient information in the cost function to obtain optimal convergence.\par  
+In the paper \cite{pieper2022nonconvex}(Pieper et al., 2022), the authors limited to ReLU as the activation function. 
+The ReLU functions enjoy many nice properties such as Lipschitz continuity and positive homogeneity.
+However in the gradient-augmented training, the ReLU activation fits the gradients with piecewise constant functions, which does not efficiently approximate the smooth area. 
+We consider instead the ReLU$^k$ activation function, which is frequently discussed in the gradient-augmented training \cite{li2024twolayer}. 
+We introduce the nonconvex penalty that preserve the $k$-homogeneity for the optimization problem and discuss its property.  \par
+
+Furthermore, the proofs of existence and optimality of the authors are based on the fact that the activation function admits the bounded support, which limits their choice of activation functions. 
+We remove the constraint and extend the support to locally compact space. We are able to discuss a broader class of activation functions that achieve better approximation properties. 
+And as in \cite{azmi2021optimal} we incorporate the gradient information in the cost function.\par  
 
  
 \section{Introduction}
@@ -158,7 +160,41 @@ The model does not require a grid and can be applied to high dimensional problem
 In particular, there is a growing literature on solving the high-dimensional problem using  neural network. 
 
 
-\subsection{theoretical review and notations}
+\subsection{The Integral Representation}
+
+
+In the setting of supervised learning we use the shallow neural network to approximate the optimal value function:
+
+\begin{equation}
+	\mathcal{N}_{\omega, c}(x) := \sum_{n = 1}^N c_n \sigma (a_n \cdot x + b_n) \in \mathbb{R},
+\end{equation}
+
+where $\sigma$ is a sufficiently smooth activation function and $N$ the width of the network. And the gradient is
+
+\begin{equation*}
+	\nabla_x  \mathcal{N}_{\omega, c}(x) =  \sum_{ n = 1}^N c_n \nabla_x \sigma(a_n \cdot x + b_n) \in \mathbb{R}^d .
+\end{equation*}
+
+In \cite{azmi2021optimal} the author explored the relationship between (\ref{TPBVP}) and (\ref{HJB}) and suggested a gradient-augmented approach. 
+In the data generating process, the adjoint state $p^*$ is obtained as a byproduct of solving (\ref{TPBVP}). 
+Moreover, the adjoint state provides the gradient information of the optimal value function: $p^*(t) = \nabla V(t, y^*(t))$ (\cite{cristiani2010initialization} \cite{cannarsa1991some} \cite{clarke1987relationship}). 
+Instead of state-value pair we get the dataset of the triple $\{x^i, V(x^i), \nabla V(x^i)\}_{i = 1}^K$ that is enriched with gradient information. 
+We have the minimization problem
+\begin{equation}
+\label{lost_dis}
+\begin{aligned}
+	&\min_{N \in \mathbb{N}, (a_n, b_n, c_n) \in \mathbb{R}^d \times \mathbb{R} \times \mathbb{R}, } l_K (\mathcal{N}_{\omega, c}; V),\\
+	& \text{with}\\
+	& l_K (\mathcal{N}_{\omega, c}; V) := \frac{1}{2K} \bigg( \sum_{k = 1}^K  |V(x^k) - \mathcal{N}_{\omega, c} (x^k)|^2 +  \sum_{k = 1}^K \sum_{i = 1}^d | \partial_{x_i} V(x^k) - \partial_{x_i} \mathcal{N}_{\omega, c} (x^k) |^2 \bigg),
+\end{aligned}
+\end{equation}
+where $x^k$ is a sample of the random variable $x \in L^2(D, \nu)$ with probability distribution $\nu$ on the domain $D$. 
+$K$ can be potentially large. The loss function can be understood as the empirical estimation of the $H^1$ loss
+\begin{align*}
+	l_\nu (\mathcal{N}_{\omega, c}; V) = \frac{1}{2} \int_D |V(x) - \mathcal{N}_{\omega, c} (x)|^2 + \sum_{i = 1}^d | \partial_{x_i} V(x) - \partial_{x_i} \mathcal{N}_{\omega, c} (x) |^2 d\nu .
+\end{align*}
+
+Before introducing the integral representation, we give a review about the functional space needed for the optimization problem.  
 Throughout the paper we denote $\Omega$ as $\mathbb{R}^{d + 1}$. 
 A finite Radon measure $\mu$ is a $\sigma$-additive $\mathbb{R}^m$-valued set function defined on the Borel sets of $\Omega$ with $\mu(\emptyset) = 0$.                                                                              
 The \emph{total-variation measure} of a finite Radon measure $\mu$ is the positive measure defined by                                                                                                                                       
@@ -198,43 +234,67 @@ We decompose $\mu \in M(\Omega)$ by $\mu = \mu_{\cont} + \mu_{\atom}$, where $\m
 	M(\Omega) = M^0(\Omega) \oplus M^\sharp(\Omega). 
 \end{align*}
 
+The shallow neural networks enjoy a canonical integral representation. 
+Instead of optimizing over the real space, we look for the optimal Radon measure. 
+For $\mu \in M(\Omega)$, we define the operator $\mathcal{N}: M(\Omega) \rightarrow L^2(D, \nu) $: 
+\begin{align*}
+	[\mathcal{N}\mu] (x) = \int_\Omega \sigma (\omega , x) d\mu(\omega).
+\end{align*}
+
+Since for all $x$, $\sigma(\cdot, x)$ is bounded by a $\mu$-integrable function , and for all $\omega$, $\sigma(\omega, \cdot )$ is continuous, we can differentiate under the integral sign and get
+\begin{align*}
+	\nabla_x [\mathcal{N}\mu](x) = \int_\Omega \nabla_x \sigma(\omega,  x) d\mu(\omega). 
+\end{align*}
+
+To abuse the notation, we define the operator
+\begin{align*}
+	\nabla \mathcal{N}: M(\Omega) \rightarrow L^2(D, \nu)^d, \quad [\nabla\mathcal{N} \mu](x) = \nabla_x[\mathcal{N} \mu](x). 
+\end{align*}
+
+In the case that the measure is supported on finite number of atoms, it can be written as
+\begin{align*}
+	[\mathcal{N}\mu](x) = \sum_{ n = 1}^N c_n \sigma(a_n \cdot x + b_n),
+\end{align*}
+which is the representation of the neural network, and the gradient of the model is:
+\begin{align*}
+	[\partial_{x_i} \mathcal{N}](x) = \sum_{n = 1}^N c_n \partial_{x_i} \sigma(a_n \cdot x + b_n).
+\end{align*}
+
+Finally we incorporate the nonconvex penalty in the integral representation. 
+For the atom parts it is defined in the discrete setting. 
+For the continuous part on $\Omega$ the measure is penalized with the weight $\phi'(0)$. 
+Under Assumption \ref{pen1} it is just the $L^1$ norm. 
+Concretely, observe $\Omega = \atom \mu \cup \cont\mu $, we define the penalty term
+\begin{equation}
+	\Phi_1(\mu) = \|\mu_{\cont}\|_{M(\Omega)} + \sum_{\omega \in \atom \mu} \phi(|\mu|(\omega)).
+\end{equation}
+
+We formulate now the optimization problem as following:
+\begin{equation}
+	\label{int_noncon}
+	\tag{$P_{\Phi_1}$}
+	\left\{
+	\begin{aligned}
+	& \min_{\mu \in M(\Omega)} J (\mu):= L(\mu) + \alpha \Phi_1(\mu),\\
+	& \text{with},\\
+	& L(\mu) = \frac{1}{2} \bigg( \|[\mathcal{N}\mu] - V \|^2_{L^2(D, \nu)} + \sum_{i = 1}^d \|  \partial_{x_i}[\mathcal{N}\mu] - \partial_{x_i} V \|_{L^2(D, \nu)}^2 \bigg) .
+	\end{aligned}
+	\right.
+\end{equation}
+
+We can still perform the gradient-based optimization in the integral setting. 
+From the review above we know the gradient is in the space of the continuous function. 
+
+The nice properties of the integral representation of the neural network has been extensively investigated. In \cite{bengio2005convex} and \cite{neyshabur2014search} the convex nature of the shallow neural network has been proved. 
+In \cite{ongie2019function} and \cite{savarese2019infinite} the representability of the shallow ReLU neural network is defined, the functional class, which can be represented by the integral neural network with finite Radon measure, is specified.
 
 
 \section{the sparse learning problem}
-In the setting of supervised learning we use the neural network to approximate the optimal value function:
-
-\begin{equation}
-	\mathcal{N}_{\omega, c}(x) := \sum_{n = 1}^N c_n \sigma (a_n \cdot x + b_n) \in \mathbb{R},
-\end{equation}
-
-where $\sigma$ is a sufficiently smooth activation function and $N$ the width of the network. And the gradient is
-
-\begin{equation*}
-	\nabla_x  \mathcal{N}_{\omega, c}(x) =  \sum_{ n = 1}^N c_n \nabla_x \sigma(a_n \cdot x + b_n) \in \mathbb{R}^d .
-\end{equation*}
-
-In \cite{azmi2021optimal} the author explored the relationship between (\ref{TPBVP}) and (\ref{HJB}) and suggested a gradient-augmented approach. 
-In the data generating process, the adjoint state $p^*$ is obtained as a byproduct of solving (\ref{TPBVP}). 
-Moreover, the adjoint state provides the gradient information of the optimal value function: $p^*(t) = \nabla V(t, y^*(t))$ (\cite{cristiani2010initialization} \cite{cannarsa1991some} \cite{clarke1987relationship}). 
-Instead of state-value pair we get the dataset of the triple $\{x^i, V(x^i), \nabla V(x^i)\}_{i = 1}^K$ that is enriched with gradient information. 
-We have the minimization problem
-\begin{equation}
-\label{lost_dis}
-\begin{aligned}
-	&\min_{N \in \mathbb{N}, (a_n, b_n, c_n) \in \mathbb{R}^d \times \mathbb{R} \times \mathbb{R}, } l_K (\mathcal{N}_{\omega, c}; V),\\
-	& \text{with}\\
-	& l_K (\mathcal{N}_{\omega, c}; V) := \frac{1}{2K} \bigg( \sum_{k = 1}^K  |V(x^k) - \mathcal{N}_{\omega, c} (x^k)|^2 +  \sum_{k = 1}^K \sum_{i = 1}^d | \partial_{x_i} V(x^k) - \partial_{x_i} \mathcal{N}_{\omega, c} (x^k) |^2 \bigg),
-\end{aligned}
-\end{equation}
-where $x^k$ is a sample of the random variable $x \in L^2(D, \nu)$ with probability distribution $\nu$ on the domain $D$. 
-$K$ can be potentially large. The loss function can be understood as the empirical estimation of the $H^1$ loss
-\begin{align*}
-	l_\nu (\mathcal{N}_{\omega, c}; V) = \frac{1}{2} \int_D |V(x) - \mathcal{N}_{\omega, c} (x)|^2 + \sum_{i = 1}^d | \partial_{x_i} V(x) - \partial_{x_i} \mathcal{N}_{\omega, c} (x) |^2 d\nu .
-\end{align*}
 
 
 
-\subsection{the activation functions}
+
+\subsection{The Activation Functions}
 First we discuss the choice of activation functions. 
 The activations function we consider satisfy the following assumption.
 \begin{assumption}[on activation function]
@@ -296,7 +356,7 @@ The value part of the loss is approximated by a high-order ReLU activation funct
 
 
 
-\subsection{the nonconvex penalty}
+\subsection{The Nonconvex Penalty}
 For enforcing the sparsity we implement the explicit sparsity-promoting penalty term. 
 The penalization not enhance the generalization performance for large neural network \cite{zhang2021understanding}. 
 Nevertheless, the explicit regularization still plays a central role in the sparse learning. 
@@ -314,13 +374,13 @@ By introducing the nonconvexity the coercivity of the quadratic cost is compromi
 With Assumption \ref{pen1}, \ref{pen2} the optimization problem stays coercive such that we can apply the direct method of calculus of variation. 
 The following lemma follows from the assumption. 
  
-\begin{lemma} If Assumption \ref{pen2} is satisfied, then it holds
+\begin{lemma} \label{firstorderestimate} If Assumption \ref{pen2} is satisfied, then it holds
 \begin{itemize}
 	\item subadditivity: for all $a, b$,  $\phi(a + b) \le \phi(a) + \phi(b)$. 
 \end{itemize}
 Furthermore, if Assumption \ref{pen1} is satisfied, it holds
 \begin{itemize}
-	\item $ \phi(|z|) \le |z|$.
+	\item $ \phi(z) \le z$.
 \end{itemize}
 \end{lemma}
 \begin{proof}
@@ -336,7 +396,7 @@ Furthermore, if Assumption \ref{pen1} is satisfied, it holds
 	\begin{align*}
 		\phi(z_1) &= \int_0^{z_1} \phi'(z) dz\\
 		 (\phi \text{ concave and } \phi'(0) = 1)  & \le \int_0^{z_1} 1 dz \\
-		 &= z_1
+		 &= z_1.
 	\end{align*}
 \end{proof}
  
@@ -378,254 +438,30 @@ for $\gamma > 0$ and its convex combination with the $l1$ norm will be the main 
 
 
 
-\subsection{the integral representation}
-We use the shallow neural network to approximate the value function because its theoretical property is well-studied. 
-The nice properties of the integral representation of the neural network has been extensively investigated. In \cite{bengio2005convex} and \cite{neyshabur2014search} the convex nature of the shallow neural network has been proved. 
-In \cite{ongie2019function} and \cite{savarese2019infinite} the representability of the shallow ReLU neural network is defined, the functional class, which can be represented by the integral neural network with finite Radon measure, is specified.  
-We introduce the following notation: $\Omega$ a subset of $\mathbb{R}^{n + 1}$, $D \subset \mathbb{R}^d$, $M(\Omega)$ the measure on $\Omega$ with bounded variation. For $\mu \in M(\Omega)$, we define the operator $\mathcal{N}: M(\Omega) \rightarrow L^2(D, \nu) $: 
-\begin{align*}
-	[\mathcal{N}\mu] (x) = \int_\Omega \sigma (\omega , x) d\mu(\omega).
-\end{align*}
-
-Since for all $x$, $\sigma(\cdot, x)$ is bounded by a $\mu$-integrable function , and for all $\omega$, $\sigma(\omega, \cdot )$ is continuous, we can differentiate under the integral sign and get
-\begin{align*}
-	\nabla_x [\mathcal{N}\mu](x) = \int_\Omega \nabla_x \sigma(\omega,  x) d\mu(\omega). 
-\end{align*}
-
-To abuse the notation, we define the operator
-\begin{align*}
-	\nabla \mathcal{N}: M(\Omega) \rightarrow L^2(D, \nu)^d, \quad [\nabla\mathcal{N} \mu](x) = \nabla_x[\mathcal{N} \mu](x). 
-\end{align*}
-
-In the case that the measure is supported on finite number of atoms, it can be written as
-\begin{align*}
-	[\mathcal{N}\mu](x) = \sum_{ n = 1}^N c_n \sigma(a_n \cdot x + b_n),
-\end{align*}
-which is the representation of the neural network, and the gradient of the model is:
-\begin{align*}
-	[\partial_{x_i} \mathcal{N}](x) = \sum_{n = 1}^N c_n \partial_{x_i} \sigma(a_n \cdot x + b_n).
-\end{align*}
-
-Next we need to incorporate the nonconvex penalty in the integral representation. 
-For the atom parts it is defined in the discrete setting. 
-For the continuous part on $\Omega$ the measure is penalized with the weight $\phi'(0)$. 
-Under Assumption \ref{pen1} it is just the $L^1$ norm. 
-Concretely, observe $\Omega = \atom \mu \cup \cont\mu $, we define the penalty term
-\begin{equation}
-	\Phi_1(\mu) = \|\mu_{\cont}\|_{M(\Omega)} + \sum_{\omega \in \atom \mu} \phi(|\mu|(\omega)).
-\end{equation}
-
-We formulate now the optimization problem as following:
-\begin{equation}
-	\label{int_noncon}
-	\tag{$P_{\Phi_1}$}
-	\left\{
-	\begin{aligned}
-	& \min_{\mu \in M(\Omega)} J (\mu):= L(\mu) + \alpha \Phi_1(\mu),\\
-	& \text{with},\\
-	& L(\mu) = \frac{1}{2} \bigg( \|[\mathcal{N}\mu] - V \|^2_{L^2(D, \nu)} + \sum_{i = 1}^d \|  \partial_{x_i}[\mathcal{N}\mu] - \partial_{x_i} V \|_{L^2(D, \nu)}^2 \bigg) .
-	\end{aligned}
-	\right.
-\end{equation}
-
-In the case where Assumption \ref{pen1} does not hold, we need other formulation.
-We observe the optimization problem with $L^2$-constrained inner weights and outer weights. 
-We prove that in this setting the nice property of $p$-homogeneous active function still holds: 
-we can constrain the inner weights on a unit ball and only penalize the outerweight with proper exponent.
-
-
-\begin{proposition}[Generalization of {\cite[Proposition~3]{pieper2022nonconvex}} to $m$-homogeneous activations]
-	Let $p \geq 1$, $q \geq 1$, and let $r \colon \mathbb{R}^{d+1} \to \mathbb{R}_+$ be a positively $1$-homogeneous functional:
-	\[
-	  r(\tau\,\omega) = |\tau|\, r(\omega) \quad \text{for all } \omega \in \mathbb{R}^{d+1},\; \tau \in \mathbb{R}.
-	\]
-	Suppose the activation function $\sigma(x;\omega)$ is positively $m$-homogeneous in $\omega$, i.e.,
-	\[
-	  \sigma(x;\, \tau\,\omega) = \tau^m\, \sigma(x;\omega) \quad \text{for all } \tau > 0,\; \omega \in \mathbb{R}^{d+1},\; x \in D.
-	\]
-	Then the unconstrained problem
-	\begin{equation*}
-	  \min_{N \in \mathbb{N},\; (c_n, \omega_n) \in \mathbb{R} \times \mathbb{R}^{d+1}}
-	  \; l(\mathcal{N}_{\omega,c};\, y)
-	  + \alpha \sum_{n=1}^{N} \left[ \frac{1}{p}\,|c_n|^p + \frac{1}{q}\,r(\omega_n)^q \right],
-	\end{equation*}
-	and the sphere-constrained problem
-	\begin{equation*}
-	  \min_{N \in \mathbb{N},\; \{c_n\} \in \mathbb{R},\; \{\tilde\omega_n:\, r(\tilde\omega_n) \leq 1\}}
-	  \; l(\mathcal{N}_{\tilde\omega,c};\, y)
-	  + \frac{2\alpha}{s}\, m^{-mp/(mp+q)} \sum_{n=1}^{N} |c_n|^{s/2},
-	\end{equation*}
-	where
-	\[
-	  s \;=\; \frac{2pq}{mp + q},
-	\]
-	are equivalent.
-\end{proposition}
-  
-\begin{proof}
-	Since $\sigma$ is positively $m$-homogeneous, for any $\tau > 0$ we have
-	\[
-		c_n\,\sigma(x;\,\omega_n)
-		= c_n\,\sigma(x;\,\tau_n\,\tilde\omega_n)
-		= c_n\,\tau_n^m\,\sigma(x;\,\tilde\omega_n),
-	\]
-	so $\mathcal{N}_{\omega,c} = \mathcal{N}_{\tilde\omega,\tilde c}$ where $\tilde\omega_n = \omega_n / \tau_n$, $\tilde c_n = c_n\,\tau_n^m$, for any choice of $\tau_n > 0$. In particular, the loss term $l(\mathcal{N}_{\omega,c};\,y)$ is
-	invariant under this reparametrization. 
-	For each $\omega_n \neq 0$, write $\omega_n = \tau_n\,\tilde\omega_n$ with $\tau_n = r(\omega_n) > 0$ and $r(\tilde\omega_n) = 1$ (using the $1$-homogeneity of $r$). 
-	Then unconstrained problem is equivalent to
-	\[
-	\min_{\substack{N \in \mathbb{N},\; \{c_n\} \in \mathbb{R}^N \\
-	\{\tilde\omega_n:\, r(\tilde\omega_n) \leq 1\},\; \tau_n \geq 0}}
-	\; l(\mathcal{N}_{\tilde\omega,\tilde c};\, y)
-	+ \alpha \sum_{n=1}^{N}
-	\left[ \frac{1}{p}\,\frac{|\tilde c_n|^p}{\tau_n^{mp}} + \frac{1}{q}\,\tau_n^q \right],
-\]
-\quad\\ 
-For fixed $\tilde c_n \neq 0$, define
-\[
-	g(\tau) \;=\; \frac{1}{p}\,|\tilde c_n|^p\,\tau^{-mp} + \frac{1}{q}\,\tau^q.
-\]
-Since $g(\tau) \to +\infty$ as $\tau \to 0^+$ and $\tau \to +\infty$, the minimum exists and is unique. Differentiating:
-\[
-	g'(\tau) = -\,m\,|\tilde c_n|^p\,\tau^{-mp-1} + \tau^{q-1} = 0
-	\quad\Longleftrightarrow\quad
-	\tau^{mp+q} = m\,|\tilde c_n|^p.
-\]
-Hence
-\begin{equation*}
-	\tau_n^* = \bigl(m\,|\tilde c_n|^p\bigr)^{1/(mp+q)}.
-\end{equation*}
-
-\quad\\
-Substituting $\tau_n^*$ into $g$:
-
-\emph{First term:}
-\[
-	\frac{1}{p}\,|\tilde c_n|^p \cdot \bigl(m\,|\tilde c_n|^p\bigr)^{-mp/(mp+q)}
-	= \frac{m^{-mp/(mp+q)}}{p}\;|\tilde c_n|^{p\,-\,mp^2/(mp+q)}
-	= \frac{m^{-mp/(mp+q)}}{p}\;|\tilde c_n|^{pq/(mp+q)}.
-\]
-Here we used $p - mp^2/(mp+q) = p(mp+q-mp)/(mp+q) = pq/(mp+q)$.
-
-\emph{Second term:}
-\[
-	\frac{1}{q}\,\bigl(m\,|\tilde c_n|^p\bigr)^{q/(mp+q)}
-	= \frac{m^{q/(mp+q)}}{q}\;|\tilde c_n|^{pq/(mp+q)}.
-\]
-Adding the two terms and letting $k = pq/(mp+q) = s/2$:
-\[
-	g(\tau_n^*)
-	= \left(\frac{m^{-mp/(mp+q)}}{p} + \frac{m^{q/(mp+q)}}{q}\right) |\tilde c_n|^{k}.
-\]
-We simplify the coefficient. Factor out $m^{q/(mp+q)}$:
-\[
-	\frac{m^{-mp/(mp+q)}}{p} + \frac{m^{q/(mp+q)}}{q}
-	= m^{q/(mp+q)}\!\left(\frac{m^{-1}}{p} + \frac{1}{q}\right)
-	= m^{q/(mp+q)}\,\frac{q + mp}{mpq}.
-\]
-Since $s = 2pq/(mp+q)$, we have $(mp+q)/(mpq) = 2/(ms)$, so
-\[
-	g(\tau_n^*) = \frac{2}{s}\,m^{q/(mp+q)}\,m^{-1}\;|\tilde c_n|^{s/2}
-	= \frac{2}{s}\,m^{q/(mp+q) - 1}\;|\tilde c_n|^{s/2}
-	= \frac{2}{s}\,m^{-mp/(mp+q)}\;|\tilde c_n|^{s/2}.
-\]
-(using $q/(mp+q) - 1 = -mp/(mp+q)$).
-\end{proof}
-
-\begin{remark}\leavevmode
-	For $p = q = 2$, the exponent becomes $s/2 = 2/(m+1)$, and the constant is $(m+1)\,m^{-m/(m+1)}$, so the sphere penalty is
-	\[
-	\alpha\,(m+1)\,m^{-m/(m+1)} \sum_{n=1}^N |c_n|^{2/(m+1)}.
-	\]
-	For $m = 1$ this gives $2\sum|c_n|$; for $m = 2$ this gives $3 \cdot 2^{-2/3}\sum|c_n|^{2/3}$.
-\end{remark}
-
-For the ReLU-p activation function with $p > 2$, the penalty term induces the power $2/(p + 1) < 1$. 
-The penalty term fails satisfy the Assumption \ref{pen1}, in particular, it holds $\phi_p'(0) = \infty$. 
-In this case the penalty functional doesn't have the continuous part. 
-The optimization problem becomes:
-\begin{equation}
-\label{opt_dis_p}
-\begin{aligned}
-		\min_{N \in \mathbb{N}, \|a_n\|^2 + |b_n|^2 \le  1 , c_n\in \mathbb{R} , n = 1, \dots, N.} l_K(\mathcal{N}_{\omega, c}(x) ;V) + \alpha \sum_{n = 1}^N \phi_p(|c_n|).
-\end{aligned}
-\end{equation}
- 
-The following proposition states that, any optimal solution of (\ref{opt_dis_p}) can be contracted on the unit sphere without increasing its value of the cost function. 
-Hence we may constrain the optimization problem to a unit sphere. 
-
-\begin{proposition}[homogeneous reformulation]
-Under Assumption \ref{pen2}, assuming (\ref{opt_dis_p}) admits at least 1 global optimal solution and $\sigma$ is $p$-homogeneous with $p \ge 1$, then (\ref{opt_dis_p}) is equivalent to 
-\begin{equation}
-\label{discrete nonconvex problem}
-\tag{$P_{\phi_p}$}
-		\min_{N \in \mathbb{N}, \|a_n\|^2 + |b_n|^2 =  1 , c_n\in \mathbb{R} , n = 1, \dots, N.} l_K(\mathcal{N}_{\omega, c}(x) ;V) + \alpha \sum_{n = 1}^N \phi_p(|c_n|).
-\end{equation}
-\end{proposition}
-\begin{proof}
-    By assumption the optimal solution exits, denote $(\hat{N}, (\hat{a}_n, \hat{b}_n, \hat{c}_n)_{n = 1}^{\hat{N}}$) one of the global minimizer. The optimal value of the first part in the fidelity term is 
-	\begin{align*}
-		 \frac{1}{2K} \sum_{k = 1}^K \bigg|\bigg( \sum_{n = 1}^{\hat{N}} \hat{c}_n \sigma(\hat{a}_n \cdot x_k + \hat{b}_n) \bigg) - V(x_k) \bigg|^2.
-	\end{align*}
-    For $(\hat{a}_n, \hat{b}_n)$ in the interior of the unit ball with $\|\hat{a}_n\|^2 + |\hat{b}_n|^2 \lneqq  1$, denote $\lambda_n =\frac{1}{ \sqrt{ \|\hat{a}_n\|^2 + |\hat{b}_n|^2} }\gneqq  1$. Projecting $(\hat{a}_n, \hat{b}_n)$ on the sphere by defining
-        \begin{align*}
-            (\tilde{a}_n,\tilde{b}_n) = \lambda_n (\hat{a}_n, \hat{b}_n).
-        \end{align*}
-    Rescaling the outer weights by define $\tilde{c}_n = \frac{1}{\lambda_n^p} \hat{c}_n$, by $p$-homogeneity of the activation the function value stays the same:  
-	\begin{align*}
-		\frac{1}{2K} \sum_{k = 1}^K \bigg|\bigg( \sum_{n = 1}^{\hat{N}} \tilde{c}_n \sigma(\tilde{a}_n \cdot x_k + \tilde{b}_n) \bigg) - V(x_k) \bigg|^2 
-		&= \frac{1}{2K} \sum_{k = 1}^K \bigg|\bigg(\sum_{n = 1}^{\hat{N}} \hat{c}_n \frac{1}{\lambda_n^p}  \lambda_n^p \sigma(\hat{a}_n \cdot x_k + \hat{b}_n) \bigg) - V(x_k) \bigg|^2, \\
-		&= \frac{1}{2K} \sum_{k = 1}^K \bigg|\bigg( \sum_{n = 1}^{\hat{N}} \hat{c}_n \sigma(\hat{a}_n \cdot x_k + \hat{b}_n) \bigg) - V(x_k) \bigg|^2.
-	\end{align*}
-    The fidelity is invariant w.r.t. the scaling. The similar result holds for the second part of the fidelity term by linearity
-	\begin{align*}
-		\tilde{c}_n \nabla_x \sigma (\tilde{a}_n \cdot x_k + \tilde{b}_n) = \hat{c}_n \frac{1}{\lambda_n^p} \nabla_x \bigg(\lambda_n^p \sigma(\hat{a}_n \cdot x+ \hat{b}_n) \bigg) = \hat{c}_n \nabla_x \sigma(\hat{a}_n \cdot x + \hat{b}_n).
-	\end{align*} 
-	
-    On the other hand, the penalty term is nondecreasing by Assumption \ref{pen2}. Since $\lambda_n > 1$ and $p \ge 1$, it holds $|\tilde{c}_n| = |\hat{c}_n|/\lambda_n^p \le |\hat{c}_n|$, hence
-	\begin{align*}
-		\phi_p(|\tilde{c}_n|) \le \phi_p(|\hat{c}_n|),
-	\end{align*}
-	The pair $\bigg(\tilde{N}, (\tilde{a}_n, \tilde{b}_n, \tilde{c}_n) \bigg)_{n = 1}^{\tilde{N}}$ with
-	\begin{align*}
-		\tilde{N} = \hat{N} \in \mathbb{N},\quad (\tilde{a}_n,\tilde{b}_n) \in \mathbb{S}^d, \quad \tilde{c}_n \in \mathbb{R}, \quad n = 1, \dots, \tilde{N},
-	\end{align*}
-	 admits smaller value. The statement holds. 
-\end{proof}
-
-% For any $\omega \neq 0$ in $\mathbb{R}^{d+1}$ (not just in a unit ball), we can always write:
-
-% $$c \cdot \sigma(x;, \omega) = c \cdot |\omega|^p \cdot \sigma!\left(x;, \frac{\omega}{|\omega|}\right) = \tilde{c} \cdot \sigma(x;, \tilde{\omega})$$
-
-% where $\tilde{\omega} = \omega/|\omega| \in \mathbb{S}^d$ and $\tilde{c} = c|\omega|^p$. This works for any starting $\omega$, regardless of its norm — inside a ball, outside a
-% ball, on a ball of radius $R$, etc. The norm gets absorbed into the outer weight.
-
-The proof relies essentially on the homogeneity of the activation function and the monotonicity of the penalty functions.
-
-
-\section{existence of minimizers}
+\section{existence and the optimality condition}
+\subsection{Existence of the Global Minimizer}
 In this section we prove the existence of the global minimizer. 
 We leverage the direct method of calculus variation. 
-Since we are working on the space of measure $M(\Omega)$ we consider the weak -* convergence. 
-As usual, the common difficulty is to prove the weak-* l.s.c.. 
+Since we are working on the space of measure $M(\Omega)$ we consider the weak-* convergence. 
+As usual, the difficulty is to prove the weak-* l.s.c.. 
 Furthermore, the coercivity is compromised by introducing the nonconvex penalty term $\Phi$. 
 The next lemma address this problem. 
 It proves that the coercivity of $\Phi_1$ is preserved by the Assumption \ref{pen1}, \ref{pen2} of $\phi_1$.  
 
 \begin{lemma}[On the coercivity of $\Phi_1$] \label{envolop}
-Under the Assumption \ref{pen1}, for any $\mu \in M(\Omega)$, it holds
+Under the Assumption \ref{pen1}, \ref{pen2}, for any $\mu \in M(\Omega)$, it holds
 \begin{align*}
 	\phi_1(\|\mu\|_{M(\Omega)}) \le \Phi_1(\mu) \le \|\mu\|_{M(\Omega)}. 
 \end{align*}
 In particular, the functional $\Phi_1$ is coercive. 
 \end{lemma}
 \begin{proof}
-The proof relies on the subadditivity and $\phi_1(|z|) \le |z|$.
+The proof relies on the subadditivity and $\phi_1(z) \le z$.
 \begin{align*}
 	\phi_1(\|\mu\|_{M(\Omega)}) &= \phi_1 \bigg(|\mu|(\Omega \backslash \atom \mu) + \sum_{\omega \in \atom \mu } |\mu|(\{\omega\}) \bigg),\\
 	(\text{subadditivity) }
 	& \le \phi_1(|\mu|(\Omega\backslash \atom \mu) + \sum_{\omega \in \atom \mu } \phi_1(|\mu|(\{\omega\})), \\
-	\bigg(\phi_1(|z|) \le |z|\bigg)\quad
+	\bigg(\phi_1(z) \le z\bigg)\quad
 	& \le |\mu|(\Omega\backslash \atom \mu) + \sum_{\omega \in  \atom \mu} \phi_1(|\mu|(\{\omega\})),\\
 	& = \Phi_1(\mu).
 \end{align*}
@@ -637,27 +473,22 @@ The next lemma proves the weak-* l.s.c. of $\Phi_1$.
 The proof follows the idea in the paper \cite{bouchitte1990new}.
 Since the original proof is valid for $\Omega$ locally compact, the result applies to the current setting.
 Moreover, since our functional doesn't have the singular part, the proof and assumptions can be simplified.
-\begin{lemma}
-Given $\mu = \mu_{\cont} + \mu_{\atom}$, under Assumption \ref{pen1}, \ref{pen2}, it holds
+\begin{lemma} \label{l.s.c.}
+Given $\mu = \mu_{\cont} + \mu_{\atom}$, under Assumption \ref{pen1}, \ref{pen2}, \ref{pen3} it holds
 \begin{align*}
 	\Phi_1(\mu) = \int_\Omega d\mu_{\cont} + \sum_{ \omega \in \atom \mu } \phi_1(|\mu_{\atom}|(\{\omega\}))
 \end{align*}
 is weak-* sequentially l.s.c..
 \end{lemma}
 \begin{proof}
-	By proposition 2.5 in \cite{bouchitte1990new} it is equivalent to show the weak-* l.s.c. of $\Phi_{1,\epsilon}(\mu): = \Phi_1(\mu) + c \|\mu\|_{M(\Omega)}$ for each $c > 0$.
-	We can therefore assume there exists $c > 0$, such that
-	\begin{align*}
-		\Phi_1(\mu) \ge c |\mu|(\Omega) \quad \forall \mu \in M(\Omega).
-	\end{align*}
 	Let $\mu_h \overset{*}{\rightharpoonup} \mu$, we decompose $\Omega$ by heavy atomes and small atoms combined the continuous part:
 	\begin{align*}
 		\Omega = A_h + (\Omega - A_h), \text{ where } A_h:= \{ \omega \in \Omega: \mu_h(\omega) \ge \epsilon \}.
 	\end{align*}
 	By passing to a subsequence we have
 	\begin{equation*}
-		\mu_{h, \cont} \overset{*}{\rightharpoonup} \mu_{\cont}, \quad
-		\mu_{h, \atom} \overset{*}{\rightharpoonup} \mu_{\atom}
+		\mu_{h}|_{A_h} \overset{*}{\rightharpoonup} \mu|_{A_h}, \quad
+		\mu_{h}|_{\Omega - A_h} \overset{*}{\rightharpoonup} \mu|_{\Omega - A_h},
 	\end{equation*}
 	We prove the weak-* l.s.c. of each part. \\
 	\textbf{On $ A_h $:} \par
@@ -672,7 +503,7 @@ is weak-* sequentially l.s.c..
 
 	\quad\\
 	\textbf{On $\Omega - A_h$:} \par
-	By proposition \ref{secondorderestimate}, we have for $\epsilon$ small enough, for all $z \in [0, \epsilon]$:
+	By proposition \ref{firstorderestimate}, \ref{secondorderestimate}, we have for $\epsilon$ small enough, for all $z \in [0, \epsilon]$:
 	\begin{equation*}
 		\begin{aligned}
 			&\phi_1(z) \ge z - \frac{\gamma_1 z^2}{2}, \\
@@ -722,17 +553,15 @@ Taking $\epsilon \rightarrow 0$ we get $\delta \rightarrow 0$ and the result is 
 \end{proof}
 
 \begin{theorem}[Existence of the global minimizer]
-Assuming Assumption \ref{pen1}, \ref{pen2} is fulfilled, problem (\ref{int_noncon}) admits at least one global minimizer in $M(\Omega)$. 
+Assuming Assumption \ref{pen1}, \ref{pen2}, \ref{pen3} are fulfilled, problem (\ref{int_noncon}) admits at least one global minimizer in $M(\Omega)$. 
 \end{theorem}
 \begin{proof}
 We apply the direct method of the calculus of variation:\\ 
 1. Boundedness (ability to take a minimizing sequence in $M(\Omega)$): $J \ge 0$, therefore $J$ is bounded from below.\\
-2. Minimizing sequence admits a weak-* convergent subsequence: To apply Banach-Alaoglu we need to prove that every minimizing sequence of $J$ is bounded in $M(\Omega)$.  We prove it by the usual coercivity argument. By the non-convexity of the penalty term, the coercivity of the cost function is compromised. However, we get form lemma \ref{envolop}
-\begin{align*}
-\alpha\|\mu\|_{M(\Omega)} \le \alpha \Phi_1(\mu) \le J(\mu),
-\end{align*}
-hence $J$ is also coercive.  \\
-3. Lower-semi continuity: by the lemma $\Phi_1(\mu)$ is weak-* l.s.c., therefore we have for $\mu_n \overset{*}{\rightharpoonup} \hat{\mu}$,
+2. Coercivity: By the non-convexity of the penalty term, the coercivity of the cost function is compromised. 
+However, we get form lemma \ref{envolop} that $\Phi_1$ is coercive. 
+Moreover, $L(\mu)$ is also coercive, hence $J$ is coercive. \\
+3. Lower-semi continuity: by the lemma \ref{l.s.c.}  $\Phi_1(\mu)$, is weak-* l.s.c., therefore we have for $\mu_n \overset{*}{\rightharpoonup} \hat{\mu}$,
 \begin{align*}
 \liminf_{n \rightarrow \infty } J(\mu_n) &= \liminf_{n \rightarrow \infty} \bigg( L(\mu_n)  + \alpha \Phi_1(\mu_n) \bigg)\\
 &\ge L(\hat{\mu}) + \alpha \liminf_{n \rightarrow \infty} \Phi_1(\mu_n)\\
@@ -742,7 +571,7 @@ hence $J$ is also coercive.  \\
 where the inequality in the second line follows from the weak-* l.s.c. of $L$ (since $L$ is convex and continuous composed with the weak-*-to-weak continuous operator $\mathcal{N}$) and the inequality in the third line follows from weak-* l.s.c. of the functional $\Phi_1$.
 \end{proof}
  
-\section{optimality condition and finite support of the solution}
+\subsection{Optimality Condition and Finite Spport of the Solution}
 Since the optimization problem is nonconvex, the global minimizer is difficult to find in general. 
 Instead, we define the local minimum: 
 \begin{definition}[local minimizer]
@@ -753,7 +582,8 @@ $\bar{\mu} \in M(\Omega)$ is a local minimizer if there exists $\epsilon > 0$ su
 \end{definition}
 
 \begin{remark}[The gradient of $L$]
-To further investigate the optimality condition of (\ref{int_noncon}) and derive the according algorithm, we calculate the first variation of $L(\mu)$,  We define the gradient information $\bar{p}(\omega) \in C(\Omega)$ as
+To further investigate the optimality condition of (\ref{int_noncon}) and derive the according algorithm, we calculate the first variation of $L(\mu)$.
+We calculate the gradient $\bar{p}(\omega) \in C(\Omega)$:
  \begin{equation}
  \begin{aligned}
  	\bar{p}(\omega) &:= \nabla L(\bar{\mu}) \\
@@ -762,10 +592,10 @@ To further investigate the optimality condition of (\ref{int_noncon}) and derive
  	 \end{aligned}
  \end{equation}
  For the finite sample and $\sigma(x) = \relu(x)^p$, the gradient admits the form:
- \begin{equation}
+ \begin{equation*}
  	p(\omega) = \frac{1}{K} \sum_{k = 1}^K  \relu(\omega \cdot x_k)^p (\mathcal{N}_{\bar{\mu}}(x_k) - y_k) + 
  	\frac{1}{K} \sum_{k = 1}^K \sum_{i = 1}^d p \cdot \relu( \omega \cdot x_k )^{ p -1}  \omega_i (\partial_{x_i} \mathcal{N}(x_k) - \partial_{x_i}V(x_k))
- \end{equation}
+ \end{equation*}
 \end{remark} 
  
  
@@ -779,7 +609,8 @@ To further investigate the optimality condition of (\ref{int_noncon}) and derive
 	the signum function $\sign: \Omega \rightarrow \{-1, 1\}$ is defined $\mu$-a.s. by Hahn decomposition. 
 \end{theorem}
 \begin{proof} 
-We leverage that dual evaluation of $\delta_\omega$ is the evaluation of $\bar{p}$ at $\omega$: $\langle \bar{p}, \delta_\omega\rangle_{C(\Omega), M(\Omega)}= \bar{p}(\omega)$. Since $\bar{\mu}$ is the local minimizer, it holds for all $u \in M(\Omega)$:
+We leverage that dual evaluation of $\delta_\omega$ is the evaluation of $\bar{p}$ at $\omega$: $\langle \bar{p}, \delta_\omega\rangle_{C(\Omega), M(\Omega)}= \bar{p}(\omega)$. 
+Since $\bar{\mu}$ is the local minimizer, it holds for all $u \in M(\Omega)$ and $\tau$ small enough:
 \begin{align*}
 	J(\bar{\mu} + \tau u) - J(\bar{\mu}) = L(\bar{\mu} + \tau u) - L(\bar{\mu}) + \alpha \Phi(\bar{\mu} + \tau u) - \alpha \Phi(\bar{\mu}) \ge 0.
 \end{align*}
@@ -814,145 +645,11 @@ Taking $u = - \bar{\mu}_{\text{cont}}$ we get $-\langle \bar{p}, \bar{\mu}_{\tex
 By $|p(\omega)| \le \alpha$ we get $\bar{p} =  - \alpha *  \sign \bar{\mu}_{\cont}$ for almost all $\omega \in \cont \bar{\mu}$. 
 \end{proof}
 
-The optimality condition assures the existence of an optimizer. 
-In absence of Assumption \ref{pen1}, it is difficult to prove that a global optimizer exists. 
-For example for the penalty $ \phi(c) = |c|^q$, we have $\phi'(0) = \infty$, the weak-* l.s.c. of the cost functional breaks.
-However, assuming the local optimizer exists, we can still derive the necessary optimality condition. 
-
-\begin{corollary}[Optimality conditions for $\phi'(0^+) = +\infty$]                     
-\label{cor:singular_penalty}                                                                                                                                                                                                                
-Let $\Omega$ be compact and suppose $\phi$ satisfies Assumption~\ref{pen2} but with $\phi'(0^+) = +\infty$ in place of Assumption~\ref{pen1}                                                                                                
-(e.g., $\phi(z) = \frac{1}{q}z^q$ for $0 < q < 1$).                                                                                                                                                                                         
-If $\bar{\mu}$ is a local minimizer of \eqref{int_noncon} with atomic part                                                                                                                                                                  
-$\bar{\mu}_{\atom} = \sum_{n=1}^N \bar{c}_n\,\delta_{\bar{\omega}_n}$, $\bar{c}_n \neq 0$, then:
-\begin{enumerate}
-	\item Stationarity at each atom:
-	\[
-		\bar{p}(\bar{\omega}_n) = -\alpha\,\phi'(|\bar{c}_n|)\,\sign(\bar{c}_n),
-		\qquad n = 1, \dots, N.
-	\]
-
-	\item Lower bound on atom weights:
-	Since $\bar{p} \in C(\Omega)$ and $\Omega$ is compact,
-	$\|\bar{p}\|_{C(\Omega)} < \infty$.
-	Combined with (1), this gives
-	$\phi'(|\bar{c}_n|) = |\bar{p}(\bar{\omega}_n)|/\alpha \le \|\bar{p}\|_{C(\Omega)}/\alpha$
-	for every $n$. Since $\phi'$ is decreasing with $\phi'(0^+) = +\infty$,
-	inverting yields a uniform lower bound:
-	\[
-		|\bar{c}_n| \;\ge\; (\phi')^{-1}\!\Big(\frac{\|\bar{p}\|_{C(\Omega)}}{\alpha}\Big)
-		\;>\; 0,
-		\qquad n = 1, \dots, N.
-	\]
-	In particular, $\bar{\mu}$ has at most finitely many atoms:
-	$N \le \|\bar{\mu}\|_{M(\Omega)} \big/ \min_n |\bar{c}_n| < \infty$.
-\end{enumerate}
-\end{corollary}
-\begin{proof}
-(1) follows by the same directional derivative argument as in Theorem~\ref{opt_cdt}.
-For $\omega_n \in \atom\bar{\mu}$ with $\bar{\mu}(\{\omega_n\}) = \bar{c}_n \neq 0$,
-perturbing with $u = \pm\delta_{\omega_n}$ gives
-\[
-	\mp\,\bar{p}(\omega_n)
-	\;\le\; \alpha\,\lim_{\tau \to 0}\frac{1}{\tau}
-	\bigl[\phi(|\bar{c}_n \pm \tau|) - \phi(|\bar{c}_n|)\bigr]
-	\;=\; \pm\,\alpha\,\phi'(|\bar{c}_n|)\,\sign(\bar{c}_n),
-\]
-which yields equality. Note that $\phi'(|\bar{c}_n|) < \infty$ for $\bar{c}_n \neq 0$,
-so this step does not require $\phi'(0) < \infty$.
-
-\medskip\noindent
-(2): The dual variable $\bar{p} = \nabla L(\bar{\mu}) \in C(\Omega)$
-is continuous on the compact set $\Omega$, hence bounded:
-$\|\bar{p}\|_{C(\Omega)} < \infty$.
-By (1), $\phi'(|\bar{c}_n|) = |\bar{p}(\bar{\omega}_n)|/\alpha
-\le \|\bar{p}\|_{C(\Omega)}/\alpha$.
-Since $\phi'$ is strictly decreasing (by concavity of $\phi$) and
-$\phi'(0^+) = +\infty$, the function $\phi'$ restricted to $(0,\infty)$
-has a well-defined decreasing inverse, and
-\[
-	|\bar{c}_n| \;\ge\; (\phi')^{-1}\!\Big(\frac{\|\bar{p}\|_{C(\Omega)}}{\alpha}\Big)
-	\;=:\; c_{\min} \;>\; 0.
-\]
-The finiteness of the support then follows from the bounded total variation:
-$N \cdot c_{\min} \le \sum_{n=1}^N |\bar{c}_n| \le \|\bar{\mu}\|_{M(\Omega)} < \infty$.
-\end{proof}
-
-\begin{remark}
-Compared with Theorem~\ref{opt_cdt}:
-\begin{enumerate}
-	\item The global dual bound $|\bar{p}(\omega)| \le \alpha$ for all $\omega \in \Omega$
-	is \emph{lost}: for $\omega \notin \atom\bar{\mu}$, perturbing with
-	$u = \delta_\omega$ yields
-	$-\bar{p}(\omega) \le \alpha\,\phi'(0^+) = +\infty$, which is vacuous.
-	No constraint on $\bar{p}$ is obtained away from the support.
-	\item In exchange, the singularity $\phi'(0^+) = +\infty$ provides an
-	\emph{automatic minimum atom size} via (2), and finite support
-	follows without the merging argument of Theorem~5.2 or
-	the local strong concavity in Assumption~\ref{pen3}.
-	\item The zero measure $\mu = 0$ is always a local minimizer,
-	since adding any atom with small weight $|c| \ll 1$ incurs a
-	marginal penalty $\phi(|c|)/|c| \to +\infty$ that dominates the
-	potential decrease in the loss.
-	This means the node insertion criterion $|\bar{p}(\omega)| > \alpha$
-	of the greedy algorithm no longer applies.
-\end{enumerate}
-\end{remark}
-
-\begin{corollary}[Existence of minimizer for $\eqref{discrete nonconvex problem}$ with $\phi_p'(0^+) = +\infty$]
-\label{cor:discrete_existence}
-Suppose $\phi_p$ satisfies Assumption~\ref{pen2} with $\phi_p'(0^+) = +\infty$;
-$\sigma$ is continuous, the domain of $x$ $D$ is bounded. 
-Then the discrete problem $\eqref{discrete nonconvex problem}$ admits a global minimizer with at most $N_{\max}$ neurons with
-\[
-	N_{\max} = \frac{\|V\|_H^2}{2\,\alpha\,\phi_p(c_{\min})}, \qquad
-	c_{\min} = (\phi_p')^{-1}\!\bigg(\frac{\|V\|_H\;\sup_{\omega \in \mathbb{S}^d}\|\sigma(\cdot\,;\omega)\|_H}{\alpha}\bigg)
-\]
-\end{corollary}
-\begin{proof}\quad\\
-1. (Fixed $N$, existence by Weierstrass).
-For fixed $N$, the objective is a real-valued function on $(\mathbb{S}^d)^N \times \mathbb{R}^N$:
-\[
-	J(\omega, c) = \frac{1}{2} \int_D \bigg| V(x) - \sum_{n=1}^N c_n \sigma(a_n \cdot x + b_n) \bigg|^2 + \sum_{i=1}^d \bigg| \partial_{x_i} V(x) - \sum_{n=1}^N c_n \partial_{x_i} \sigma(a_n \cdot x + b_n) \bigg|^2 d\nu + \alpha \sum_{n=1}^N \phi_p(|c_n|).
-\]
-
-We verify $J$ is continuous in $(\omega, c)$.
-Since $\sigma$ is continuous and $\mathbb{S}^d \times \overline{D}$ is compact ($D$ bounded), both $\sigma(a \cdot x + b)$ and $\nabla_x \sigma(a \cdot x + b)$ are uniformly bounded on $\mathbb{S}^d \times \overline{D}$.
-For any convergent sequence $(\omega^k, c^k) \to (\omega, c)$, the integrand converges pointwise in $x$ and is dominated by $C(|V(x)|^2 + |\nabla V(x)|^2 + 1) \in L^1(D, \nu)$ with some constant $C$.
-By dominated convergence, the integral is continuous in $(\omega, c)$. Combined with the continuity of $\phi_p$, $J$ is continuous.
-
-Since $\phi_p(z) \to \infty$ as $z \to \infty$ (Assumption~\ref{pen2}) and $J \ge 0$, any minimizing sequence is bounded.
-Furthermore, since taking $c = 0$ is feasible and the penalty is non-negative, we have
-\begin{equation*}
-	L(\omega^*, c^*) \le J(\omega^*, c^*) \le J(\omega, 0) = L(0) = \frac{1}{2}\|V\|_H^2,
-\end{equation*}
-Therefore,
-\begin{equation*}
-	\sum_{n = 1}^N \phi_p(|c_n^*|) \le \frac{1}{2\alpha}\|V\|_H^2
-\end{equation*} 
-The minimizing sequence lies in $(\mathbb{S}^d)^N \times [-R, R]^N$ for some $R > 0$, which is compact. By Weierstrass, $J$ attains its minimum for each $N$.
-
-\medskip\noindent
-2. (Uniform bound on $N$).
-Let $(\omega^*, c^*)$ be a minimizer for $N$ neurons with all $c_n^* \neq 0$. The stationarity condition in $c_n$ gives $|p(\omega_n^*)| = \alpha\,\phi_p'(|c_n^*|)$, where $p(\omega) = \langle \mathcal{N}_{\omega^*, c^*} - V,\, \sigma(\cdot\,;\omega)\rangle_H$.
-By Cauchy--Schwarz:
-\[
-	\alpha\,\phi_p'(|c_n^*|) = |p(\omega_n^*)| \le \|\mathcal{N}_{\omega^*, c^*} - V\|_H \;\|\sigma(\cdot\,;\omega_n^*)\|_H \le \|V\|_H\;\sup_{\omega \in \mathbb{S}^d}\|\sigma(\cdot\,;\omega)\|_H.
-\]
-Since $\phi_p'$ is decreasing with $\phi_p'(0^+) = +\infty$ we can define $c_{\min}$ with
-\begin{equation*}
-	c_{\min} := (\phi_p')^{-1}\!\bigg(\frac{\|V\|_H\;\sup_{\omega \in \mathbb{S}^d}\|\sigma(\cdot\,;\omega)\|_H}{\alpha}\bigg),
-\end{equation*}
-with $|c_n^*| \ge c_{\min} > 0$.
-Hence $N\,\phi_p(c_{\min}) \le \sum \phi_p(|c_n^*|) \le \frac{1}{2\alpha}\|V\|_H^2$, giving $N \le N_{\max}$.
-
-For $N > N_{\max}$, any $N$-neuron minimizer must have some $c_n = 0$, reducing to an $N'$-neuron solution with $N' \le N_{\max}$.
-Therefore $\inf_N J_N^* = J_{N_{\max}}^*$, which is attained by Step~1.
-\end{proof}
-
-For the (\ref{int_noncon}), the statement of finite support requires different proof. 
+The theorem gives a necessary optimality condition for the local minimizer. 
+But on the other hand, it lays the ground to prove that the local optimizer admits finite support. 
 If the sample size is finite, then the optimal solution admits finite support by the Carath\'eodory's theorem. 
 The following theorem proves that the optimal solution admits the finite support even though the dataset is infinitely large. 
+Unlike the \cite{pieper2022nonconvex}, we don't assume $\Omega$ is compact. 
 
 \begin{theorem}
 	If the Assumption \ref{pen1}, \ref{pen2}, \ref{pen3} are satisfied, then the optimal solution of (\ref{int_noncon}) admits at most finite nodes.
@@ -1142,15 +839,309 @@ Choose $\epsilon$ such that  $\epsilon \|\mathcal{N}\|^2 + (\alpha \delta - \fra
 
 
 
+\section{the \texorpdfstring{$k$}{k}-homogeneous formulation}
+
+The following proposition states that, any optimal solution of (\ref{opt_dis_p}) can be contracted on the unit sphere without increasing its value of the cost function. 
+Hence we may constrain the optimization problem to a unit sphere. 
 
 
+\begin{proposition}[Generalization of {\cite[Proposition~3]{pieper2022nonconvex}} to $m$-homogeneous activations]
+	Let $p \geq 1$, $q \geq 1$, and let $r \colon \mathbb{R}^{d+1} \to \mathbb{R}_+$ be a positively $1$-homogeneous functional:
+	\[
+	  r(\tau\,\omega) = |\tau|\, r(\omega) \quad \text{for all } \omega \in \mathbb{R}^{d+1},\; \tau \in \mathbb{R}.
+	\]
+	Suppose the activation function $\sigma(x;\omega)$ is positively $m$-homogeneous in $\omega$, i.e.,
+	\[
+	  \sigma(x;\, \tau\,\omega) = \tau^m\, \sigma(x;\omega) \quad \text{for all } \tau > 0,\; \omega \in \mathbb{R}^{d+1},\; x \in D.
+	\]
+	Then the unconstrained problem
+	\begin{equation*}
+	  \min_{N \in \mathbb{N},\; (c_n, \omega_n) \in \mathbb{R} \times \mathbb{R}^{d+1}}
+	  \; l(\mathcal{N}_{\omega,c};\, y)
+	  + \alpha \sum_{n=1}^{N} \left[ \frac{1}{p}\,|c_n|^p + \frac{1}{q}\,r(\omega_n)^q \right],
+	\end{equation*}
+	and the sphere-constrained problem
+	\begin{equation*}
+	  \min_{N \in \mathbb{N},\; \{c_n\} \in \mathbb{R},\; \{\tilde\omega_n:\, r(\tilde\omega_n) \leq 1\}}
+	  \; l(\mathcal{N}_{\tilde\omega,c};\, y)
+	  + \frac{2\alpha}{s}\, m^{-mp/(mp+q)} \sum_{n=1}^{N} |c_n|^{s/2},
+	\end{equation*}
+	where
+	\[
+	  s \;=\; \frac{2pq}{mp + q},
+	\]
+	are equivalent.
+\end{proposition}
+  
+\begin{proof}
+	Since $\sigma$ is positively $m$-homogeneous, for any $\tau > 0$ we have
+	\[
+		c_n\,\sigma(x;\,\omega_n)
+		= c_n\,\sigma(x;\,\tau_n\,\tilde\omega_n)
+		= c_n\,\tau_n^m\,\sigma(x;\,\tilde\omega_n),
+	\]
+	so $\mathcal{N}_{\omega,c} = \mathcal{N}_{\tilde\omega,\tilde c}$ where $\tilde\omega_n = \omega_n / \tau_n$, $\tilde c_n = c_n\,\tau_n^m$, for any choice of $\tau_n > 0$. In particular, the loss term $l(\mathcal{N}_{\omega,c};\,y)$ is
+	invariant under this reparametrization. 
+	For each $\omega_n \neq 0$, write $\omega_n = \tau_n\,\tilde\omega_n$ with $\tau_n = r(\omega_n) > 0$ and $r(\tilde\omega_n) = 1$ (using the $1$-homogeneity of $r$). 
+	Then unconstrained problem is equivalent to
+	\[
+	\min_{\substack{N \in \mathbb{N},\; \{c_n\} \in \mathbb{R}^N \\
+	\{\tilde\omega_n:\, r(\tilde\omega_n) \leq 1\},\; \tau_n \geq 0}}
+	\; l(\mathcal{N}_{\tilde\omega,\tilde c};\, y)
+	+ \alpha \sum_{n=1}^{N}
+	\left[ \frac{1}{p}\,\frac{|\tilde c_n|^p}{\tau_n^{mp}} + \frac{1}{q}\,\tau_n^q \right],
+\]
+\quad\\ 
+For fixed $\tilde c_n \neq 0$, define
+\[
+	g(\tau) \;=\; \frac{1}{p}\,|\tilde c_n|^p\,\tau^{-mp} + \frac{1}{q}\,\tau^q.
+\]
+Since $g(\tau) \to +\infty$ as $\tau \to 0^+$ and $\tau \to +\infty$, the minimum exists and is unique. Differentiating:
+\[
+	g'(\tau) = -\,m\,|\tilde c_n|^p\,\tau^{-mp-1} + \tau^{q-1} = 0
+	\quad\Longleftrightarrow\quad
+	\tau^{mp+q} = m\,|\tilde c_n|^p.
+\]
+Hence
+\begin{equation*}
+	\tau_n^* = \bigl(m\,|\tilde c_n|^p\bigr)^{1/(mp+q)}.
+\end{equation*}
+
+\quad\\
+Substituting $\tau_n^*$ into $g$:
+
+\emph{First term:}
+\[
+	\frac{1}{p}\,|\tilde c_n|^p \cdot \bigl(m\,|\tilde c_n|^p\bigr)^{-mp/(mp+q)}
+	= \frac{m^{-mp/(mp+q)}}{p}\;|\tilde c_n|^{p\,-\,mp^2/(mp+q)}
+	= \frac{m^{-mp/(mp+q)}}{p}\;|\tilde c_n|^{pq/(mp+q)}.
+\]
+Here we used $p - mp^2/(mp+q) = p(mp+q-mp)/(mp+q) = pq/(mp+q)$.
+
+\emph{Second term:}
+\[
+	\frac{1}{q}\,\bigl(m\,|\tilde c_n|^p\bigr)^{q/(mp+q)}
+	= \frac{m^{q/(mp+q)}}{q}\;|\tilde c_n|^{pq/(mp+q)}.
+\]
+Adding the two terms and letting $k = pq/(mp+q) = s/2$:
+\[
+	g(\tau_n^*)
+	= \left(\frac{m^{-mp/(mp+q)}}{p} + \frac{m^{q/(mp+q)}}{q}\right) |\tilde c_n|^{k}.
+\]
+We simplify the coefficient. Factor out $m^{q/(mp+q)}$:
+\[
+	\frac{m^{-mp/(mp+q)}}{p} + \frac{m^{q/(mp+q)}}{q}
+	= m^{q/(mp+q)}\!\left(\frac{m^{-1}}{p} + \frac{1}{q}\right)
+	= m^{q/(mp+q)}\,\frac{q + mp}{mpq}.
+\]
+Since $s = 2pq/(mp+q)$, we have $(mp+q)/(mpq) = 2/(ms)$, so
+\[
+	g(\tau_n^*) = \frac{2}{s}\,m^{q/(mp+q)}\,m^{-1}\;|\tilde c_n|^{s/2}
+	= \frac{2}{s}\,m^{q/(mp+q) - 1}\;|\tilde c_n|^{s/2}
+	= \frac{2}{s}\,m^{-mp/(mp+q)}\;|\tilde c_n|^{s/2}.
+\]
+(using $q/(mp+q) - 1 = -mp/(mp+q)$).
+\end{proof}
+
+\begin{remark}\leavevmode
+	For $p = q = 2$, the exponent becomes $s/2 = 2/(m+1)$, and the constant is $(m+1)\,m^{-m/(m+1)}$, so the sphere penalty is
+	\[
+	\alpha\,(m+1)\,m^{-m/(m+1)} \sum_{n=1}^N |c_n|^{2/(m+1)}.
+	\]
+	For $m = 1$ this gives $2\sum|c_n|$; for $m = 2$ this gives $3 \cdot 2^{-2/3}\sum|c_n|^{2/3}$.
+\end{remark}
+
+For the ReLU-p activation function with $p > 2$, the penalty term induces the power $2/(p + 1) < 1$. 
+The penalty term fails satisfy the Assumption \ref{pen1}, in particular, it holds $\phi_p'(0) = \infty$. 
+In this case the penalty functional doesn't have the continuous part. 
+The optimization problem becomes:
+\begin{equation}
+\label{opt_dis_p}
+\begin{aligned}
+		\min_{N \in \mathbb{N}, \|a_n\|^2 + |b_n|^2 \le  1 , c_n\in \mathbb{R} , n = 1, \dots, N.} l_K(\mathcal{N}_{\omega, c}(x) ;V) + \alpha \sum_{n = 1}^N \phi_p(|c_n|).
+\end{aligned}
+\end{equation}
+
+\begin{proposition}[homogeneous reformulation]
+Under Assumption \ref{pen2}, assuming (\ref{opt_dis_p}) admits at least 1 global optimal solution and $\sigma$ is $p$-homogeneous with $p \ge 1$, then (\ref{opt_dis_p}) is equivalent to 
+\begin{equation}
+\label{discrete nonconvex problem}
+\tag{$P_{\phi_p}$}
+		\min_{N \in \mathbb{N}, \|a_n\|^2 + |b_n|^2 =  1 , c_n\in \mathbb{R} , n = 1, \dots, N.} l_K(\mathcal{N}_{\omega, c}(x) ;V) + \alpha \sum_{n = 1}^N \phi_p(|c_n|).
+\end{equation}
+\end{proposition}
+\begin{proof}
+    By assumption the optimal solution exits, denote $(\hat{N}, (\hat{a}_n, \hat{b}_n, \hat{c}_n)_{n = 1}^{\hat{N}}$) one of the global minimizer. The optimal value of the first part in the fidelity term is 
+	\begin{align*}
+		 \frac{1}{2K} \sum_{k = 1}^K \bigg|\bigg( \sum_{n = 1}^{\hat{N}} \hat{c}_n \sigma(\hat{a}_n \cdot x_k + \hat{b}_n) \bigg) - V(x_k) \bigg|^2.
+	\end{align*}
+    For $(\hat{a}_n, \hat{b}_n)$ in the interior of the unit ball with $\|\hat{a}_n\|^2 + |\hat{b}_n|^2 \lneqq  1$, denote $\lambda_n =\frac{1}{ \sqrt{ \|\hat{a}_n\|^2 + |\hat{b}_n|^2} }\gneqq  1$. Projecting $(\hat{a}_n, \hat{b}_n)$ on the sphere by defining
+        \begin{align*}
+            (\tilde{a}_n,\tilde{b}_n) = \lambda_n (\hat{a}_n, \hat{b}_n).
+        \end{align*}
+    Rescaling the outer weights by define $\tilde{c}_n = \frac{1}{\lambda_n^p} \hat{c}_n$, by $p$-homogeneity of the activation the function value stays the same:  
+	\begin{align*}
+		\frac{1}{2K} \sum_{k = 1}^K \bigg|\bigg( \sum_{n = 1}^{\hat{N}} \tilde{c}_n \sigma(\tilde{a}_n \cdot x_k + \tilde{b}_n) \bigg) - V(x_k) \bigg|^2 
+		&= \frac{1}{2K} \sum_{k = 1}^K \bigg|\bigg(\sum_{n = 1}^{\hat{N}} \hat{c}_n \frac{1}{\lambda_n^p}  \lambda_n^p \sigma(\hat{a}_n \cdot x_k + \hat{b}_n) \bigg) - V(x_k) \bigg|^2, \\
+		&= \frac{1}{2K} \sum_{k = 1}^K \bigg|\bigg( \sum_{n = 1}^{\hat{N}} \hat{c}_n \sigma(\hat{a}_n \cdot x_k + \hat{b}_n) \bigg) - V(x_k) \bigg|^2.
+	\end{align*}
+    The fidelity is invariant w.r.t. the scaling. The similar result holds for the second part of the fidelity term by linearity
+	\begin{align*}
+		\tilde{c}_n \nabla_x \sigma (\tilde{a}_n \cdot x_k + \tilde{b}_n) = \hat{c}_n \frac{1}{\lambda_n^p} \nabla_x \bigg(\lambda_n^p \sigma(\hat{a}_n \cdot x+ \hat{b}_n) \bigg) = \hat{c}_n \nabla_x \sigma(\hat{a}_n \cdot x + \hat{b}_n).
+	\end{align*} 
+	
+    On the other hand, the penalty term is nondecreasing by Assumption \ref{pen2}. Since $\lambda_n > 1$ and $p \ge 1$, it holds $|\tilde{c}_n| = |\hat{c}_n|/\lambda_n^p \le |\hat{c}_n|$, hence
+	\begin{align*}
+		\phi_p(|\tilde{c}_n|) \le \phi_p(|\hat{c}_n|),
+	\end{align*}
+	The pair $\bigg(\tilde{N}, (\tilde{a}_n, \tilde{b}_n, \tilde{c}_n) \bigg)_{n = 1}^{\tilde{N}}$ with
+	\begin{align*}
+		\tilde{N} = \hat{N} \in \mathbb{N},\quad (\tilde{a}_n,\tilde{b}_n) \in \mathbb{S}^d, \quad \tilde{c}_n \in \mathbb{R}, \quad n = 1, \dots, \tilde{N},
+	\end{align*}
+	 admits smaller value. The statement holds. 
+\end{proof}
+
+In absence of Assumption \ref{pen1}, it is difficult to prove that a global optimizer exists. 
+For example for the penalty $ \phi(c) = |c|^q$, we have $\phi'(0) = \infty$, the weak-* l.s.c. of the cost functional breaks.
+However, assuming the local optimizer exists, we can still derive the necessary optimality condition. 
+
+\begin{corollary}[Optimality conditions for $\phi'(0^+) = +\infty$]                     
+\label{cor:singular_penalty}                                                                                                                                                                                                                
+Let $\Omega$ be compact and suppose $\phi$ satisfies Assumption~\ref{pen2} but with $\phi'(0^+) = +\infty$ in place of Assumption~\ref{pen1}                                                                                                
+(e.g., $\phi(z) = \frac{1}{q}z^q$ for $0 < q < 1$).                                                                                                                                                                                         
+If $\bar{\mu}$ is a local minimizer of \eqref{int_noncon} with atomic part                                                                                                                                                                  
+$\bar{\mu}_{\atom} = \sum_{n=1}^N \bar{c}_n\,\delta_{\bar{\omega}_n}$, $\bar{c}_n \neq 0$, then:
+\begin{enumerate}
+	\item Stationarity at each atom:
+	\[
+		\bar{p}(\bar{\omega}_n) = -\alpha\,\phi'(|\bar{c}_n|)\,\sign(\bar{c}_n),
+		\qquad n = 1, \dots, N.
+	\]
+
+	\item Lower bound on atom weights:
+	Since $\bar{p} \in C(\Omega)$ and $\Omega$ is compact,
+	$\|\bar{p}\|_{C(\Omega)} < \infty$.
+	Combined with (1), this gives
+	$\phi'(|\bar{c}_n|) = |\bar{p}(\bar{\omega}_n)|/\alpha \le \|\bar{p}\|_{C(\Omega)}/\alpha$
+	for every $n$. Since $\phi'$ is decreasing with $\phi'(0^+) = +\infty$,
+	inverting yields a uniform lower bound:
+	\[
+		|\bar{c}_n| \;\ge\; (\phi')^{-1}\!\Big(\frac{\|\bar{p}\|_{C(\Omega)}}{\alpha}\Big)
+		\;>\; 0,
+		\qquad n = 1, \dots, N.
+	\]
+	In particular, $\bar{\mu}$ has at most finitely many atoms:
+	$N \le \|\bar{\mu}\|_{M(\Omega)} \big/ \min_n |\bar{c}_n| < \infty$.
+\end{enumerate}
+\end{corollary}
+\begin{proof}
+(1) follows by the same directional derivative argument as in Theorem~\ref{opt_cdt}.
+For $\omega_n \in \atom\bar{\mu}$ with $\bar{\mu}(\{\omega_n\}) = \bar{c}_n \neq 0$,
+perturbing with $u = \pm\delta_{\omega_n}$ gives
+\[
+	\mp\,\bar{p}(\omega_n)
+	\;\le\; \alpha\,\lim_{\tau \to 0}\frac{1}{\tau}
+	\bigl[\phi(|\bar{c}_n \pm \tau|) - \phi(|\bar{c}_n|)\bigr]
+	\;=\; \pm\,\alpha\,\phi'(|\bar{c}_n|)\,\sign(\bar{c}_n),
+\]
+which yields equality. Note that $\phi'(|\bar{c}_n|) < \infty$ for $\bar{c}_n \neq 0$,
+so this step does not require $\phi'(0) < \infty$.
+
+\medskip\noindent
+(2): The dual variable $\bar{p} = \nabla L(\bar{\mu}) \in C(\Omega)$
+is continuous on the compact set $\Omega$, hence bounded:
+$\|\bar{p}\|_{C(\Omega)} < \infty$.
+By (1), $\phi'(|\bar{c}_n|) = |\bar{p}(\bar{\omega}_n)|/\alpha
+\le \|\bar{p}\|_{C(\Omega)}/\alpha$.
+Since $\phi'$ is strictly decreasing (by concavity of $\phi$) and
+$\phi'(0^+) = +\infty$, the function $\phi'$ restricted to $(0,\infty)$
+has a well-defined decreasing inverse, and
+\[
+	|\bar{c}_n| \;\ge\; (\phi')^{-1}\!\Big(\frac{\|\bar{p}\|_{C(\Omega)}}{\alpha}\Big)
+	\;=:\; c_{\min} \;>\; 0.
+\]
+The finiteness of the support then follows from the bounded total variation:
+$N \cdot c_{\min} \le \sum_{n=1}^N |\bar{c}_n| \le \|\bar{\mu}\|_{M(\Omega)} < \infty$.
+\end{proof}
+
+\begin{remark}
+Compared with Theorem~\ref{opt_cdt}:
+\begin{enumerate}
+	\item The global dual bound $|\bar{p}(\omega)| \le \alpha$ for all $\omega \in \Omega$
+	is \emph{lost}: for $\omega \notin \atom\bar{\mu}$, perturbing with
+	$u = \delta_\omega$ yields
+	$-\bar{p}(\omega) \le \alpha\,\phi'(0^+) = +\infty$, which is vacuous.
+	No constraint on $\bar{p}$ is obtained away from the support.
+	\item In exchange, the singularity $\phi'(0^+) = +\infty$ provides an
+	\emph{automatic minimum atom size} via (2), and finite support
+	follows without the merging argument of Theorem~5.2 or
+	the local strong concavity in Assumption~\ref{pen3}.
+	\item The zero measure $\mu = 0$ is always a local minimizer,
+	since adding any atom with small weight $|c| \ll 1$ incurs a
+	marginal penalty $\phi(|c|)/|c| \to +\infty$ that dominates the
+	potential decrease in the loss.
+	This means the node insertion criterion $|\bar{p}(\omega)| > \alpha$
+	of the greedy algorithm no longer applies.
+\end{enumerate}
+\end{remark}
+
+\begin{corollary}[Existence of minimizer for $\eqref{discrete nonconvex problem}$ with $\phi_p'(0^+) = +\infty$]
+\label{cor:discrete_existence}
+Suppose $\phi_p$ satisfies Assumption~\ref{pen2} with $\phi_p'(0^+) = +\infty$;
+$\sigma$ is continuous, the domain of $x$ $D$ is bounded. 
+Then the discrete problem $\eqref{discrete nonconvex problem}$ admits a global minimizer with at most $N_{\max}$ neurons with
+\[
+	N_{\max} = \frac{\|V\|_H^2}{2\,\alpha\,\phi_p(c_{\min})}, \qquad
+	c_{\min} = (\phi_p')^{-1}\!\bigg(\frac{\|V\|_H\;\sup_{\omega \in \mathbb{S}^d}\|\sigma(\cdot\,;\omega)\|_H}{\alpha}\bigg)
+\]
+\end{corollary}
+\begin{proof}\quad\\
+1. (Fixed $N$, existence by Weierstrass).
+For fixed $N$, the objective is a real-valued function on $(\mathbb{S}^d)^N \times \mathbb{R}^N$:
+\[
+	J(\omega, c) = \frac{1}{2} \int_D \bigg| V(x) - \sum_{n=1}^N c_n \sigma(a_n \cdot x + b_n) \bigg|^2 + \sum_{i=1}^d \bigg| \partial_{x_i} V(x) - \sum_{n=1}^N c_n \partial_{x_i} \sigma(a_n \cdot x + b_n) \bigg|^2 d\nu + \alpha \sum_{n=1}^N \phi_p(|c_n|).
+\]
+
+We verify $J$ is continuous in $(\omega, c)$.
+Since $\sigma$ is continuous and $\mathbb{S}^d \times \overline{D}$ is compact ($D$ bounded), both $\sigma(a \cdot x + b)$ and $\nabla_x \sigma(a \cdot x + b)$ are uniformly bounded on $\mathbb{S}^d \times \overline{D}$.
+For any convergent sequence $(\omega^k, c^k) \to (\omega, c)$, the integrand converges pointwise in $x$ and is dominated by $C(|V(x)|^2 + |\nabla V(x)|^2 + 1) \in L^1(D, \nu)$ with some constant $C$.
+By dominated convergence, the integral is continuous in $(\omega, c)$. Combined with the continuity of $\phi_p$, $J$ is continuous.
+
+Since $\phi_p(z) \to \infty$ as $z \to \infty$ (Assumption~\ref{pen2}) and $J \ge 0$, any minimizing sequence is bounded.
+Furthermore, since taking $c = 0$ is feasible and the penalty is non-negative, we have
+\begin{equation*}
+	L(\omega^*, c^*) \le J(\omega^*, c^*) \le J(\omega, 0) = L(0) = \frac{1}{2}\|V\|_H^2,
+\end{equation*}
+Therefore,
+\begin{equation*}
+	\sum_{n = 1}^N \phi_p(|c_n^*|) \le \frac{1}{2\alpha}\|V\|_H^2
+\end{equation*} 
+The minimizing sequence lies in $(\mathbb{S}^d)^N \times [-R, R]^N$ for some $R > 0$, which is compact. By Weierstrass, $J$ attains its minimum for each $N$.
+
+\medskip\noindent
+2. (Uniform bound on $N$).
+Let $(\omega^*, c^*)$ be a minimizer for $N$ neurons with all $c_n^* \neq 0$. The stationarity condition in $c_n$ gives $|p(\omega_n^*)| = \alpha\,\phi_p'(|c_n^*|)$, where $p(\omega) = \langle \mathcal{N}_{\omega^*, c^*} - V,\, \sigma(\cdot\,;\omega)\rangle_H$.
+By Cauchy--Schwarz:
+\[
+	\alpha\,\phi_p'(|c_n^*|) = |p(\omega_n^*)| \le \|\mathcal{N}_{\omega^*, c^*} - V\|_H \;\|\sigma(\cdot\,;\omega_n^*)\|_H \le \|V\|_H\;\sup_{\omega \in \mathbb{S}^d}\|\sigma(\cdot\,;\omega)\|_H.
+\]
+Since $\phi_p'$ is decreasing with $\phi_p'(0^+) = +\infty$ we can define $c_{\min}$ with
+\begin{equation*}
+	c_{\min} := (\phi_p')^{-1}\!\bigg(\frac{\|V\|_H\;\sup_{\omega \in \mathbb{S}^d}\|\sigma(\cdot\,;\omega)\|_H}{\alpha}\bigg),
+\end{equation*}
+with $|c_n^*| \ge c_{\min} > 0$.
+Hence $N\,\phi_p(c_{\min}) \le \sum \phi_p(|c_n^*|) \le \frac{1}{2\alpha}\|V\|_H^2$, giving $N \le N_{\max}$.
+
+For $N > N_{\max}$, any $N$-neuron minimizer must have some $c_n = 0$, reducing to an $N'$-neuron solution with $N' \le N_{\max}$.
+Therefore $\inf_N J_N^* = J_{N_{\max}}^*$, which is attained by Step~1.
+\end{proof}
 
 
 
 \section{algorithms}
 In this section, we introduce the optimization algorithm. In the first step, we generate the data for training and validation. In the second step, we insert neurons. And finally we trained the network with nonconvex penalty to get a sparse network. The process is repeated a fixed time. 
 
-\subsection{generate data via open loop problem}
+\subsection{Generate Data via Open Loop Problem}
 We come back to the original problem (\ref{opt}), the problem can be written as 
 \begin{align*}
 	&  \inf_{u, y} J(y, u)\\
@@ -1204,10 +1195,7 @@ $p^*$ can be calculated by (\ref{adjoint equation}) and integration by parts:
 For the implemented data-driven approach, it is essential to have the causality-free initial dataset $\{x^j, V(0, x^j), \nabla V(0, x^j)\}_{j = 1}^N$, where by causality-free we mean the sample are generated without approximated valuation at nearby points. \cite{kang2021algorithms} provides a comprehensive survey about generating the initial dataset. In \cite{azmi2021optimal} an adjoint approach is used to compute the optimal value and the reduced gradient (Barzilai-Borwein updates). 
 
 
-
-
-
-\subsection{greedy insertion}
+\subsection{Greedy Insertion}
 In \cite{bach2017breaking}, a conditional gradient algorithm for finitely many samples is presented. 
 To avoid the constraint, like in \cite{pieper2022nonconvex} we implement the stereographic projection for the ReLU activation function:
 \begin{align*}
@@ -1229,7 +1217,7 @@ In each iteration $f_t$, we calculate $\bar{f}_t$ such that
 To find the global maximal is a NP-hard problem. However heuristic approaches are available for greedy insertion.
 
 
-\subsection{nonconvex penalized algorithm}
+\subsection{Nonconvex Penalized Algorithm}
 We present two variants of the iterative node insertion and optimization algorithm, adapted from \cite{pieper2022nonconvex}.
 The first handles penalties $\phi$ satisfying Assumption~\ref{pen1} (in particular the log-penalty $\phi_{\log, \gamma}$),
 where the insertion criterion is the necessary optimality condition from Theorem~\ref{opt_cdt}:
@@ -1307,7 +1295,7 @@ and is used directly as the initial outer weight.
 
 
 \section{numerical Example}
-\subsection{Van der Pol  oscillator}
+\subsection{Van der Pol Oscillator}
 In this example we consider the Van der Pol equation. 
 We consider the optimal control of the Van der Pol oscillator expressed as
 \[
@@ -1359,7 +1347,7 @@ The optimization yields the dataset $\{x^k, V(x^k), \nabla V(x^k)\}_{k=1}^K$, wh
 \label{fig:vdp_data}
 \end{figure}
 
-\subsection{Experiment results}
+\subsection{Experiment Results}
 
 We solve the open-loop problem on a $30 \times 30$ grid over $[-3,3]^2$ ($K = 900$ data points).
 All experiments run 10 outer iterations, inserting up to 50 neurons per iteration and pruning neurons with $|c| < 10^{-5}$.
@@ -1731,7 +1719,3 @@ The $p = 3$ network achieves the sparsest representation with only 29 active neu
 \bibliographystyle{plain}
 \bibliography{ref.bib}
 \end{document}
-
-
-
-
